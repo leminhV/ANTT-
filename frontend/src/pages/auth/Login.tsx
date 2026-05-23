@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
 import { Shield, AlertCircle, User, Lock, Eye, EyeOff } from "lucide-react";
-import { ImageWithFallback } from "../../components/figma/./figma/ImageWithFallback";
+import { authService } from "../../services";
+import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 
 export function Login() {
   const navigate = useNavigate();
@@ -11,23 +12,30 @@ export function Login() {
   const [error, setError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(false);
     
-    setTimeout(() => {
-      setIsLoading(false);
-      // Simulate generic error on first try, then login
-      if (email === "student@vju.ac.vn" && password === "password") {
-        localStorage.setItem("userRole", "student");
-        navigate("/student-dashboard");
-      } else if (email === "admin@vju.ac.vn" && password === "password") {
-        localStorage.setItem("userRole", "admin");
+    try {
+      const response = await authService.login({ email, password });
+      const { access_token, user } = response.data;
+      
+      authService.saveToken(access_token);
+      localStorage.setItem("userRole", user.role.toLowerCase());
+      localStorage.setItem("user", JSON.stringify(user));
+      
+      if (user.role === "ADMIN") {
         navigate("/admin-dashboard");
       } else {
-        setError(true);
+        navigate("/student-dashboard");
       }
-    }, 800);
+    } catch (err) {
+      console.error(err);
+      setError(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

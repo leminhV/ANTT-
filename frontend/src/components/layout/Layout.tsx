@@ -1,14 +1,16 @@
 import { Outlet, NavLink, useLocation, useNavigate } from "react-router";
 import { LayoutDashboard, Calendar, Box, LogOut, Search, Bell, Settings, FileText, Server, Users, ChevronDown, BarChart2 } from "lucide-react";
 import clsx from "clsx";
+import { authService } from "../../services";
 
 export function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // Use localStorage to remember if user logged in as admin or student.
-  // Fallback to path checking if accessed directly without logging in.
-  const storedRole = localStorage.getItem("userRole");
+  // Read user from localStorage
+  const userStr = localStorage.getItem("user");
+  const user = userStr ? JSON.parse(userStr) : null;
+  const storedRole = localStorage.getItem("userRole") || (user?.role?.toLowerCase());
   const isAdminPath = ["/admin-dashboard", "/approvals", "/resources", "/users", "/reports"].includes(location.pathname);
   const isAdmin = storedRole === "admin" || (!storedRole && isAdminPath);
 
@@ -67,20 +69,20 @@ export function Layout() {
         <div className="p-4 border-t border-[#E0E0E0]">
           <div className="flex items-center gap-3 mb-4 px-2">
             <div className="w-10 h-10 rounded-full bg-[#D6E4F7] text-[#1E5FA5] flex items-center justify-center font-bold">
-              {isAdmin ? "AD" : "SV"}
+              {user ? user.name.substring(0, 2).toUpperCase() : (isAdmin ? "AD" : "SV")}
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-[14px] font-semibold text-[#212121] truncate">
-                {isAdmin ? "Admin System" : "Nguyễn Văn A"}
+                {user ? user.name : (isAdmin ? "Admin System" : "Nguyễn Văn A")}
               </div>
               <div className="text-[12px] text-[#757575] truncate">
-                {isAdmin ? "admin@vju.ac.vn" : "student@vju.ac.vn"}
+                {user ? user.email : (isAdmin ? "admin@vju.ac.vn" : "student@vju.ac.vn")}
               </div>
             </div>
           </div>
           <button 
             onClick={() => {
-              localStorage.removeItem("userRole");
+              authService.logout();
               navigate("/");
             }}
             className="w-full flex items-center gap-2 px-2 py-2 text-[14px] text-[#C62828] hover:bg-[#F5F5F5] rounded-md transition-colors font-medium"

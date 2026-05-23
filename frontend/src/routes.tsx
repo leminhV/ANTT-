@@ -13,9 +13,16 @@ import { ResourceManagement } from "./pages/chemicals/ResourceManagement";
 import { Reports } from "./pages/reports/Reports";
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
 
+import { ProtectedRoute } from "./components/auth/ProtectedRoute";
+
 export const router = createBrowserRouter([
   {
     path: "/",
+    Component: Login,
+    errorElement: <ErrorBoundary />,
+  },
+  {
+    path: "/login",
     Component: Login,
     errorElement: <ErrorBoundary />,
   },
@@ -25,19 +32,26 @@ export const router = createBrowserRouter([
     errorElement: <ErrorBoundary />,
   },
   {
+    // General protected routes
     path: "/",
-    Component: Layout,
+    Component: ProtectedRoute,
     errorElement: <ErrorBoundary />,
     children: [
-      { path: "student-dashboard", Component: DashboardStudent },
-      { path: "admin-dashboard", Component: DashboardAdmin },
-      { path: "calendar", Component: CalendarView },
-      { path: "my-bookings", Component: MyBookings },
-      { path: "approvals", Component: Approvals },
-      { path: "users", Component: Users },
-      { path: "devices", Component: DeviceManagement },
-      { path: "resources", Component: ResourceManagement },
-      { path: "reports", Component: Reports },
+      {
+        path: "/",
+        Component: Layout,
+        children: [
+          { path: "student-dashboard", Component: DashboardStudent },
+          { path: "admin-dashboard", Component: DashboardAdmin },
+          { path: "calendar", Component: CalendarView },
+          { path: "my-bookings", Component: MyBookings },
+          { path: "approvals", Component: Approvals },
+          { path: "users", Component: Users },
+          { path: "devices", Component: DeviceManagement },
+          { path: "resources", Component: ResourceManagement },
+          { path: "reports", Component: Reports },
+        ],
+      },
     ],
   },
 ]);

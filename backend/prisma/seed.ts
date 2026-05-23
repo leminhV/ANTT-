@@ -1,17 +1,22 @@
 import { PrismaClient } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('Seeding database...');
 
+  const hashedAdminPassword = await bcrypt.hash('password', 10);
+  const hashedHoangPassword = await bcrypt.hash('hoang281@', 10);
+  const hashedStudentPassword = await bcrypt.hash('password', 10);
+
   // Create admin user
   const admin = await prisma.user.upsert({
     where: { email: 'admin@vju.ac.vn' },
-    update: {},
+    update: { password: hashedAdminPassword },
     create: {
       email: 'admin@vju.ac.vn',
-      password: 'hashed_password_here', // We will hash passwords in Phase 2
+      password: hashedAdminPassword,
       name: 'System Admin',
       role: 'ADMIN',
     },
@@ -20,10 +25,10 @@ async function main() {
   // Create Hoàng Admin user
   const hoangAdmin = await prisma.user.upsert({
     where: { email: 'hoang@vju.ac.vn' },
-    update: {},
+    update: { password: hashedHoangPassword },
     create: {
       email: 'hoang@vju.ac.vn',
-      password: 'hoang281@',
+      password: hashedHoangPassword,
       name: 'Hoàng',
       role: 'ADMIN',
     },
@@ -32,10 +37,10 @@ async function main() {
   // Create student user
   const student = await prisma.user.upsert({
     where: { email: 'student@vju.ac.vn' },
-    update: {},
+    update: { password: hashedStudentPassword },
     create: {
       email: 'student@vju.ac.vn',
-      password: 'hashed_password_here',
+      password: hashedStudentPassword,
       name: 'Nguyen Van A',
       role: 'STUDENT',
     },
@@ -44,10 +49,10 @@ async function main() {
   // Create instructor user
   const instructor = await prisma.user.upsert({
     where: { email: 'instructor@vju.ac.vn' },
-    update: {},
+    update: { password: hashedStudentPassword },
     create: {
       email: 'instructor@vju.ac.vn',
-      password: 'hashed_password_here',
+      password: hashedStudentPassword,
       name: 'Le Thi B',
       role: 'INSTRUCTOR',
     },

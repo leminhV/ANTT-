@@ -1,47 +1,128 @@
-import { useState } from "react";
-import { ChevronLeft, ChevronRight, Lock, Clock, Calendar, Search, Filter, Plus, Info } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, Lock, Clock, Calendar, Search, Filter, Plus, Info, X } from "lucide-react";
+import { bookingService, roomService } from "../../services";
+import { format, startOfWeek, addDays, getHours, getDay, differenceInHours, isSameDay, parseISO } from "date-fns";
 
 const HOURS = Array.from({ length: 16 }, (_, i) => i + 7); // 07:00 to 22:00
-const DAYS = [
-  { name: "T2", date: "23/10" },
-  { name: "T3", date: "24/10" },
-  { name: "T4", date: "25/10" },
-  { name: "T5", date: "26/10" },
-  { name: "T6", date: "27/10" },
-  { name: "T7", date: "28/10" },
-  { name: "CN", date: "29/10" },
-];
-
-// Giả lập dữ liệu Booking
-// Tương ứng trạng thái: 
-// - locked: Pessimistic Locked (Màu xám + Ổ khóa)
-// - pending: Pending approval (Màu vàng nhạt)
-// - approved: Đã duyệt (Màu xanh dương - của user)
-const MOCK_BOOKINGS: Record<string, { type: "locked" | "pending" | "approved"; title?: string; duration?: number }> = {
-  "0-8": { type: "locked", duration: 2 },
-  "0-9": { type: "locked" }, // spanned
-  "1-14": { type: "pending", title: "Thực hành Hóa học", duration: 3 },
-  "1-15": { type: "pending" }, // spanned
-  "1-16": { type: "pending" }, // spanned
-  "2-10": { type: "approved", title: "Lab IoT - Ca sáng", duration: 2 },
-  "2-11": { type: "approved" }, // spanned
-  "4-9": { type: "locked", duration: 1 },
-  "4-13": { type: "locked", duration: 2 },
-  "4-14": { type: "locked" }, // spanned
-};
 
 export function CalendarView() {
-  const [selectedRooms, setSelectedRooms] = useState<string[]>(["lab-iot", "lab-ai"]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [rooms, setRooms] = useState<any[]>([]);
+  const [selectedRooms, setSelectedRooms] = useState<number[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   
-  const toggleRoom = (id: string) => {
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    purpose: "",
+    date: format(new Date(), "yyyy-MM-dd"),
+    startTime: "08:00",
+    duration: "2",
+    room_id: "",
+  });
+
+  const currentUserStr = localStorage.getItem("user");
+  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    try {
+      const [bookingsRes, roomsRes] = await Promise.all([
+        bookingService.getAll(),
+        roomService.getAll()
+      ]);
+      setBookings(bookingsRes.data || []);
+      setRooms(roomsRes.data || []);
+      if (roomsRes.data && roomsRes.data.length > 0) {
+        setSelectedRooms(roomsRes.data.map((r: any) => r.id));
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải dữ liệu", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const toggleRoom = (id: number) => {
     setSelectedRooms(prev => 
       prev.includes(id) ? prev.filter(r => r !== id) : [...prev, id]
     );
   };
 
+  const startOfCurrentWeek = startOfWeek(currentDate, { weekStartsOn: 1 }); // Monday
+  const DAYS = Array.from({ length: 7 }).map((_, i) => {
+    const d = addDays(startOfCurrentWeek, i);
+    const dayNames = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
+    return { name: dayNames[getDay(d)], date: format(d, "dd/MM"), fullDate: d };
+  });
+
+  // Chuyển đổi bookings thành Record để render
+  const gridBookings: Record<string, any> = {};
+  
+  bookings.forEach(b => {
+    if (b.status === "REJECTED") return;
+    if (!selectedRooms.includes(b.room_id)) return;
+
+    const start = new Date(b.start_time);
+    const end = new Date(b.end_time);
+    
+    // Check if it falls in the current week view
+    DAYS.forEach((day, dayIdx) => {
+      if (isSameDay(start, day.fullDate)) {
+        const startHour = getHours(start);
+        const duration = differenceInHours(end, start) || 1;
+        
+        let type = "locked";
+        if (b.status === "PENDING") {
+          type = currentUser && b.user_id === currentUser.id ? "pending" : "locked";
+        } else if (b.status === "APPROVED") {
+          type = currentUser && b.user_id === currentUser.id ? "approved" : "locked";
+        }
+
+        // Fill slots
+        for (let i = 0; i < duration; i++) {
+          const h = startHour + i;
+          if (h >= 7 && h <= 22) {
+            gridBookings[`${dayIdx}-${h}`] = {
+              type,
+              title: b.purpose,
+              duration: i === 0 ? duration : undefined, // Only first cell has title and duration
+              isTail: i > 0
+            };
+          }
+        }
+      }
+    });
+  });
+
   const getSlot = (dayIdx: number, hour: number) => {
-    return MOCK_BOOKINGS[`${dayIdx}-${hour}`];
+    return gridBookings[`${dayIdx}-${hour}`];
+  };
+
+  const handleCreateBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const startDate = new Date(`${formData.date}T${formData.startTime}:00`);
+      const endDate = new Date(startDate.getTime() + parseInt(formData.duration) * 60 * 60 * 1000);
+      
+      await bookingService.create({
+        purpose: formData.purpose,
+        room_id: parseInt(formData.room_id),
+        start_time: startDate.toISOString(),
+        end_time: endDate.toISOString(),
+      });
+      
+      alert("Đặt phòng thành công! Đang chờ duyệt.");
+      setIsModalOpen(false);
+      fetchData();
+    } catch (error: any) {
+      alert(error.response?.data?.message || "Lỗi đặt phòng. Có thể bị trùng lịch.");
+    }
   };
 
   return (
@@ -49,7 +130,10 @@ export function CalendarView() {
       
       {/* Lọc & Cài đặt (Left Sidebar) - 260px */}
       <div className="w-full md:w-[260px] flex flex-col gap-6 flex-shrink-0">
-        <button className="w-full bg-[#1E5FA5] hover:bg-[#154a85] text-white py-3 px-4 rounded-lg font-bold transition-colors flex items-center justify-center gap-2 shadow-sm text-[14px]">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="w-full bg-[#1E5FA5] hover:bg-[#154a85] text-white py-3 px-4 rounded-lg font-bold transition-colors flex items-center justify-center gap-2 shadow-sm text-[14px]"
+        >
           <Plus className="w-5 h-5" /> Đặt phòng / Thiết bị
         </button>
 
@@ -65,22 +149,8 @@ export function CalendarView() {
             {/* Lọc theo Phòng */}
             <div className="space-y-3">
               <h4 className="text-[13px] font-bold text-[#212121] uppercase tracking-wide">Phòng Lab</h4>
-              <div className="relative mb-3">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#757575]" />
-                <input 
-                  type="text" 
-                  placeholder="Tìm tên phòng..." 
-                  className="w-full pl-9 pr-3 py-2 bg-[#F5F5F5] border-transparent rounded text-[13px] focus:outline-none focus:ring-1 focus:ring-[#1E5FA5] transition-shadow"
-                />
-              </div>
               <div className="space-y-2">
-                {[
-                  { id: "lab-iot", label: "Lab IoT & Robotics" },
-                  { id: "lab-ai", label: "Lab AI & Máy học" },
-                  { id: "x3d", label: "Xưởng in 3D" },
-                  { id: "hoa-sinh", label: "Phòng Thực hành Hóa Sinh" },
-                  { id: "mang", label: "Phòng Thực hành Mạng" },
-                ].map((room) => (
+                {rooms.map((room) => (
                   <label key={room.id} className="flex items-center gap-3 cursor-pointer group">
                     <input 
                       type="checkbox" 
@@ -88,35 +158,11 @@ export function CalendarView() {
                       onChange={() => toggleRoom(room.id)}
                       className="w-4 h-4 rounded border-[#E0E0E0] text-[#1E5FA5] focus:ring-[#1E5FA5]"
                     />
-                    <span className="text-[13px] text-[#212121] group-hover:text-[#1E5FA5] transition-colors">{room.label}</span>
+                    <span className="text-[13px] text-[#212121] group-hover:text-[#1E5FA5] transition-colors">{room.name}</span>
                   </label>
                 ))}
               </div>
             </div>
-
-            <div className="h-px bg-[#E0E0E0]"></div>
-
-            {/* Lọc theo Loại Thiết bị */}
-            <div className="space-y-3">
-              <h4 className="text-[13px] font-bold text-[#212121] uppercase tracking-wide">Thiết bị đi kèm</h4>
-              <div className="space-y-2">
-                {[
-                  { id: "may-tinh", label: "Máy tính hiệu năng cao" },
-                  { id: "cam-bien", label: "Bộ Kit Cảm biến" },
-                  { id: "kinh-hien-vi", label: "Kính hiển vi điện tử" },
-                  { id: "dong-ho-do", label: "Đồng hồ đo điện" },
-                ].map((cat) => (
-                  <label key={cat.id} className="flex items-center gap-3 cursor-pointer group">
-                    <input 
-                      type="checkbox" 
-                      className="w-4 h-4 rounded border-[#E0E0E0] text-[#1E5FA5] focus:ring-[#1E5FA5]"
-                    />
-                    <span className="text-[13px] text-[#212121] group-hover:text-[#1E5FA5] transition-colors">{cat.label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
           </div>
         </div>
 
@@ -134,7 +180,7 @@ export function CalendarView() {
             </div>
             <div className="flex items-center gap-3">
               <div className="w-4 h-4 bg-[#FFF8E1] border border-[#FFE082] rounded-sm"></div>
-              <span className="text-[13px] text-[#757575]">Đang chờ duyệt (Pending)</span>
+              <span className="text-[13px] text-[#757575]">Đang chờ duyệt của bạn</span>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-4 h-4 bg-[#D6E4F7] border border-[#1E5FA5] rounded-sm"></div>
@@ -154,20 +200,28 @@ export function CalendarView() {
               <Calendar className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-[18px] font-bold text-[#212121]">23 - 29 Tháng 10, 2023</h2>
-              <p className="text-[12px] text-[#757575] font-medium">Học kỳ 1 • Tuần 8</p>
+              <h2 className="text-[18px] font-bold text-[#212121]">{format(startOfCurrentWeek, "dd/MM/yyyy")} - {format(addDays(startOfCurrentWeek, 6), "dd/MM/yyyy")}</h2>
             </div>
           </div>
           
           <div className="flex items-center gap-2">
-            <button className="px-3 py-1.5 text-[13px] font-bold text-[#757575] bg-white border border-[#E0E0E0] hover:bg-[#F5F5F5] hover:text-[#212121] rounded transition-colors">
+            <button 
+              onClick={() => setCurrentDate(new Date())}
+              className="px-3 py-1.5 text-[13px] font-bold text-[#757575] bg-white border border-[#E0E0E0] hover:bg-[#F5F5F5] hover:text-[#212121] rounded transition-colors"
+            >
               Hôm nay
             </button>
             <div className="w-px h-6 bg-[#E0E0E0] mx-1"></div>
-            <button className="p-1.5 text-[#757575] border border-[#E0E0E0] hover:bg-[#F5F5F5] hover:text-[#212121] rounded transition-colors">
+            <button 
+              onClick={() => setCurrentDate(addDays(currentDate, -7))}
+              className="p-1.5 text-[#757575] border border-[#E0E0E0] hover:bg-[#F5F5F5] hover:text-[#212121] rounded transition-colors"
+            >
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <button className="p-1.5 text-[#757575] border border-[#E0E0E0] hover:bg-[#F5F5F5] hover:text-[#212121] rounded transition-colors">
+            <button 
+              onClick={() => setCurrentDate(addDays(currentDate, 7))}
+              className="p-1.5 text-[#757575] border border-[#E0E0E0] hover:bg-[#F5F5F5] hover:text-[#212121] rounded transition-colors"
+            >
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
@@ -182,12 +236,15 @@ export function CalendarView() {
               <div className="p-3 border-r border-[#E0E0E0] flex items-center justify-center">
                 <Clock className="w-4 h-4 text-[#9E9E9E]" />
               </div>
-              {DAYS.map((d, i) => (
-                <div key={i} className={`p-3 border-r border-[#E0E0E0] text-center ${i === 2 ? 'bg-[#D6E4F7]/30' : ''}`}>
-                  <div className={`text-[14px] font-bold ${i === 2 ? 'text-[#1E5FA5]' : 'text-[#212121]'}`}>{d.name}</div>
-                  <div className={`text-[12px] mt-0.5 ${i === 2 ? 'text-[#1E5FA5] font-semibold' : 'text-[#757575]'}`}>{d.date}</div>
-                </div>
-              ))}
+              {DAYS.map((d, i) => {
+                const isToday = isSameDay(d.fullDate, new Date());
+                return (
+                  <div key={i} className={`p-3 border-r border-[#E0E0E0] text-center ${isToday ? 'bg-[#D6E4F7]/30' : ''}`}>
+                    <div className={`text-[14px] font-bold ${isToday ? 'text-[#1E5FA5]' : 'text-[#212121]'}`}>{d.name}</div>
+                    <div className={`text-[12px] mt-0.5 ${isToday ? 'text-[#1E5FA5] font-semibold' : 'text-[#757575]'}`}>{d.date}</div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Time Slots */}
@@ -203,8 +260,6 @@ export function CalendarView() {
                   {DAYS.map((_, dayIdx) => {
                     const slot = getSlot(dayIdx, hour);
                     
-                    // If it's a spanned slot (has type but no title/duration -> it's the tail of a previous block)
-                    // In a real app we'd absolutely position these, but for a grid we just visually style the cell.
                     let cellClasses = "border-b border-r border-[#E0E0E0] transition-colors relative h-[60px] p-1 ";
                     let content = null;
 
@@ -221,7 +276,7 @@ export function CalendarView() {
                         );
                       }
                     } else if (slot.type === "pending") {
-                      cellClasses += "bg-[#FFF8E1] border-l-4 border-l-[#FFC107] cursor-not-allowed";
+                      cellClasses += "bg-[#FFF8E1] border-l-4 border-l-[#FFC107] cursor-pointer";
                       if (slot.duration) {
                         content = (
                           <div className="w-full h-full p-1 overflow-hidden">
@@ -244,11 +299,19 @@ export function CalendarView() {
                       }
                     }
 
-                    // Remove right border for the last item
                     if (dayIdx === 6) cellClasses = cellClasses.replace("border-r", "");
 
                     return (
-                      <div key={dayIdx} className={cellClasses}>
+                      <div 
+                        key={dayIdx} 
+                        className={cellClasses} 
+                        onClick={() => {
+                          if (!slot) {
+                            setFormData(prev => ({ ...prev, date: format(DAYS[dayIdx].fullDate, "yyyy-MM-dd"), startTime: `${hour.toString().padStart(2, '0')}:00` }));
+                            setIsModalOpen(true);
+                          }
+                        }}
+                      >
                         {content}
                       </div>
                     );
@@ -261,6 +324,101 @@ export function CalendarView() {
         </div>
       </div>
 
+      {/* Booking Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-4 border-b border-[#E0E0E0] flex justify-between items-center bg-[#FAFAFA]">
+              <h3 className="font-bold text-[#212121] text-[16px]">Đặt phòng / Thiết bị</h3>
+              <button onClick={() => setIsModalOpen(false)} className="p-1.5 text-[#757575] hover:bg-[#E0E0E0] rounded transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateBooking} className="p-6 space-y-4">
+              <div>
+                <label className="block text-[13px] font-medium text-[#757575] mb-1">Mục đích sử dụng <span className="text-red-500">*</span></label>
+                <input 
+                  required
+                  type="text" 
+                  value={formData.purpose}
+                  onChange={e => setFormData({...formData, purpose: e.target.value})}
+                  placeholder="VD: Thực hành Hóa vô cơ..." 
+                  className="w-full px-3 py-2 border border-[#E0E0E0] rounded-md text-[14px] focus:outline-none focus:border-[#1E5FA5] focus:ring-1 focus:ring-[#1E5FA5]"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-[13px] font-medium text-[#757575] mb-1">Chọn phòng Lab <span className="text-red-500">*</span></label>
+                <select 
+                  required
+                  value={formData.room_id}
+                  onChange={e => setFormData({...formData, room_id: e.target.value})}
+                  className="w-full px-3 py-2 border border-[#E0E0E0] rounded-md text-[14px] focus:outline-none focus:border-[#1E5FA5] focus:ring-1 focus:ring-[#1E5FA5]"
+                >
+                  <option value="">-- Chọn phòng --</option>
+                  {rooms.map(r => (
+                    <option key={r.id} value={r.id}>{r.name} (Sức chứa: {r.capacity})</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[13px] font-medium text-[#757575] mb-1">Ngày <span className="text-red-500">*</span></label>
+                  <input 
+                    required
+                    type="date" 
+                    value={formData.date}
+                    onChange={e => setFormData({...formData, date: e.target.value})}
+                    className="w-full px-3 py-2 border border-[#E0E0E0] rounded-md text-[14px] focus:outline-none focus:border-[#1E5FA5]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-medium text-[#757575] mb-1">Giờ bắt đầu <span className="text-red-500">*</span></label>
+                  <input 
+                    required
+                    type="time" 
+                    value={formData.startTime}
+                    onChange={e => setFormData({...formData, startTime: e.target.value})}
+                    className="w-full px-3 py-2 border border-[#E0E0E0] rounded-md text-[14px] focus:outline-none focus:border-[#1E5FA5]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[13px] font-medium text-[#757575] mb-1">Thời lượng (Giờ) <span className="text-red-500">*</span></label>
+                <select 
+                  value={formData.duration}
+                  onChange={e => setFormData({...formData, duration: e.target.value})}
+                  className="w-full px-3 py-2 border border-[#E0E0E0] rounded-md text-[14px] focus:outline-none focus:border-[#1E5FA5]"
+                >
+                  <option value="1">1 giờ</option>
+                  <option value="2">2 giờ</option>
+                  <option value="3">3 giờ</option>
+                  <option value="4">4 giờ</option>
+                  <option value="5">5 giờ</option>
+                </select>
+              </div>
+
+              <div className="pt-4 flex justify-end gap-3 border-t border-[#E0E0E0]">
+                <button 
+                  type="button" 
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 text-[14px] font-medium text-[#757575] hover:bg-[#F5F5F5] rounded-md transition-colors"
+                >
+                  Hủy
+                </button>
+                <button 
+                  type="submit" 
+                  className="px-4 py-2 text-[14px] font-bold text-white bg-[#1E5FA5] hover:bg-[#154a85] rounded-md transition-colors"
+                >
+                  Xác nhận đặt
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
