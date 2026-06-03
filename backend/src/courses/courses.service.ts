@@ -33,7 +33,10 @@ export class CoursesService {
     return this.prisma.course.create({ data });
   }
 
-  async update(id: number, data: { code?: string; name?: string; instructor_id?: number }) {
+  async update(
+    id: number,
+    data: { code?: string; name?: string; instructor_id?: number },
+  ) {
     await this.findOne(id);
     return this.prisma.course.update({
       where: { id },

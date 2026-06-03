@@ -1,12 +1,12 @@
-import { 
-  Controller, 
-  Get, 
-  Post, 
-  Body, 
-  Patch, 
-  Param, 
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
   Delete,
-  UseGuards
+  UseGuards,
 } from '@nestjs/common';
 import { CoursesService } from './courses.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -24,7 +24,9 @@ export class CoursesController {
   @Post()
   @UseGuards(ThrottlerGuard) // Bổ sung Rate Limit riêng tránh spam tạo khóa học
   @Roles(Role.ADMIN, Role.INSTRUCTOR) // Chỉ Admin hoặc Giảng viên mới được tạo
-  create(@Body() createData: { code: string; name: string; instructor_id: number }) {
+  create(
+    @Body() createData: { code: string; name: string; instructor_id: number },
+  ) {
     return this.coursesService.create(createData);
   }
 
@@ -42,7 +44,11 @@ export class CoursesController {
 
   @Patch(':id')
   @Roles(Role.ADMIN, Role.INSTRUCTOR)
-  update(@Param('id') id: string, @Body() updateData: { code?: string; name?: string; instructor_id?: number }) {
+  update(
+    @Param('id') id: string,
+    @Body()
+    updateData: { code?: string; name?: string; instructor_id?: number },
+  ) {
     return this.coursesService.update(+id, updateData);
   }
 

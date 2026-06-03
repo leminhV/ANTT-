@@ -1,3 +1,4 @@
+import { UserPayload } from '../auth/interfaces/user-payload.interface';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCheckInDto } from './dto/create-check-in.dto';
 import { UpdateCheckInDto } from './dto/update-check-in.dto';
@@ -10,7 +11,7 @@ export class CheckInService {
 
   async create(createCheckInDto: CreateCheckInDto, userId: number) {
     const { check_in, ...rest } = createCheckInDto;
-    return (this.prisma as any).checkInRecord.create({
+    return this.prisma.checkInRecord.create({
       data: {
         ...rest,
         user_id: userId,
@@ -20,7 +21,7 @@ export class CheckInService {
   }
 
   async findAll() {
-    return (this.prisma as any).checkInRecord.findMany({
+    return this.prisma.checkInRecord.findMany({
       include: {
         user: { select: { id: true, name: true, email: true } },
         equipment: { select: { id: true, name: true } },
@@ -32,7 +33,7 @@ export class CheckInService {
   }
 
   async getActiveRecords() {
-    return (this.prisma as any).checkInRecord.findMany({
+    return this.prisma.checkInRecord.findMany({
       where: { status: 'ACTIVE' },
       include: {
         user: { select: { id: true, name: true, email: true } },
@@ -45,7 +46,7 @@ export class CheckInService {
   }
 
   async getUserHistory(userId: number) {
-    return (this.prisma as any).checkInRecord.findMany({
+    return this.prisma.checkInRecord.findMany({
       where: { user_id: userId },
       include: {
         equipment: { select: { id: true, name: true } },
@@ -57,7 +58,7 @@ export class CheckInService {
   }
 
   async findOne(id: number) {
-    const record = await (this.prisma as any).checkInRecord.findUnique({
+    const record = await this.prisma.checkInRecord.findUnique({
       where: { id },
       include: {
         user: { select: { id: true, name: true, email: true } },
@@ -68,24 +69,30 @@ export class CheckInService {
     });
 
     if (!record) {
-      throw new NotFoundException(`Bản ghi Check-in với ID ${id} không tồn tại`);
+      throw new NotFoundException(
+        `Bản ghi Check-in với ID ${id} không tồn tại`,
+      );
     }
 
     return record;
   }
 
-  async findOneSecure(id: number, currentUser: any) {
+  async findOneSecure(id: number, currentUser: UserPayload) {
     const record = await this.findOne(id);
     checkOwnership(record.user_id, currentUser);
     return record;
   }
 
-  async update(id: number, updateCheckInDto: UpdateCheckInDto, currentUser: any) {
+  async update(
+    id: number,
+    updateCheckInDto: UpdateCheckInDto,
+    currentUser: UserPayload,
+  ) {
     await this.findOneSecure(id, currentUser);
 
     const { check_in, check_out, ...rest } = updateCheckInDto;
 
-    return (this.prisma as any).checkInRecord.update({
+    return this.prisma.checkInRecord.update({
       where: { id },
       data: {
         ...rest,
@@ -95,9 +102,9 @@ export class CheckInService {
     });
   }
 
-  async checkOut(id: number, currentUser: any) {
+  async checkOut(id: number, currentUser: UserPayload) {
     await this.findOneSecure(id, currentUser);
-    return (this.prisma as any).checkInRecord.update({
+    return this.prisma.checkInRecord.update({
       where: { id },
       data: {
         status: 'COMPLETED',
@@ -108,7 +115,7 @@ export class CheckInService {
 
   async remove(id: number) {
     await this.findOne(id);
-    return (this.prisma as any).checkInRecord.delete({
+    return this.prisma.checkInRecord.delete({
       where: { id },
     });
   }

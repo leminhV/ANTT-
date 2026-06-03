@@ -1,4 +1,11 @@
-import { IsString, IsNumber, IsOptional, MaxLength, IsDateString, Min } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  MaxLength,
+  IsDateString,
+  Min,
+} from 'class-validator';
 
 export class CreateChemicalDto {
   @IsString()

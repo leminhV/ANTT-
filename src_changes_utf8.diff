@@ -1,0 +1,1361 @@
+﻿diff --git a/backend/prisma/schema.prisma b/backend/prisma/schema.prisma
+index df1ece4..0c94752 100644
+--- a/backend/prisma/schema.prisma
++++ b/backend/prisma/schema.prisma
+@@ -65,6 +65,7 @@ model User {
+   courses          Course[]   // Hß╗ìc phß║ºn do giß║úng vi├¬n quß║ún l├╜
+   reports          Report[]
+   check_in_records CheckInRecord[]
++  comments         Comment[]
+   
+   @@map("users")
+ }
+@@ -117,6 +118,7 @@ model Equipment {
+   bookings         Booking[]
+   reports          Report[]
+   check_in_records CheckInRecord[]
++  comments         Comment[]
+ 
+   @@map("equipment")
+ }
+@@ -157,6 +159,7 @@ model Booking {
+   course          Course?         @relation(fields: [course_id], references: [id], onDelete: SetNull)
+   chemical_usages ChemicalUsage[]
+   check_in_records CheckInRecord[]
++  comments        Comment[]
+ 
+   // Tß║ío chß╗ë mß╗Ñc Index giß╗æng hß╗çt SQL ─æß╗â t─âng tß╗æc truy vß║Ñn kiß╗âm tra tr├╣ng lß╗ïch
+   @@index([room_id, start_time, end_time])
+@@ -208,6 +211,7 @@ model Report {
+   user         User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+   equipment    Equipment?   @relation(fields: [equipment_id], references: [id], onDelete: SetNull)
+   room         Room?        @relation(fields: [room_id], references: [id], onDelete: SetNull)
++  comments     Comment[]
+ 
+   @@map("reports")
+ }
+@@ -229,3 +233,25 @@ model CheckInRecord {
+ 
+   @@map("check_in_records")
+ }
++
++model Comment {
++  id           Int       @id @default(autoincrement())
++  content      String    @db.Text
++  user_id      Int
++  report_id    Int?
++  booking_id   Int?
++  equipment_id Int?
++  parent_id    Int?
++  created_at   DateTime  @default(now())
++  updated_at   DateTime  @updatedAt
++
++  user         User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
++  report       Report?   @relation(fields: [report_id], references: [id], onDelete: Cascade)
++  booking      Booking?  @relation(fields: [booking_id], references: [id], onDelete: Cascade)
++  equipment    Equipment? @relation(fields: [equipment_id], references: [id], onDelete: Cascade)
++  
++  parent       Comment?  @relation("CommentReplies", fields: [parent_id], references: [id], onDelete: Cascade)
++  replies      Comment[] @relation("CommentReplies")
++
++  @@map("comments")
++}
+diff --git a/backend/prisma/schema_original.prisma b/backend/prisma/schema_original.prisma
+new file mode 100644
+index 0000000..a041174
+Binary files /dev/null and b/backend/prisma/schema_original.prisma differ
+diff --git a/backend/src/app.module.ts b/backend/src/app.module.ts
+index 8f90890..041062b 100644
+--- a/backend/src/app.module.ts
++++ b/backend/src/app.module.ts
+@@ -14,7 +14,10 @@ import { CoursesModule } from './courses/courses.module';
+ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+ import { APP_GUARD } from '@nestjs/core';
+ import { ConfigModule } from '@nestjs/config';
++import { CommentsModule } from './comments/comments.module';
+ import * as Joi from 'joi';
++import { ScheduleModule } from '@nestjs/schedule';
++import { TasksModule } from './tasks/tasks.module';
+ 
+ @Module({
+   imports: [
+@@ -39,7 +42,7 @@ import * as Joi from 'joi';
+         limit: 100, // Tß╗æi ─æa 100 request
+       },
+     ]),
+-    PrismaModule, UsersModule, AuthModule, RoomsModule, EquipmentModule, ChemicalsModule, BookingsModule, ReportsModule, CheckInModule, CoursesModule
++    PrismaModule, UsersModule, AuthModule, RoomsModule, EquipmentModule, ChemicalsModule, BookingsModule, ReportsModule, CheckInModule, CoursesModule, CommentsModule, ScheduleModule.forRoot(), TasksModule
+   ],
+   controllers: [AppController],
+   providers: [
+diff --git a/backend/src/auth/jwt.strategy.ts b/backend/src/auth/jwt.strategy.ts
+index 7022183..9113e31 100644
+--- a/backend/src/auth/jwt.strategy.ts
++++ b/backend/src/auth/jwt.strategy.ts
+@@ -9,7 +9,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
+     super({
+       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+       ignoreExpiration: false,
+-      secretOrKey: configService.get<string>('JWT_SECRET'),
++      secretOrKey: configService.get<string>('JWT_SECRET') as string,
+     });
+   }
+ 
+diff --git a/backend/src/bookings/bookings.service.ts b/backend/src/bookings/bookings.service.ts
+index 3a245e5..ed5f2f4 100644
+--- a/backend/src/bookings/bookings.service.ts
++++ b/backend/src/bookings/bookings.service.ts
+@@ -1,4 +1,4 @@
+-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
++import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
+ import { CreateBookingDto } from './dto/create-booking.dto';
+ import { UpdateBookingDto } from './dto/update-booking.dto';
+ import { PrismaService } from '../prisma/prisma.service';
+@@ -13,60 +13,96 @@ export class BookingsService {
+     
+     const startTime = new Date(start_time);
+     const endTime = new Date(end_time);
++    const now = new Date();
+ 
+-    // Validate times
++    // 1. Validate times
+     if (startTime >= endTime) {
+       throw new ConflictException('Thß╗¥i gian kß║┐t th├║c phß║úi lß╗¢n h╞ín thß╗¥i gian bß║»t ─æß║ºu');
+     }
++    
++    if (startTime < now) {
++      throw new BadRequestException('Kh├┤ng thß╗â ─æß║╖t lß╗ïch trong qu├í khß╗⌐');
++    }
+ 
+-    // Check conflict
+-    const conflictingBookings = await this.prisma.booking.findMany({
+-      where: {
+-        room_id,
+-        status: { in: ['PENDING', 'APPROVED', 'IN_USE'] },
+-        OR: [
+-          {
+-            start_time: { lt: endTime },
+-            end_time: { gt: startTime },
+-          },
+-        ],
+-      },
+-    });
+-
+-    if (conflictingBookings.length > 0) {
+-      throw new ConflictException('Ph├▓ng Lab ─æ├ú ─æ╞░ß╗úc ─æß║╖t trong khoß║úng thß╗¥i gian n├áy');
++    const startHour = startTime.getHours();
++    const endHour = endTime.getHours();
++    
++    // 2. Khung giß╗¥ 07:00 ─æß║┐n 22:00
++    if (startHour < 7 || endHour >= 22 || (endHour === 22 && endTime.getMinutes() > 0)) {
++      throw new BadRequestException('Chß╗ë ─æ╞░ß╗úc ─æß║╖t lß╗ïch trong khung giß╗¥ tß╗½ 07:00 ─æß║┐n 22:00');
+     }
+ 
+-    if (equipment_id) {
+-      const equipmentConflict = await this.prisma.booking.findMany({
++    return this.prisma.$transaction(async (tx) => {
++      // 3. Pessimistic Locking: Kh├│a Room ─æß╗â ng─ân Race Condition (Double Booking)
++      await tx.$executeRaw`SELECT id FROM rooms WHERE id = ${room_id} FOR UPDATE`;
++
++      // 4. Kiß╗âm tra giß╗¢i hß║ín 3 lß║ºn / ng├áy
++      const startOfDay = new Date(startTime);
++      startOfDay.setHours(0, 0, 0, 0);
++      const endOfDay = new Date(startTime);
++      endOfDay.setHours(23, 59, 59, 999);
++
++      const userBookingsToday = await tx.booking.count({
++        where: {
++          user_id: userId,
++          start_time: { gte: startOfDay, lte: endOfDay },
++          status: { notIn: ['CANCELED', 'REJECTED'] },
++        },
++      });
++
++      if (userBookingsToday >= 3) {
++        throw new ConflictException('Sinh vi├¬n chß╗ë ─æ╞░ß╗úc tß║ío tß╗æi ─æa 3 Booking trong c├╣ng 1 ng├áy');
++      }
++
++      // 5. Kiß╗âm tra ─æß╗Ñng ─æß╗Ö lß╗ïch ph├▓ng
++      const conflictingBookings = await tx.booking.findFirst({
+         where: {
+-          equipment_id,
++          room_id,
+           status: { in: ['PENDING', 'APPROVED', 'IN_USE'] },
+-          OR: [
+-            {
+-              start_time: { lt: endTime },
+-              end_time: { gt: startTime },
+-            },
+-          ],
++          start_time: { lt: endTime },
++          end_time: { gt: startTime },
+         },
+       });
+ 
+-      if (equipmentConflict.length > 0) {
+-        throw new ConflictException('Thiß║┐t bß╗ï ─æ├ú ─æ╞░ß╗úc ─æß║╖t trong khoß║úng thß╗¥i gian n├áy');
++      if (conflictingBookings) {
++        throw new ConflictException('Ph├▓ng Lab ─æ├ú ─æ╞░ß╗úc ─æß║╖t trong khoß║úng thß╗¥i gian n├áy');
+       }
+-    }
+ 
+-    return this.prisma.booking.create({
+-      data: {
+-        user_id: userId,
+-        room_id,
+-        equipment_id: equipment_id || null,
+-        course_id: course_id || null,
+-        start_time: startTime,
+-        end_time: endTime,
+-        purpose,
+-        status: 'PENDING',
+-      },
++      // 6. Kiß╗âm tra thiß║┐t bß╗ï
++      if (equipment_id) {
++        const equipment = await tx.equipment.findUnique({ where: { id: equipment_id } });
++        if (!equipment) throw new NotFoundException('Thiß║┐t bß╗ï kh├┤ng tß╗ôn tß║íi');
++        
++        if (equipment.status === 'MAINTENANCE' || equipment.status === 'BROKEN') {
++          throw new ConflictException(`Thiß║┐t bß╗ï ─æang ß╗ƒ trß║íng th├íi ${equipment.status} kh├┤ng thß╗â ─æß║╖t`);
++        }
++
++        const equipmentConflict = await tx.booking.findFirst({
++          where: {
++            equipment_id,
++            status: { in: ['PENDING', 'APPROVED', 'IN_USE'] },
++            start_time: { lt: endTime },
++            end_time: { gt: startTime },
++          },
++        });
++
++        if (equipmentConflict) {
++          throw new ConflictException('Thiß║┐t bß╗ï ─æ├ú ─æ╞░ß╗úc ─æß║╖t trong khoß║úng thß╗¥i gian n├áy');
++        }
++      }
++
++      return tx.booking.create({
++        data: {
++          user_id: userId,
++          room_id,
++          equipment_id: equipment_id || null,
++          course_id: course_id || null,
++          start_time: startTime,
++          end_time: endTime,
++          purpose,
++          status: 'PENDING',
++        },
++      });
+     });
+   }
+ 
+@@ -106,7 +142,7 @@ export class BookingsService {
+     });
+ 
+     if (!booking) {
+-      throw new NotFoundException(`Booking vß╗¢i ID ${id} kh├┤ng tß╗ôn tß║íi`);
++      throw new NotFoundException(`Lß╗ïch ─æß║╖t vß╗¢i ID ${id} kh├┤ng tß╗ôn tß║íi`);
+     }
+ 
+     return booking;
+@@ -121,10 +157,13 @@ export class BookingsService {
+   async update(id: number, updateBookingDto: UpdateBookingDto) {
+     await this.findOne(id); // Check exists
+ 
+-    const { start_time, end_time, ...rest } = updateBookingDto;
++    const { start_time, end_time, row_version, ...rest } = updateBookingDto;
+ 
+     return this.prisma.booking.update({
+-      where: { id },
++      where: { 
++        id,
++        ...(row_version !== undefined && { row_version }),
++      },
+       data: {
+         ...rest,
+         ...(start_time && { start_time: new Date(start_time) }),
+@@ -139,15 +178,20 @@ export class BookingsService {
+     if (booking.user_id !== userId) {
+       throw new ConflictException('Bß║ín kh├┤ng c├│ quyß╗ün hß╗ºy ─æ╞ín n├áy');
+     }
++    if (['COMPLETED', 'CANCELED', 'REJECTED'].includes(booking.status)) {
++      throw new BadRequestException('Kh├┤ng thß╗â hß╗ºy ─æ╞ín ß╗ƒ trß║íng th├íi n├áy');
++    }
+     return this.prisma.booking.update({
+       where: { id },
+-      data: { status: 'CANCELED' },
++      data: { 
++        status: 'CANCELED',
++        row_version: { increment: 1 }
++      },
+     });
+   }
+ 
+   async remove(id: number) {
+     await this.findOne(id);
+-
+     return this.prisma.booking.delete({
+       where: { id },
+     });
+diff --git a/backend/src/bookings/dto/update-booking.dto.ts b/backend/src/bookings/dto/update-booking.dto.ts
+index 70e3a12..84e27f7 100644
+--- a/backend/src/bookings/dto/update-booking.dto.ts
++++ b/backend/src/bookings/dto/update-booking.dto.ts
+@@ -1,4 +1,10 @@
+ import { PartialType } from '@nestjs/mapped-types';
+ import { CreateBookingDto } from './create-booking.dto';
+ 
+-export class UpdateBookingDto extends PartialType(CreateBookingDto) {}
++import { IsOptional, IsInt } from 'class-validator';
++
++export class UpdateBookingDto extends PartialType(CreateBookingDto) {
++  @IsOptional()
++  @IsInt()
++  row_version?: number;
++}
+diff --git a/backend/src/comments/comments.controller.spec.ts b/backend/src/comments/comments.controller.spec.ts
+new file mode 100644
+index 0000000..3aa5596
+--- /dev/null
++++ b/backend/src/comments/comments.controller.spec.ts
+@@ -0,0 +1,18 @@
++import { Test, TestingModule } from '@nestjs/testing';
++import { CommentsController } from './comments.controller';
++
++describe('CommentsController', () => {
++  let controller: CommentsController;
++
++  beforeEach(async () => {
++    const module: TestingModule = await Test.createTestingModule({
++      controllers: [CommentsController],
++    }).compile();
++
++    controller = module.get<CommentsController>(CommentsController);
++  });
++
++  it('should be defined', () => {
++    expect(controller).toBeDefined();
++  });
++});
+diff --git a/backend/src/comments/comments.controller.ts b/backend/src/comments/comments.controller.ts
+new file mode 100644
+index 0000000..bfa9d18
+--- /dev/null
++++ b/backend/src/comments/comments.controller.ts
+@@ -0,0 +1,37 @@
++import { Controller, Get, Post, Body, Param, Delete, UseGuards, Request, Query, ParseIntPipe } from '@nestjs/common';
++import { CommentsService } from './comments.service';
++import { CreateCommentDto } from './dto/create-comment.dto';
++import { JwtAuthGuard } from '../auth/jwt-auth.guard';
++import { IsAuthorGuard } from './guards/is-author.guard';
++
++@Controller('comments')
++@UseGuards(JwtAuthGuard)
++export class CommentsController {
++  constructor(private readonly commentsService: CommentsService) {}
++
++  @Post()
++  create(@Request() req: any, @Body() createCommentDto: CreateCommentDto) {
++    return this.commentsService.create(req.user.userId, createCommentDto);
++  }
++
++  @Get()
++  findAll(
++    @Query('reportId') reportId?: string,
++    @Query('bookingId') bookingId?: string,
++    @Query('equipmentId') equipmentId?: string,
++  ) {
++    return this.commentsService.findAllByEntity(
++      reportId ? parseInt(reportId) : undefined,
++      bookingId ? parseInt(bookingId) : undefined,
++      equipmentId ? parseInt(equipmentId) : undefined,
++    );
++  }
++
++  @Delete(':id')
++  @UseGuards(IsAuthorGuard)
++  remove(@Param('id', ParseIntPipe) id: number) {
++    // We don't need to pass req.user anymore because IsAuthorGuard already handles the authorization.
++    // However, I still need to fix the service to not take currentUser.
++    return this.commentsService.remove(id);
++  }
++}
+diff --git a/backend/src/comments/comments.module.ts b/backend/src/comments/comments.module.ts
+new file mode 100644
+index 0000000..44e9090
+--- /dev/null
++++ b/backend/src/comments/comments.module.ts
+@@ -0,0 +1,11 @@
++import { Module } from '@nestjs/common';
++import { CommentsService } from './comments.service';
++import { CommentsController } from './comments.controller';
++import { PrismaModule } from '../prisma/prisma.module';
++
++@Module({
++  imports: [PrismaModule],
++  providers: [CommentsService],
++  controllers: [CommentsController]
++})
++export class CommentsModule {}
+diff --git a/backend/src/comments/comments.service.spec.ts b/backend/src/comments/comments.service.spec.ts
+new file mode 100644
+index 0000000..8ab6e50
+--- /dev/null
++++ b/backend/src/comments/comments.service.spec.ts
+@@ -0,0 +1,18 @@
++import { Test, TestingModule } from '@nestjs/testing';
++import { CommentsService } from './comments.service';
++
++describe('CommentsService', () => {
++  let service: CommentsService;
++
++  beforeEach(async () => {
++    const module: TestingModule = await Test.createTestingModule({
++      providers: [CommentsService],
++    }).compile();
++
++    service = module.get<CommentsService>(CommentsService);
++  });
++
++  it('should be defined', () => {
++    expect(service).toBeDefined();
++  });
++});
+diff --git a/backend/src/comments/comments.service.ts b/backend/src/comments/comments.service.ts
+new file mode 100644
+index 0000000..1c5e6e6
+--- /dev/null
++++ b/backend/src/comments/comments.service.ts
+@@ -0,0 +1,52 @@
++import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
++import { PrismaService } from '../prisma/prisma.service';
++import { CreateCommentDto } from './dto/create-comment.dto';
++
++@Injectable()
++export class CommentsService {
++  constructor(private prisma: PrismaService) {}
++
++  async create(userId: number, createCommentDto: CreateCommentDto) {
++    return this.prisma.comment.create({
++      data: {
++        content: createCommentDto.content,
++        user_id: userId,
++        report_id: createCommentDto.reportId,
++        booking_id: createCommentDto.bookingId,
++        equipment_id: createCommentDto.equipmentId,
++        parent_id: createCommentDto.parentId,
++      },
++      include: {
++        user: { select: { id: true, name: true, avatar_url: true, role: true } }
++      }
++    });
++  }
++
++  async findAllByEntity(reportId?: number, bookingId?: number, equipmentId?: number) {
++    // Only return top-level comments (parent_id: null)
++    // The replies will be loaded via Prisma relations
++    return this.prisma.comment.findMany({
++      where: {
++        report_id: reportId || undefined,
++        booking_id: bookingId || undefined,
++        equipment_id: equipmentId || undefined,
++        parent_id: null
++      },
++      include: {
++        user: { select: { id: true, name: true, avatar_url: true, role: true } },
++        replies: {
++          include: {
++            user: { select: { id: true, name: true, avatar_url: true, role: true } }
++          },
++          orderBy: { created_at: 'asc' }
++        }
++      },
++      orderBy: { created_at: 'asc' }
++    });
++  }
++
++  async remove(id: number) {
++    // IsAuthorGuard already verified that the comment exists and the user has permission to delete it.
++    return this.prisma.comment.delete({ where: { id } });
++  }
++}
+diff --git a/backend/src/comments/dto/create-comment.dto.ts b/backend/src/comments/dto/create-comment.dto.ts
+new file mode 100644
+index 0000000..c193233
+--- /dev/null
++++ b/backend/src/comments/dto/create-comment.dto.ts
+@@ -0,0 +1,31 @@
++import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
++import { Transform } from 'class-transformer';
++import { JSDOM } from 'jsdom';
++import * as dompurify from 'dompurify';
++
++const window = new JSDOM('').window;
++const DOMPurify = (dompurify as any).default || dompurify;
++const purify = DOMPurify(window as any);
++
++export class CreateCommentDto {
++  @Transform(({ value }) => typeof value === 'string' ? purify.sanitize(value) : value)
++  @IsString()
++  @IsNotEmpty()
++  content: string;
++
++  @IsOptional()
++  @IsNumber()
++  reportId?: number;
++
++  @IsOptional()
++  @IsNumber()
++  bookingId?: number;
++  
++  @IsOptional()
++  @IsNumber()
++  equipmentId?: number;
++
++  @IsOptional()
++  @IsNumber()
++  parentId?: number;
++}
+diff --git a/backend/src/comments/guards/is-author.guard.ts b/backend/src/comments/guards/is-author.guard.ts
+new file mode 100644
+index 0000000..03a1c21
+--- /dev/null
++++ b/backend/src/comments/guards/is-author.guard.ts
+@@ -0,0 +1,37 @@
++import { Injectable, CanActivate, ExecutionContext, ForbiddenException, NotFoundException } from '@nestjs/common';
++import { PrismaService } from '../../prisma/prisma.service';
++
++@Injectable()
++export class IsAuthorGuard implements CanActivate {
++  constructor(private prisma: PrismaService) {}
++
++  async canActivate(context: ExecutionContext): Promise<boolean> {
++    const request = context.switchToHttp().getRequest();
++    const commentId = parseInt(request.params.id, 10);
++    const user = request.user; // Set by JwtAuthGuard
++
++    if (!commentId || !user) {
++      return false;
++    }
++
++    const comment = await this.prisma.comment.findUnique({
++      where: { id: commentId }
++    });
++
++    if (!comment) {
++      throw new NotFoundException('B├¼nh luß║¡n kh├┤ng tß╗ôn tß║íi.');
++    }
++
++    // ADMIN or TECHNICIAN can delete any comment
++    if (user.role === 'ADMIN' || user.role === 'TECHNICIAN') {
++      return true;
++    }
++
++    // Author can delete their own comment
++    if (comment.user_id === user.userId) {
++      return true;
++    }
++
++    throw new ForbiddenException('Bß║ín kh├┤ng c├│ quyß╗ün chß╗ënh sß╗¡a b├¼nh luß║¡n cß╗ºa ng╞░ß╗¥i kh├íc (Lß╗ùi BOLA/IDOR bß╗ï tß╗½ chß╗æi).');
++  }
++}
+diff --git a/backend/src/common/filters/prisma-client-exception.filter.ts b/backend/src/common/filters/prisma-client-exception.filter.ts
+new file mode 100644
+index 0000000..05daceb
+--- /dev/null
++++ b/backend/src/common/filters/prisma-client-exception.filter.ts
+@@ -0,0 +1,23 @@
++import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from '@nestjs/common';
++import { BaseExceptionFilter } from '@nestjs/core';
++import { Prisma } from '@prisma/client';
++import { Response } from 'express';
++
++@Catch(Prisma.PrismaClientKnownRequestError)
++export class PrismaClientExceptionFilter extends BaseExceptionFilter {
++  catch(exception: Prisma.PrismaClientKnownRequestError, host: ArgumentsHost) {
++    const ctx = host.switchToHttp();
++    const response = ctx.getResponse<Response>();
++
++    if (exception.code === 'P2025') {
++      response.status(HttpStatus.CONFLICT).json({
++        statusCode: HttpStatus.CONFLICT,
++        message: 'T├ái nguy├¬n ─æ├ú bß╗ï thay ─æß╗òi bß╗ƒi mß╗Öt ng╞░ß╗¥i d├╣ng kh├íc. Vui l├▓ng tß║úi lß║íi dß╗» liß╗çu.',
++      });
++      return;
++    }
++
++    // Default error handling for other Prisma known request errors
++    super.catch(exception, host);
++  }
++}
+diff --git a/backend/src/main.ts b/backend/src/main.ts
+index fdb6154..b6a5126 100644
+--- a/backend/src/main.ts
++++ b/backend/src/main.ts
+@@ -3,8 +3,9 @@ import { AppModule } from './app.module';
+ import { ValidationPipe } from '@nestjs/common';
+ import helmet from 'helmet';
+ import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
+-
+ import { ThrottlerExceptionFilter } from './common/filters/throttler-exception.filter';
++import { PrismaClientExceptionFilter } from './common/filters/prisma-client-exception.filter';
++import { HttpAdapterHost } from '@nestjs/core';
+ 
+ async function bootstrap() {
+   const app = await NestFactory.create(AppModule);
+@@ -53,9 +54,11 @@ async function bootstrap() {
+ 
+   // 5. Global Exception Filter: Chuß║⌐n h├│a lß╗ùi
+   // Giß║úi th├¡ch: ß║¿n Stack Trace hß╗ç thß╗æng (nh╞░ lß╗ùi truy vß║Ñn DB) kh├┤ng cho Hacker thß║Ñy
++  const httpAdapter = app.get(HttpAdapterHost);
+   app.useGlobalFilters(
+     new GlobalExceptionFilter(),
+-    new ThrottlerExceptionFilter() // Th├¬m bß╗Ö lß╗ìc lß╗ùi Rate Limit (Hiß╗ân thß╗ï tiß║┐ng Viß╗çt)
++    new ThrottlerExceptionFilter(), // Th├¬m bß╗Ö lß╗ìc lß╗ùi Rate Limit (Hiß╗ân thß╗ï tiß║┐ng Viß╗çt)
++    new PrismaClientExceptionFilter(httpAdapter.httpAdapter)
+   );
+ 
+   await app.listen(process.env.PORT ?? 3000);
+diff --git a/backend/src/tasks/tasks.module.ts b/backend/src/tasks/tasks.module.ts
+new file mode 100644
+index 0000000..51c8ab9
+--- /dev/null
++++ b/backend/src/tasks/tasks.module.ts
+@@ -0,0 +1,7 @@
++import { Module } from '@nestjs/common';
++import { TasksService } from './tasks.service';
++
++@Module({
++  providers: [TasksService],
++})
++export class TasksModule {}
+diff --git a/backend/src/tasks/tasks.service.ts b/backend/src/tasks/tasks.service.ts
+new file mode 100644
+index 0000000..2ecf4bc
+--- /dev/null
++++ b/backend/src/tasks/tasks.service.ts
+@@ -0,0 +1,76 @@
++import { Injectable, Logger } from '@nestjs/common';
++import { Cron, CronExpression } from '@nestjs/schedule';
++import { PrismaService } from '../prisma/prisma.service';
++
++@Injectable()
++export class TasksService {
++  private readonly logger = new Logger(TasksService.name);
++
++  constructor(private readonly prisma: PrismaService) {}
++
++  // Chß║íy mß╗ùi giß╗¥ mß╗Öt lß║ºn ─æß╗â kiß╗âm tra v├á hß╗ºy c├íc booking PENDING qu├í 24h
++  @Cron(CronExpression.EVERY_HOUR)
++  async handleCronCancelPendingBookings() {
++    this.logger.debug('─Éang chß║íy cronjob: Tß╗▒ ─æß╗Öng hß╗ºy c├íc lß╗ïch ─æß║╖t PENDING qu├í 24h...');
++    
++    const twentyFourHoursAgo = new Date();
++    twentyFourHoursAgo.setHours(twentyFourHoursAgo.getHours() - 24);
++
++    try {
++      const result = await this.prisma.booking.updateMany({
++        where: {
++          status: 'PENDING',
++          created_at: { lt: twentyFourHoursAgo }
++        },
++        data: {
++          status: 'CANCELED',
++          // Note: updateMany does not support row_version increment per row easily without raw query, 
++          // but since it's an automated background task resolving dangling state, it's acceptable here.
++        }
++      });
++      
++      if (result.count > 0) {
++        this.logger.log(`─É├ú tß╗▒ ─æß╗Öng hß╗ºy ${result.count} ─æ╞ín ─æß║╖t lß╗ïch qu├í 24h ch╞░a duyß╗çt.`);
++      }
++    } catch (error) {
++      this.logger.error('Lß╗ùi khi chß║íy cronjob hß╗ºy ─æ╞ín:', error);
++    }
++  }
++
++  // Chß║íy mß╗ùi 30 ph├║t ─æß╗â tß╗▒ ─æß╗Öng hß╗ºy c├íc lß╗ïch IN_USE nß║┐u ─æ├ú qu├í thß╗¥i gian kß║┐t th├║c m├á kh├┤ng check-out
++  // Hoß║╖c tß╗▒ ─æß╗Öng hß╗ºy c├íc lß╗ïch APPROVED nß║┐u ─æ├ú qua thß╗¥i gian bß║»t ─æß║ºu m├á kh├┤ng check-in
++  @Cron('0 */30 * * * *')
++  async handleCronCleanUpExpiredBookings() {
++    this.logger.debug('─Éang chß║íy cronjob: Dß╗ìn dß║╣p c├íc lß╗ïch APPROVED/IN_USE ─æ├ú qu├í hß║ín...');
++    const now = new Date();
++
++    try {
++      // 1. Hß╗ºy c├íc ─æ╞ín APPROVED nh╞░ng kh├┤ng ─æß║┐n check-in (qu├í hß║ín 30 ph├║t sau giß╗¥ bß║»t ─æß║ºu)
++      const thirtyMinutesAgo = new Date();
++      thirtyMinutesAgo.setMinutes(thirtyMinutesAgo.getMinutes() - 30);
++      
++      const noShows = await this.prisma.booking.updateMany({
++        where: {
++          status: 'APPROVED',
++          start_time: { lt: thirtyMinutesAgo }
++        },
++        data: { status: 'CANCELED' }
++      });
++
++      // 2. Chuyß╗ân IN_USE th├ánh COMPLETED nß║┐u ─æ├ú qua thß╗¥i gian end_time (Giß║ú sß╗¡ tß╗▒ ─æß╗Öng check-out)
++      const autoCompleted = await this.prisma.booking.updateMany({
++        where: {
++          status: 'IN_USE',
++          end_time: { lt: now }
++        },
++        data: { status: 'COMPLETED' }
++      });
++
++      if (noShows.count > 0 || autoCompleted.count > 0) {
++        this.logger.log(`─É├ú hß╗ºy ${noShows.count} ─æ╞ín (No-show), Tß╗▒ ─æß╗Öng ho├án th├ánh ${autoCompleted.count} ─æ╞ín.`);
++      }
++    } catch (error) {
++      this.logger.error('Lß╗ùi khi chß║íy cronjob dß╗ìn dß║╣p:', error);
++    }
++  }
++}
+diff --git a/frontend/src/components/common/CommentSection.tsx b/frontend/src/components/common/CommentSection.tsx
+new file mode 100644
+index 0000000..fda8258
+--- /dev/null
++++ b/frontend/src/components/common/CommentSection.tsx
+@@ -0,0 +1,182 @@
++import React, { useState, useEffect } from 'react';
++import { commentService } from '../../services';
++import { Send, CornerDownRight, MessageSquare, Trash2, User as UserIcon } from 'lucide-react';
++import { format } from 'date-fns';
++import { vi } from 'date-fns/locale';
++
++interface CommentProps {
++  entityType: 'report' | 'booking' | 'equipment';
++  entityId: number;
++  currentUser: any;
++}
++
++export function CommentSection({ entityType, entityId, currentUser }: CommentProps) {
++  const [comments, setComments] = useState<any[]>([]);
++  const [newComment, setNewComment] = useState('');
++  const [replyTo, setReplyTo] = useState<{ id: number; name: string } | null>(null);
++  const [isLoading, setIsLoading] = useState(false);
++
++  useEffect(() => {
++    fetchComments();
++  }, [entityId]);
++
++  const fetchComments = async () => {
++    try {
++      const res = await commentService.getAll(
++        entityType === 'report' ? entityId : undefined,
++        entityType === 'booking' ? entityId : undefined,
++        entityType === 'equipment' ? entityId : undefined
++      );
++      setComments(res.data);
++    } catch (error) {
++      console.error('Failed to fetch comments', error);
++    }
++  };
++
++  const handleSubmit = async (e: React.FormEvent) => {
++    e.preventDefault();
++    if (!newComment.trim()) return;
++
++    setIsLoading(true);
++    try {
++      const payload: any = { content: newComment };
++      if (entityType === 'report') payload.reportId = entityId;
++      if (entityType === 'booking') payload.bookingId = entityId;
++      if (entityType === 'equipment') payload.equipmentId = entityId;
++      if (replyTo) payload.parentId = replyTo.id;
++
++      await commentService.create(payload);
++      setNewComment('');
++      setReplyTo(null);
++      fetchComments();
++    } catch (error) {
++      console.error('Failed to post comment', error);
++    } finally {
++      setIsLoading(false);
++    }
++  };
++
++  const handleDelete = async (id: number) => {
++    if (!window.confirm('Bß║ín c├│ chß║»c chß║»n muß╗æn x├│a b├¼nh luß║¡n n├áy?')) return;
++    try {
++      await commentService.delete(id);
++      fetchComments();
++    } catch (error) {
++      console.error('Failed to delete comment', error);
++    }
++  };
++
++  const renderComment = (comment: any, isReply = false) => {
++    const isOwner = currentUser?.id === comment.user_id;
++    const canDelete = isOwner || currentUser?.role === 'ADMIN' || currentUser?.role === 'TECHNICIAN';
++
++    return (
++      <div key={comment.id} className={`flex gap-3 ${isReply ? 'ml-10 mt-3 relative' : 'mt-4'}`}>
++        {isReply && (
++          <div className="absolute -left-6 top-0 w-4 h-6 border-l-2 border-b-2 border-[#E0E0E0] rounded-bl-lg" />
++        )}
++        <div className="flex-shrink-0 mt-1">
++          {comment.user?.avatar_url ? (
++            <img src={comment.user.avatar_url} alt="avatar" className="w-8 h-8 rounded-full object-cover border border-[#E0E0E0]" />
++          ) : (
++            <div className="w-8 h-8 rounded-full bg-[#1E5FA5]/10 flex items-center justify-center text-[#1E5FA5]">
++              <UserIcon className="w-4 h-4" />
++            </div>
++          )}
++        </div>
++        <div className="flex-1 min-w-0 bg-[#F5F5F5] rounded-2xl rounded-tl-none p-3 relative group">
++          <div className="flex justify-between items-start mb-1">
++            <span className="font-bold text-[13px] text-[#212121]">
++              {comment.user?.name || 'Ng╞░ß╗¥i d├╣ng'} 
++              {comment.user?.role === 'ADMIN' && <span className="ml-2 text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded">ADMIN</span>}
++              {comment.user?.role === 'TECHNICIAN' && <span className="ml-2 text-[10px] bg-orange-100 text-orange-600 px-1.5 py-0.5 rounded">Kß╗╕ THUß║¼T</span>}
++            </span>
++            <span className="text-[11px] text-[#9E9E9E]">
++              {format(new Date(comment.created_at), 'HH:mm - dd/MM/yyyy')}
++            </span>
++          </div>
++          <p className="text-[13px] text-[#424242] whitespace-pre-wrap leading-relaxed">{comment.content}</p>
++          
++          <div className="flex items-center gap-4 mt-2">
++            {!isReply && (
++              <button 
++                onClick={() => setReplyTo({ id: comment.id, name: comment.user?.name })}
++                className="text-[11px] font-bold text-[#757575] hover:text-[#1E5FA5] transition-colors flex items-center gap-1"
++              >
++                <CornerDownRight className="w-3 h-3" /> Phß║ún hß╗ôi
++              </button>
++            )}
++            {canDelete && (
++              <button 
++                onClick={() => handleDelete(comment.id)}
++                className="text-[11px] font-bold text-[#757575] hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100 flex items-center gap-1"
++              >
++                <Trash2 className="w-3 h-3" /> X├│a
++              </button>
++            )}
++          </div>
++        </div>
++      </div>
++    );
++  };
++
++  return (
++    <div className="flex flex-col h-full bg-white border-t border-[#E0E0E0]">
++      <div className="p-4 border-b border-[#E0E0E0] bg-[#FAFAFA] flex items-center gap-2">
++        <MessageSquare className="w-4 h-4 text-[#757575]" />
++        <h3 className="font-bold text-[#212121] text-[14px]">Thß║úo luß║¡n ({comments.length + comments.reduce((acc, c) => acc + (c.replies?.length || 0), 0)})</h3>
++      </div>
++      
++      <div className="flex-1 overflow-y-auto p-4 bg-white">
++        {comments.length === 0 ? (
++          <div className="flex flex-col items-center justify-center h-32 text-[#9E9E9E]">
++            <MessageSquare className="w-8 h-8 mb-2 opacity-20" />
++            <p className="text-[13px]">Ch╞░a c├│ thß║úo luß║¡n n├áo</p>
++          </div>
++        ) : (
++          <div className="space-y-2">
++            {comments.map((comment) => (
++              <div key={comment.id}>
++                {renderComment(comment)}
++                {comment.replies && comment.replies.map((reply: any) => renderComment(reply, true))}
++              </div>
++            ))}
++          </div>
++        )}
++      </div>
++
++      <div className="p-4 border-t border-[#E0E0E0] bg-[#FAFAFA]">
++        {replyTo && (
++          <div className="flex items-center justify-between mb-2 px-3 py-1.5 bg-[#E3F2FD] text-[#1E5FA5] rounded-md text-[12px] font-medium border border-[#BBDEFB]">
++            <span className="flex items-center gap-2">
++              <CornerDownRight className="w-3 h-3" /> ─Éang trß║ú lß╗¥i <strong>{replyTo.name}</strong>
++            </span>
++            <button onClick={() => setReplyTo(null)} className="hover:text-red-500">Hß╗ºy</button>
++          </div>
++        )}
++        <form onSubmit={handleSubmit} className="flex items-end gap-2 relative">
++          <textarea
++            value={newComment}
++            onChange={(e) => setNewComment(e.target.value)}
++            placeholder={replyTo ? `Nhß║¡p phß║ún hß╗ôi cho ${replyTo.name}...` : "Viß║┐t b├¼nh luß║¡n mß╗¢i..."}
++            className="flex-1 resize-none bg-white border border-[#E0E0E0] rounded-xl px-4 py-3 text-[13px] focus:outline-none focus:border-[#1E5FA5] focus:ring-1 focus:ring-[#1E5FA5] min-h-[44px] max-h-[120px]"
++            rows={1}
++            onKeyDown={(e) => {
++              if (e.key === 'Enter' && !e.shiftKey) {
++                e.preventDefault();
++                handleSubmit(e);
++              }
++            }}
++          />
++          <button 
++            type="submit" 
++            disabled={isLoading || !newComment.trim()}
++            className="w-[44px] h-[44px] flex items-center justify-center bg-[#1E5FA5] text-white rounded-xl hover:bg-[#154a85] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
++          >
++            <Send className="w-4 h-4" />
++          </button>
++        </form>
++      </div>
++    </div>
++  );
++}
+diff --git a/frontend/src/components/layout/Layout.tsx b/frontend/src/components/layout/Layout.tsx
+index 63930ce..f1ba7bb 100644
+--- a/frontend/src/components/layout/Layout.tsx
++++ b/frontend/src/components/layout/Layout.tsx
+@@ -63,6 +63,7 @@ export function Layout() {
+               <NavItem to="/student-dashboard" icon={<LayoutDashboard />} label="Dashboard tß╗òng quan" />
+               <NavItem to="/calendar" icon={<Calendar />} label="Lß╗ïch biß╗âu / ─Éß║╖t ph├▓ng" />
+               <NavItem to="/my-bookings" icon={<FileText />} label="─É╞ín cß╗ºa t├┤i" />
++              <NavItem to="/reports" icon={<BarChart2 />} label="B├ío c├ío sß╗▒ cß╗æ" />
+             </>
+           )}
+         </nav>
+diff --git a/frontend/src/pages/auth/Login.tsx b/frontend/src/pages/auth/Login.tsx
+index 62b3f6c..d999beb 100644
+--- a/frontend/src/pages/auth/Login.tsx
++++ b/frontend/src/pages/auth/Login.tsx
+@@ -19,9 +19,10 @@ export function Login() {
+     
+     try {
+       const response = await authService.login({ email: email.trim(), password });
+-      const { access_token, user } = response.data;
++      const { access_token, refresh_token, user } = response.data;
+       
+       authService.saveToken(access_token);
++      localStorage.setItem("refresh_token", refresh_token);
+       localStorage.setItem("userRole", user.role.toLowerCase());
+       localStorage.setItem("user", JSON.stringify(user));
+       
+diff --git a/frontend/src/pages/booking/CalendarView.tsx b/frontend/src/pages/booking/CalendarView.tsx
+index 0797187..b5efb06 100644
+--- a/frontend/src/pages/booking/CalendarView.tsx
++++ b/frontend/src/pages/booking/CalendarView.tsx
+@@ -216,6 +216,17 @@ export function CalendarView() {
+           </div>
+           
+           <div className="flex items-center gap-2">
++            <input 
++              type="date"
++              value={format(currentDate, "yyyy-MM-dd")}
++              onChange={(e) => {
++                if (e.target.value) {
++                  setCurrentDate(new Date(e.target.value));
++                }
++              }}
++              className="px-2 py-1.5 text-[13px] font-medium text-[#212121] bg-white border border-[#E0E0E0] hover:border-[#1E5FA5] rounded transition-colors focus:outline-none focus:ring-1 focus:ring-[#1E5FA5] cursor-pointer cursor-text"
++              title="Chß╗ìn mß╗Öt ng├áy bß║Ñt kß╗│"
++            />
+             <button 
+               onClick={() => setCurrentDate(new Date())}
+               className="px-3 py-1.5 text-[13px] font-bold text-[#757575] bg-white border border-[#E0E0E0] hover:bg-[#F5F5F5] hover:text-[#212121] rounded transition-colors"
+diff --git a/frontend/src/pages/equipment/DeviceManagement.tsx b/frontend/src/pages/equipment/DeviceManagement.tsx
+index 1427aa9..ebadb96 100644
+--- a/frontend/src/pages/equipment/DeviceManagement.tsx
++++ b/frontend/src/pages/equipment/DeviceManagement.tsx
+@@ -4,7 +4,8 @@ import { equipmentService, roomService } from "../../services";
+ import { format } from "date-fns";
+ import { toast } from "react-hot-toast";
+ import { ConfirmModal } from "../../components/common/ConfirmModal";
+-import { DatabaseBackup } from "lucide-react";
++import { CommentSection } from "../../components/common/CommentSection";
++import { DatabaseBackup, MessageSquare } from "lucide-react";
+ 
+ function StatusBadge({ status }: { status: string }) {
+   const getBadgeStyle = (status: string) => {
+@@ -45,6 +46,11 @@ export function DeviceManagement() {
+   const [editingDevice, setEditingDevice] = useState({ id: 0, name: "", serial_number: "", room_id: 0, status: "AVAILABLE" });
+   const [rooms, setRooms] = useState<any[]>([]);
+   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
++  const [selectedDevice, setSelectedDevice] = useState<any | null>(null);
++  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
++  
++  const currentUserStr = localStorage.getItem("user");
++  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+ 
+   useEffect(() => {
+     fetchData();
+@@ -235,14 +241,25 @@ export function DeviceManagement() {
+                   </td>
+                   <td className="px-4 py-3 text-right">
+                     <div className="flex justify-end gap-1">
+-                      <button onClick={() => { 
++                      <button onClick={(e) => {
++                        e.stopPropagation();
++                        setSelectedDevice(dev);
++                        setIsDetailModalOpen(true);
++                      }} className="p-1.5 text-[#757575] hover:text-[#1E5FA5] hover:bg-[#D6E4F7] rounded" title="B├¼nh luß║¡n & Chi tiß║┐t">
++                        <MessageSquare className="w-4 h-4" />
++                      </button>
++                      <button onClick={(e) => { 
++                        e.stopPropagation();
+                         setEditingDevice({ id: dev.id, name: dev.name, serial_number: dev.serial_number, room_id: dev.room_id || 0, status: dev.status }); 
+                         fetchRooms(); 
+                         setIsEditingDevice(true); 
+                       }} className="p-1.5 text-[#757575] hover:text-[#1E5FA5] hover:bg-[#D6E4F7] rounded" title="Sß╗¡a">
+                         <Edit2 className="w-4 h-4" />
+                       </button>
+-                      <button onClick={() => setDeleteConfirmId(dev.id)} className="p-1.5 text-[#757575] hover:text-[#C62828] hover:bg-[#FDEDED] rounded" title="X├│a">
++                      <button onClick={(e) => {
++                        e.stopPropagation();
++                        setDeleteConfirmId(dev.id);
++                      }} className="p-1.5 text-[#757575] hover:text-[#C62828] hover:bg-[#FDEDED] rounded" title="X├│a">
+                         <Trash2 className="w-4 h-4" />
+                       </button>
+                     </div>
+@@ -264,6 +281,58 @@ export function DeviceManagement() {
+         </div>
+       </div>
+ 
++      {/* Detail & Comment Modal */}
++      {isDetailModalOpen && selectedDevice && (
++        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
++          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
++            <div className="p-6 border-b border-[#E0E0E0] flex justify-between items-center bg-[#F5F5F5]">
++              <div>
++                <h2 className="text-[20px] font-bold text-[#212121]">Chi tiß║┐t thiß║┐t bß╗ï #{selectedDevice.id}</h2>
++                <p className="text-[14px] text-[#757575] mt-1">{selectedDevice.name}</p>
++              </div>
++              <button 
++                onClick={() => setIsDetailModalOpen(false)}
++                className="text-[#757575] hover:text-[#212121] p-2 bg-white rounded-full"
++              >
++                Γ£ò
++              </button>
++            </div>
++            
++            <div className="p-6 overflow-y-auto">
++              <div className="space-y-4 mb-8">
++                <div className="grid grid-cols-2 gap-4">
++                  <div>
++                    <span className="text-[13px] text-[#757575]">Sß╗æ Serial:</span>
++                    <p className="text-[14px] font-medium text-[#212121] font-mono">{selectedDevice.serial_number}</p>
++                  </div>
++                  <div>
++                    <span className="text-[13px] text-[#757575]">Trß║íng th├íi:</span>
++                    <div><StatusBadge status={selectedDevice.status} /></div>
++                  </div>
++                  <div>
++                    <span className="text-[13px] text-[#757575]">Ph├▓ng Lab:</span>
++                    <p className="text-[14px] font-medium text-[#212121]">{selectedDevice.room?.name || 'Ch╞░a xß║┐p ph├▓ng'}</p>
++                  </div>
++                  <div>
++                    <span className="text-[13px] text-[#757575]">Ng├áy th├¬m:</span>
++                    <p className="text-[14px] font-medium text-[#212121]">{format(new Date(selectedDevice.created_at), "dd/MM/yyyy")}</p>
++                  </div>
++                </div>
++              </div>
++
++              {/* T├¡ch hß╗úp Component Comment */}
++              <div className="border-t border-[#E0E0E0] pt-6">
++                <CommentSection
++                  entityType="equipment"
++                  entityId={selectedDevice.id}
++                  currentUser={currentUser}
++                />
++              </div>
++            </div>
++          </div>
++        </div>
++      )}
++
+       <ConfirmModal
+         isOpen={deleteConfirmId !== null}
+         title="X├│a thiß║┐t bß╗ï"
+diff --git a/frontend/src/pages/reports/Reports.tsx b/frontend/src/pages/reports/Reports.tsx
+index 41944a0..7deea43 100644
+--- a/frontend/src/pages/reports/Reports.tsx
++++ b/frontend/src/pages/reports/Reports.tsx
+@@ -6,6 +6,7 @@ import { format } from "date-fns";
+ import { timeAgo } from "../../utils/timeAgo";
+ import { LoadingSpinner } from "../../components/common/LoadingSpinner";
+ import { ConfirmModal } from "../../components/common/ConfirmModal";
++import { CommentSection } from "../../components/common/CommentSection";
+ import { toast } from "react-hot-toast";
+ 
+ function StatusBadge({ status }: { status: string }) {
+@@ -29,6 +30,10 @@ export function Reports() {
+   const [equipments, setEquipments] = useState<any[]>([]);
+   const [rooms, setRooms] = useState<any[]>([]);
+   const [deleteConfirmReportId, setDeleteConfirmReportId] = useState<number | null>(null);
++  
++  // Detail Modal
++  const [selectedReport, setSelectedReport] = useState<any>(null);
++  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+ 
+   const currentUserStr = localStorage.getItem("user");
+   const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+@@ -146,20 +151,24 @@ export function Reports() {
+       {/* Header */}
+       <div className="flex justify-between items-end">
+         <div>
+-          <h1 className="text-[24px] font-bold text-[#212121] mb-4">B├ío c├ío & Thß╗æng k├¬</h1>
+-          <div className="flex border-b border-[#E0E0E0]">
+-            {['Thß╗æng k├¬', 'Sß╗▒ cß╗æ'].map(tab => (
+-              <button 
+-                key={tab}
+-                onClick={() => setActiveTab(tab)}
+-                className={`px-6 py-2 text-[14px] font-medium border-b-2 transition-colors ${
+-                  activeTab === tab ? 'border-[#1E5FA5] text-[#1E5FA5]' : 'border-transparent text-[#757575] hover:text-[#212121]'
+-                }`}
+-              >
+-                {tab}
+-              </button>
+-            ))}
+-          </div>
++          <h1 className="text-[24px] font-bold text-[#212121] mb-4">
++            {isAdmin ? "B├ío c├ío & Thß╗æng k├¬" : "B├ío c├ío sß╗▒ cß╗æ"}
++          </h1>
++          {isAdmin && (
++            <div className="flex border-b border-[#E0E0E0]">
++              {['Thß╗æng k├¬', 'Sß╗▒ cß╗æ'].map(tab => (
++                <button 
++                  key={tab}
++                  onClick={() => setActiveTab(tab)}
++                  className={`px-6 py-2 text-[14px] font-medium border-b-2 transition-colors ${
++                    activeTab === tab ? 'border-[#1E5FA5] text-[#1E5FA5]' : 'border-transparent text-[#757575] hover:text-[#212121]'
++                  }`}
++                >
++                  {tab}
++                </button>
++              ))}
++            </div>
++          )}
+         </div>
+         {activeTab === "Thß╗æng k├¬" && (
+           <button onClick={handleExportCSV} className="flex items-center gap-2 bg-white border border-[#E0E0E0] hover:bg-[#F5F5F5] text-[#212121] px-4 py-2.5 rounded-md font-medium transition-colors text-[14px] shadow-sm mb-2">
+@@ -282,7 +291,7 @@ export function Reports() {
+                     </td>
+                   </tr>
+                 ) : reports.map((r) => (
+-                  <tr key={r.id} className="hover:bg-[#F5F5F5] bg-white transition-colors">
++                  <tr key={r.id} onClick={() => { setSelectedReport(r); setIsDetailModalOpen(true); }} className="hover:bg-[#F5F5F5] bg-white transition-colors cursor-pointer">
+                     <td className="px-6 py-4 text-[14px] text-[#212121]" title={format(new Date(r.created_at), "dd/MM/yyyy HH:mm")}>{timeAgo(r.created_at)}</td>
+                     <td className="px-6 py-4 text-[14px] text-[#212121]">{r.user?.name}</td>
+                     <td className="px-6 py-4">
+@@ -295,7 +304,7 @@ export function Reports() {
+                     <td className="px-6 py-4"><StatusBadge status={r.status} /></td>
+                     {isAdmin && (
+                       <td className="px-6 py-4 text-center">
+-                        <div className="flex items-center justify-center gap-2">
++                        <div className="flex items-center justify-center gap-2" onClick={e => e.stopPropagation()}>
+                           {r.status === 'OPEN' && (
+                             <button onClick={() => handleUpdateStatus(r.id, "IN_PROGRESS")} className="text-[12px] px-3 py-1 bg-[#FFF8E1] text-[#F59E0B] border border-[#FFECB3] hover:bg-[#FFECB3] rounded transition-colors">
+                               Bß║»t ─æß║ºu sß╗¡a
+@@ -370,6 +379,65 @@ export function Reports() {
+         </div>
+       )}
+ 
++      {/* Detail & Comment Modal */}
++      {isDetailModalOpen && selectedReport && (
++        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
++          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
++            <div className="p-4 border-b border-[#E0E0E0] flex justify-between items-center bg-[#FAFAFA] flex-shrink-0">
++              <h3 className="font-bold text-[#212121] text-[16px]">Chi tiß║┐t Sß╗▒ cß╗æ #{selectedReport.id}</h3>
++              <button onClick={() => setIsDetailModalOpen(false)} className="p-1.5 text-[#757575] hover:bg-[#E0E0E0] rounded transition-colors">
++                <X className="w-5 h-5" />
++              </button>
++            </div>
++            
++            <div className="flex-1 overflow-auto flex flex-col">
++              {/* Report Details */}
++              <div className="p-6 space-y-4">
++                <div>
++                  <h4 className="text-[18px] font-bold text-[#212121]">{selectedReport.title}</h4>
++                  <div className="flex items-center gap-3 mt-2">
++                    <StatusBadge status={selectedReport.status} />
++                    <span className="text-[13px] text-[#757575]">{format(new Date(selectedReport.created_at), "dd/MM/yyyy HH:mm")}</span>
++                    <span className="text-[13px] font-medium text-[#1E5FA5] bg-[#D6E4F7] px-2 py-0.5 rounded-full">{selectedReport.user?.name}</span>
++                  </div>
++                </div>
++                
++                <div className="grid grid-cols-2 gap-4 bg-[#F5F5F5] p-4 rounded-lg border border-[#E0E0E0]">
++                  <div>
++                    <span className="block text-[12px] text-[#757575] mb-1">Thiß║┐t bß╗ï li├¬n quan</span>
++                    <span className="text-[14px] font-medium text-[#212121]">
++                      {selectedReport.equipment ? `${selectedReport.equipment.name} (${selectedReport.equipment.serial_number})` : '-'}
++                    </span>
++                  </div>
++                  <div>
++                    <span className="block text-[12px] text-[#757575] mb-1">Ph├▓ng Lab</span>
++                    <span className="text-[14px] font-medium text-[#212121]">
++                      {selectedReport.room ? selectedReport.room.name : '-'}
++                    </span>
++                  </div>
++                </div>
++
++                <div>
++                  <h5 className="text-[13px] font-bold text-[#757575] mb-2">M├ö Tß║ó CHI TIß║╛T</h5>
++                  <p className="text-[14px] text-[#424242] whitespace-pre-wrap bg-[#FAFAFA] p-4 rounded-lg border border-[#E0E0E0]">
++                    {selectedReport.description}
++                  </p>
++                </div>
++              </div>
++
++              {/* Comment Section (gß║»n v├áo nß╗¡a d╞░ß╗¢i cß╗ºa modal) */}
++              <div className="mt-auto">
++                <CommentSection 
++                  entityType="report" 
++                  entityId={selectedReport.id} 
++                  currentUser={currentUser} 
++                />
++              </div>
++            </div>
++          </div>
++        </div>
++      )}
++
+       <ConfirmModal
+         isOpen={deleteConfirmReportId !== null}
+         title="X├│a b├ío c├ío sß╗▒ cß╗æ"
+diff --git a/frontend/src/services/apiClient.ts b/frontend/src/services/apiClient.ts
+index 635e2a7..b872d1f 100644
+--- a/frontend/src/services/apiClient.ts
++++ b/frontend/src/services/apiClient.ts
+@@ -10,7 +10,7 @@ const apiClient = axios.create({
+   },
+ });
+ 
+-// Add token to requests
++// Th├¬m Access Token v├áo mß╗ìi Request
+ apiClient.interceptors.request.use((config) => {
+   const token = localStorage.getItem('token');
+   if (token) {
+@@ -19,11 +19,27 @@ apiClient.interceptors.request.use((config) => {
+   return config;
+ });
+ 
+-// Handle response errors
++let isRefreshing = false;
++let failedQueue: any[] = [];
++
++const processQueue = (error: any, token: string | null = null) => {
++  failedQueue.forEach((prom) => {
++    if (error) {
++      prom.reject(error);
++    } else {
++      prom.resolve(token);
++    }
++  });
++  failedQueue = [];
++};
++
++// Xß╗¡ l├╜ lß╗ùi to├án cß╗Ñc
+ apiClient.interceptors.response.use(
+   (response) => response,
+-  (error) => {
+-    // Network errors (Server down, cors, etc)
++  async (error) => {
++    const originalRequest = error.config;
++
++    // Lß╗ùi mß║íng (Network error / Server Down)
+     if (!error.response) {
+       toast.error('Mß║Ñt kß║┐t nß╗æi m├íy chß╗º. Vui l├▓ng kiß╗âm tra mß║íng!');
+       return Promise.reject(error);
+@@ -31,15 +47,75 @@ apiClient.interceptors.response.use(
+ 
+     const { status, data } = error.response;
+ 
+-    if (status === 401) {
+-      localStorage.removeItem('token');
+-      localStorage.removeItem('user');
+-      window.location.href = '/login';
+-      toast.error('Phi├¬n ─æ─âng nhß║¡p ─æ├ú hß║┐t hß║ín.');
+-    } else if (status === 403) {
++    // Bß║»t lß╗ùi 401 (Access Token hß║┐t hß║ín) v├á gß╗ìi API cß║Ñp lß║íi Token
++    if (status === 401 && !originalRequest._retry) {
++      if (isRefreshing) {
++        return new Promise(function (resolve, reject) {
++          failedQueue.push({ resolve, reject });
++        })
++          .then((token) => {
++            originalRequest.headers['Authorization'] = 'Bearer ' + token;
++            return apiClient(originalRequest);
++          })
++          .catch((err) => {
++            return Promise.reject(err);
++          });
++      }
++
++      originalRequest._retry = true;
++      isRefreshing = true;
++
++      const refreshToken = localStorage.getItem('refresh_token');
++      const userStr = localStorage.getItem('user');
++
++      if (!refreshToken || !userStr) {
++        isRefreshing = false;
++        localStorage.removeItem('token');
++        localStorage.removeItem('refresh_token');
++        localStorage.removeItem('user');
++        window.location.href = '/login';
++        return Promise.reject(error);
++      }
++
++      try {
++        const user = JSON.parse(userStr);
++        // Gß╗ìi thß║│ng axios gß╗æc ─æß╗â kh├┤ng d├¡nh v├áo v├▓ng lß║╖p cß╗ºa apiClient
++        const response = await axios.post(`${API_BASE_URL}/api/auth/refresh`, {
++          userId: user.id,
++          refreshToken: refreshToken,
++        });
++
++        const { access_token, refresh_token: new_refresh_token } = response.data;
++        
++        // Cß║¡p nhß║¡t Token mß╗¢i
++        localStorage.setItem('token', access_token);
++        localStorage.setItem('refresh_token', new_refresh_token);
++
++        apiClient.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
++        originalRequest.headers['Authorization'] = `Bearer ${access_token}`;
++
++        processQueue(null, access_token);
++        return apiClient(originalRequest); // Gß╗¡i lß║íi Request ban ─æß║ºu bß╗ï fail
++      } catch (refreshError) {
++        processQueue(refreshError, null);
++        localStorage.removeItem('token');
++        localStorage.removeItem('refresh_token');
++        localStorage.removeItem('user');
++        window.location.href = '/login';
++        toast.error('Phi├¬n ─æ─âng nhß║¡p ─æ├ú hß║┐t hß║ín. Vui l├▓ng ─æ─âng nhß║¡p lß║íi.');
++        return Promise.reject(refreshError);
++      } finally {
++        isRefreshing = false;
++      }
++    }
++
++    // Xß╗¡ l├╜ c├íc lß╗ùi kh├íc
++    if (status === 403) {
+       toast.error('Bß║ín kh├┤ng c├│ quyß╗ün thß╗▒c hiß╗çn h├ánh ─æß╗Öng n├áy.');
+-    } else if (status === 400 || status === 404 || status === 409) {
+-      // Backend error messages
++    } else if (status === 409) {
++      const msg = data.message || data.error || 'T├ái nguy├¬n ─æ├ú bß╗ï thay ─æß╗òi bß╗ƒi mß╗Öt ng╞░ß╗¥i d├╣ng kh├íc. Vui l├▓ng tß║úi lß║íi dß╗» liß╗çu.';
++      toast.error(Array.isArray(msg) ? msg[0] : msg);
++    } else if (status === 400 || status === 404) {
+       const msg = data.message || data.error || 'Y├¬u cß║ºu kh├┤ng hß╗úp lß╗ç.';
+       toast.error(Array.isArray(msg) ? msg[0] : msg);
+     } else if (status >= 500) {
+diff --git a/frontend/src/services/index.ts b/frontend/src/services/index.ts
+index 368f302..f67aa3e 100644
+--- a/frontend/src/services/index.ts
++++ b/frontend/src/services/index.ts
+@@ -120,6 +120,19 @@ export const reportService = {
+   delete: (id: string) => apiClient.delete(`/api/reports/${id}`),
+ };
+ 
++export const commentService = {
++  getAll: (reportId?: number, bookingId?: number, equipmentId?: number) => {
++    const params = new URLSearchParams();
++    if (reportId) params.append('reportId', reportId.toString());
++    if (bookingId) params.append('bookingId', bookingId.toString());
++    if (equipmentId) params.append('equipmentId', equipmentId.toString());
++    return apiClient.get(`/api/comments?${params.toString()}`);
++  },
++  create: (data: { content: string; reportId?: number; bookingId?: number; equipmentId?: number; parentId?: number }) => 
++    apiClient.post('/api/comments', data),
++  delete: (id: number) => apiClient.delete(`/api/comments/${id}`)
++};
++
+ export const courseService = {
+   getAll: () => apiClient.get('/api/courses'),
+ 

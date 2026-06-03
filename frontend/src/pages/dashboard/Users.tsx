@@ -14,27 +14,42 @@ export function Users() {
   const [newUser, setNewUser] = useState({ name: "", email: "", password: "", role: "STUDENT" });
   const [editingUser, setEditingUser] = useState({ id: 0, name: "", email: "", role: "STUDENT" });
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  const [filterStatus, setFilterStatus] = useState("ALL"); // ALL, BLACKLIST
+  const [blacklistingUserId, setBlacklistingUserId] = useState<number | null>(null);
+  const [blacklistReason, setBlacklistReason] = useState("");
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
+  async function fetchData() {
     setIsLoading(true);
     try {
       const res = await userService.getAll();
       setUsers(res.data || []);
     } catch (error) {
-      console.error(error);
+      // apiClient.ts sẽ tự hiển thị toast lỗi
     } finally {
       setIsLoading(false);
     }
+  }
+
+  const handleToggleActiveClick = (userId: number, currentStatus: boolean) => {
+    if (currentStatus) {
+      // Khóa -> Mở Modal nhập lý do
+      setBlacklistingUserId(userId);
+      setBlacklistReason("");
+    } else {
+      // Mở khóa -> Gỡ Blacklist
+      executeToggleActive(userId, true, "");
+    }
   };
 
-  const toggleActive = async (userId: number, currentStatus: boolean) => {
+  const executeToggleActive = async (userId: number, newStatus: boolean, reason: string) => {
     try {
-      await userService.update(userId.toString(), { is_active: !currentStatus });
-      toast.success(currentStatus ? "Đã khóa tài khoản" : "Đã mở khóa tài khoản");
+      await userService.update(userId.toString(), { is_active: newStatus, blacklist_reason: reason });
+      toast.success(newStatus ? "Đã gỡ Blacklist thành công" : "Đã thêm vào Blacklist");
+      setBlacklistingUserId(null);
       fetchData();
     } catch (error) {
       toast.error("Cập nhật trạng thái thất bại");
@@ -99,8 +114,9 @@ export function Users() {
   };
 
   const filteredUsers = users.filter(u => 
-    (u.name || "").toLowerCase().includes(searchTerm.toLowerCase()) || 
-    (u.email || "").toLowerCase().includes(searchTerm.toLowerCase())
+    ((u.name || "").toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (u.email || "").toLowerCase().includes(searchTerm.toLowerCase())) &&
+    (filterStatus === "ALL" || (filterStatus === "BLACKLIST" && u.is_active === false))
   );
 
   return (
@@ -127,12 +143,22 @@ export function Users() {
               className="w-full pl-9 pr-4 py-2 bg-white border border-[#E0E0E0] rounded text-[14px] focus:outline-none focus:border-[#1E5FA5]"
             />
           </div>
-          <select className="px-4 py-2 bg-white border border-[#E0E0E0] rounded text-[14px] text-[#212121] outline-none">
-            <option>Vai trò (Tất cả)</option>
-            <option>Sinh viên</option>
-            <option>Giảng viên</option>
-            <option>Quản trị viên</option>
-          </select>
+          <div className="flex gap-2">
+            <select 
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-4 py-2 bg-white border border-[#E0E0E0] rounded text-[14px] text-[#212121] outline-none"
+            >
+              <option value="ALL">Tất cả tài khoản</option>
+              <option value="BLACKLIST">Danh sách Blacklist</option>
+            </select>
+            <select className="px-4 py-2 bg-white border border-[#E0E0E0] rounded text-[14px] text-[#212121] outline-none">
+              <option>Vai trò (Tất cả)</option>
+              <option>Sinh viên</option>
+              <option>Giảng viên</option>
+              <option>Quản trị viên</option>
+            </select>
+          </div>
         </div>
 
         {/* Table */}
@@ -157,20 +183,36 @@ export function Users() {
                 </tr>
               ) : filteredUsers.map((u) => (
                 <tr key={u.id} className="hover:bg-[#F5F5F5] bg-white transition-colors">
-                  <td className="px-6 py-4 text-[14px] font-bold text-[#212121]">{u.name}</td>
+                  <td className="px-6 py-4 text-[14px] font-bold text-[#212121]">
+                    {u.name}
+                    {u.is_active === false && (
+                      <p className="text-[12px] font-normal text-[#C62828] mt-1 bg-[#FDEDED] px-2 py-1 rounded inline-block">
+                        Blacklist: {u.blacklist_reason || "Không có lý do"}
+                      </p>
+                    )}
+                  </td>
                   <td className="px-6 py-4 text-[14px] text-[#757575] font-mono">{u.id}</td>
                   <td className="px-6 py-4 text-[14px] text-[#212121]">{u.email}</td>
                   <td className="px-6 py-4">
                     <span className="px-2 py-1 bg-[#F5F5F5] rounded text-[12px] font-medium text-[#757575]">{getRoleLabel(u.role)}</span>
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <button 
-                      onClick={() => toggleActive(u.id, u.is_active ?? true)}
-                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${u.is_active !== false ? 'bg-[#1E5FA5]' : 'bg-[#E0E0E0]'}`}
-                      title={u.is_active !== false ? "Khóa tài khoản" : "Mở khóa tài khoản"}
-                    >
-                      <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${u.is_active !== false ? 'translate-x-4' : 'translate-x-1'}`} />
-                    </button>
+                    {u.is_active === false ? (
+                      <button 
+                        onClick={() => handleToggleActiveClick(u.id, false)}
+                        className="px-3 py-1 bg-[#F5F5F5] border border-[#E0E0E0] hover:bg-white text-[#212121] rounded text-[12px] font-medium transition-colors"
+                      >
+                        Gỡ Blacklist
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => handleToggleActiveClick(u.id, true)}
+                        className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors bg-[#1E5FA5]"
+                        title="Thêm vào Blacklist"
+                      >
+                        <span className="inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform translate-x-4" />
+                      </button>
+                    )}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-1">
@@ -258,6 +300,32 @@ export function Users() {
               <div className="flex justify-end gap-3 mt-6">
                 <button type="button" onClick={() => setIsEditingUser(false)} className="px-4 py-2 text-[#757575] hover:bg-[#F5F5F5] rounded-md transition-colors">Hủy</button>
                 <button type="submit" className="px-4 py-2 bg-[#1E5FA5] hover:bg-[#154a85] text-white rounded-md transition-colors">Cập nhật</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {blacklistingUserId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6">
+            <h2 className="text-[20px] font-bold text-[#C62828] mb-2">Đưa vào Blacklist</h2>
+            <p className="text-[14px] text-[#757575] mb-4">Tài khoản này sẽ không thể đăng nhập vào hệ thống cho đến khi được gỡ bỏ.</p>
+            <form onSubmit={(e) => { e.preventDefault(); executeToggleActive(blacklistingUserId, false, blacklistReason); }} className="space-y-4">
+              <div>
+                <label className="block text-[13px] font-medium text-[#757575] mb-1">Lý do Blacklist (hiển thị cho sinh viên)</label>
+                <textarea 
+                  required 
+                  rows={3}
+                  value={blacklistReason} 
+                  onChange={e => setBlacklistReason(e.target.value)} 
+                  placeholder="Vd: Không đến phòng Lab sau khi đặt quá 3 lần"
+                  className="w-full px-3 py-2 border border-[#E0E0E0] rounded-md focus:outline-none focus:border-[#C62828]" 
+                />
+              </div>
+              <div className="flex justify-end gap-3 mt-6">
+                <button type="button" onClick={() => setBlacklistingUserId(null)} className="px-4 py-2 text-[#757575] hover:bg-[#F5F5F5] rounded-md transition-colors">Hủy</button>
+                <button type="submit" className="px-4 py-2 bg-[#C62828] hover:bg-[#B71C1C] text-white rounded-md transition-colors">Xác nhận Khóa</button>
               </div>
             </form>
           </div>

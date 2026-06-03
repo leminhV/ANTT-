@@ -12,6 +12,7 @@ import { Users } from "./pages/dashboard/Users";
 import { ResourceManagement } from "./pages/chemicals/ResourceManagement";
 import { Reports } from "./pages/reports/Reports";
 import { Courses } from "./pages/courses/Courses";
+import { Settings } from "./pages/settings/Settings";
 import { ErrorBoundary } from "./components/common/ErrorBoundary";
 
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
@@ -52,6 +53,7 @@ export const router = createBrowserRouter([
           { path: "resources", Component: ResourceManagement },
           { path: "courses", Component: Courses },
           { path: "reports", Component: Reports },
+          { path: "settings", Component: Settings },
         ],
       },
     ],

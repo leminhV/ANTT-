@@ -20,7 +20,7 @@ export function ResourceManagement() {
     setIsLoadingRooms(true);
     roomService.getAll()
       .then(res => setRooms(res.data || []))
-      .catch(console.error)
+      .catch(() => { /* apiClient.ts sẽ tự hiển thị toast lỗi */ })
       .finally(() => setIsLoadingRooms(false));
   };
 
@@ -38,7 +38,7 @@ export function ResourceManagement() {
       setNewRoom({ name: "", location: "", capacity: 30, has_air_conditioner: true });
       toast.success("Thêm phòng Lab thành công!");
       fetchRooms();
-    } catch (error) {
+    } catch {
       toast.error("Thêm phòng thất bại");
     }
   };
@@ -52,7 +52,7 @@ export function ResourceManagement() {
       setIsEditingRoom(false);
       toast.success("Cập nhật phòng Lab thành công!");
       fetchRooms();
-    } catch (error) {
+    } catch {
       toast.error("Cập nhật phòng thất bại");
     }
   };
@@ -64,7 +64,7 @@ export function ResourceManagement() {
         toast.success("Xóa phòng Lab thành công!");
         setDeleteConfirmRoomId(null);
         fetchRooms();
-      } catch (error) {
+      } catch {
         toast.error("Xóa phòng thất bại");
       }
     }

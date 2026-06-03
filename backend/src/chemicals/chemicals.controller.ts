@@ -38,9 +38,10 @@ export class ChemicalsController {
 
   @Get('history/usage')
   getUsageHistory(@Query('chemicalId') chemicalId?: string) {
-    return this.chemicalsService.getUsageHistory(chemicalId ? parseInt(chemicalId, 10) : undefined);
+    return this.chemicalsService.getUsageHistory(
+      chemicalId ? parseInt(chemicalId, 10) : undefined,
+    );
   }
-
 
   @Get()
   findAll() {

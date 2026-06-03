@@ -26,7 +26,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
     // Ghi log lỗi vào file hoặc console (không gửi về client để giấu stack trace)
     if (!isHttpException) {
-      console.error(`[CRITICAL ERROR] ${request.method} ${request.url}`, exception);
+      console.error(
+        `[CRITICAL ERROR] ${request.method} ${request.url}`,
+        exception,
+      );
     }
 
     response.status(status).json({
@@ -34,7 +37,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       path: request.url,
       // Ép kiểu message để trả về đúng định dạng, ẩn hoàn toàn stack trace nếu là lỗi 500
-      message: typeof message === 'string' ? message : (message as any).message || message,
+      message:
+        typeof message === 'string'
+          ? message
+          : (message as Record<string, unknown>).message || message,
     });
   }
 }

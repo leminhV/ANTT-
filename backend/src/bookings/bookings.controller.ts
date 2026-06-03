@@ -1,13 +1,15 @@
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import type { UserPayload } from '../auth/interfaces/user-payload.interface';
 import {
   Controller,
   Get,
   Post,
   Body,
   Patch,
+  Put,
   Param,
   Delete,
   UseGuards,
-  Request,
   ParseIntPipe,
 } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
@@ -24,8 +26,11 @@ export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
   @Post()
-  create(@Body() createBookingDto: CreateBookingDto, @Request() req: any) {
-    return this.bookingsService.create(createBookingDto, req.user.userId);
+  create(
+    @Body() createBookingDto: CreateBookingDto,
+    @CurrentUser() user: UserPayload,
+  ) {
+    return this.bookingsService.create(createBookingDto, user.userId);
   }
 
   @Get()
@@ -34,13 +39,22 @@ export class BookingsController {
   }
 
   @Get('user/my-bookings')
-  findMyBookings(@Request() req: any) {
-    return this.bookingsService.findMyBookings(req.user.userId);
+  findMyBookings(@CurrentUser() user: UserPayload) {
+    return this.bookingsService.findMyBookings(user.userId);
+  }
+
+  @Put('approve-all')
+  @Roles(Role.ADMIN, Role.INSTRUCTOR, Role.TECHNICIAN)
+  approveAllPending() {
+    return this.bookingsService.approveAllPending();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number, @Request() req: any) {
-    return this.bookingsService.findOneSecure(id, req.user);
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: UserPayload,
+  ) {
+    return this.bookingsService.findOneSecure(id, user);
   }
 
   @Patch(':id')
@@ -53,8 +67,11 @@ export class BookingsController {
   }
 
   @Post(':id/cancel')
-  cancelBooking(@Param('id', ParseIntPipe) id: number, @Request() req: any) {
-    return this.bookingsService.cancelBooking(id, req.user.userId);
+  cancelBooking(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: UserPayload,
+  ) {
+    return this.bookingsService.cancelBooking(id, user.userId);
   }
 
   @Delete(':id')

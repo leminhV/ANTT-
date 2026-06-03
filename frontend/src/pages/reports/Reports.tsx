@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Download, FileText, Settings, AlertTriangle, CheckCircle, Plus, Search, RefreshCw, X, FileX, Trash2 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { reportService, equipmentService, roomService } from "../../services";
@@ -34,11 +34,7 @@ export function Reports() {
   const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
   const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.role === 'TECHNICIAN';
 
-  useEffect(() => {
-    if (activeTab === "Sự cố") fetchData();
-  }, [activeTab]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
       const [repRes, eqRes, roomRes] = await Promise.all([
@@ -50,11 +46,15 @@ export function Reports() {
       setEquipments(eqRes.data || []);
       setRooms(roomRes.data || []);
     } catch (error) {
-      console.error(error);
+      // apiClient.ts sẽ tự hiển thị toast lỗi
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isAdmin]);
+
+  useEffect(() => {
+    if (activeTab === "Sự cố") fetchData();
+  }, [activeTab, fetchData]);
 
   const handleCreateReport = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,7 +70,7 @@ export function Reports() {
       setFormData({ title: "", description: "", equipment_id: "", room_id: "" });
       fetchData();
     } catch (error) {
-      console.error(error);
+      // apiClient.ts sẽ tự hiển thị toast lỗi
     }
   };
 
@@ -80,7 +80,7 @@ export function Reports() {
       toast.success("Đã cập nhật trạng thái");
       fetchData();
     } catch (error) {
-      console.error(error);
+      // apiClient.ts sẽ tự hiển thị toast lỗi
     }
   };
 

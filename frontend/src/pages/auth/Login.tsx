@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
-import { Shield, AlertCircle, User, Lock, Eye, EyeOff } from "lucide-react";
+import { AlertCircle, User, Lock, Eye, EyeOff } from "lucide-react";
+import { toast } from 'react-hot-toast';
 import { authService } from "../../services";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 
@@ -9,19 +10,20 @@ export function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError(false);
+    setErrorMessage("");
     
     try {
       const response = await authService.login({ email: email.trim(), password });
-      const { access_token, user } = response.data;
+      const { access_token, refresh_token, user } = response.data;
       
       authService.saveToken(access_token);
+      localStorage.setItem("refresh_token", refresh_token);
       localStorage.setItem("userRole", user.role.toLowerCase());
       localStorage.setItem("user", JSON.stringify(user));
       
@@ -30,9 +32,15 @@ export function Login() {
       } else {
         navigate("/student-dashboard");
       }
-    } catch (err) {
-      console.error(err);
-      setError(true);
+    } catch (err: any) {
+      toast.error("Đăng nhập thất bại");
+      if (err.response?.data?.message) {
+        // Có thể là Array message (Validation) hoặc string (Blacklist/Unauthorized)
+        const msg = err.response.data.message;
+        setErrorMessage(Array.isArray(msg) ? msg[0] : msg);
+      } else {
+        setErrorMessage("Đăng nhập thất bại. Vui lòng kiểm tra kết nối mạng.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -72,12 +80,12 @@ export function Login() {
             <p className="text-[14px] text-[#757575]">Chào mừng trở lại! Vui lòng đăng nhập để tiếp tục.</p>
           </div>
 
-          {/* Security Requirement: Generic Error Message */}
-          {error && (
+          {/* Security Requirement / Blacklist Info */}
+          {errorMessage && (
             <div className="mb-6 flex items-start gap-3 p-3 rounded bg-[#FDEDED] border border-[#C62828] text-[#C62828] animate-in fade-in slide-in-from-top-2 duration-300">
               <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-[14px] font-medium">Tên đăng nhập hoặc mật khẩu không đúng.</p>
+                <p className="text-[14px] font-medium">{errorMessage}</p>
               </div>
             </div>
           )}
@@ -94,8 +102,8 @@ export function Login() {
                   type="email"
                   required
                   value={email}
-                  onChange={(e) => { setEmail(e.target.value); setError(false); }}
-                  className={`w-full pl-10 pr-4 h-[44px] rounded-[8px] border bg-white focus:outline-none focus:ring-2 focus:ring-[#1E5FA5] transition-all text-[14px] ${error ? 'border-[#C62828]' : 'border-[#E0E0E0]'}`}
+                  onChange={(e) => { setEmail(e.target.value); setErrorMessage(""); }}
+                  className={`w-full pl-10 pr-4 h-[44px] rounded-[8px] border bg-white focus:outline-none focus:ring-2 focus:ring-[#1E5FA5] transition-all text-[14px] ${errorMessage ? 'border-[#C62828]' : 'border-[#E0E0E0]'}`}
                   placeholder="vd: nguyen_van_a"
                 />
               </div>
@@ -112,8 +120,8 @@ export function Login() {
                   type={showPassword ? "text" : "password"}
                   required
                   value={password}
-                  onChange={(e) => { setPassword(e.target.value); setError(false); }}
-                  className={`w-full pl-10 pr-10 h-[44px] rounded-[8px] border bg-white focus:outline-none focus:ring-2 focus:ring-[#1E5FA5] transition-all text-[14px] ${error ? 'border-[#C62828]' : 'border-[#E0E0E0]'}`}
+                  onChange={(e) => { setPassword(e.target.value); setErrorMessage(""); }}
+                  className={`w-full pl-10 pr-10 h-[44px] rounded-[8px] border bg-white focus:outline-none focus:ring-2 focus:ring-[#1E5FA5] transition-all text-[14px] ${errorMessage ? 'border-[#C62828]' : 'border-[#E0E0E0]'}`}
                   placeholder="••••••••"
                 />
                 <button 

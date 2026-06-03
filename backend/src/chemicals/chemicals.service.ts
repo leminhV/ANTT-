@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { CreateChemicalDto } from './dto/create-chemical.dto';
 import { UpdateChemicalDto } from './dto/update-chemical.dto';
 import { RecordUsageDto } from './dto/record-usage.dto';
@@ -26,17 +30,25 @@ export class ChemicalsService {
     const { chemicalId, amountUsed, bookingId } = recordUsageDto;
 
     if (!bookingId) {
-      throw new BadRequestException('Vui lòng cung cấp bookingId để lưu lịch sử hóa chất');
+      throw new BadRequestException(
+        'Vui lòng cung cấp bookingId để lưu lịch sử hóa chất',
+      );
     }
 
-    const booking = await this.prisma.booking.findUnique({ where: { id: bookingId } });
+    const booking = await this.prisma.booking.findUnique({
+      where: { id: bookingId },
+    });
     if (!booking) {
       throw new NotFoundException('Không tìm thấy lịch đặt');
     }
 
-    const chemical = await this.prisma.chemical.findUnique({ where: { id: chemicalId } });
+    const chemical = await this.prisma.chemical.findUnique({
+      where: { id: chemicalId },
+    });
     if (!chemical) {
-      throw new NotFoundException(`Hóa chất với ID ${chemicalId} không tồn tại`);
+      throw new NotFoundException(
+        `Hóa chất với ID ${chemicalId} không tồn tại`,
+      );
     }
 
     if (chemical.quantity_stock < amountUsed) {
@@ -64,9 +76,11 @@ export class ChemicalsService {
       where: chemicalId ? { chemical_id: chemicalId } : undefined,
       include: {
         chemical: { select: { name: true, unit: true } },
-        booking: { select: { id: true, purpose: true, user: { select: { name: true } } } }
+        booking: {
+          select: { id: true, purpose: true, user: { select: { name: true } } },
+        },
       },
-      orderBy: { used_at: 'desc' }
+      orderBy: { used_at: 'desc' },
     });
   }
 
@@ -94,8 +108,8 @@ export class ChemicalsService {
       where: { id },
       data: {
         ...rest,
-        ...(expiration_date !== undefined && { 
-          expiration_date: expiration_date ? new Date(expiration_date) : null 
+        ...(expiration_date !== undefined && {
+          expiration_date: expiration_date ? new Date(expiration_date) : null,
         }),
       },
     });

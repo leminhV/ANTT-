@@ -23,7 +23,7 @@ export function Approvals() {
       const res = await bookingService.getAll();
       setRequests(res.data || []);
     } catch (error) {
-      console.error(error);
+      // apiClient.ts đã xử lý toast
     } finally {
       setIsLoading(false);
     }
@@ -35,7 +35,7 @@ export function Approvals() {
       setRequests(prev => prev.map(r => r.id === id ? { ...r, status } : r));
       toast.success("Cập nhật trạng thái thành công");
     } catch (error) {
-      console.error(error);
+      // apiClient.ts đã xử lý toast
     }
   };
 
@@ -56,7 +56,7 @@ export function Approvals() {
         toast.success(`Đã duyệt ${pendingReqs.length} đơn`);
         fetchData();
       } catch (error) {
-        console.error(error);
+        // apiClient.ts đã xử lý toast
       }
     } else if (confirmState.type === 'REJECT' && confirmState.id) {
       handleUpdateStatus(confirmState.id, "REJECTED");

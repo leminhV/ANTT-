@@ -2,7 +2,9 @@ import {
   Injectable,
   BadRequestException,
   UnauthorizedException,
+  ForbiddenException,
 } from '@nestjs/common';
+import { I18nContext } from 'nestjs-i18n';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
@@ -46,6 +48,15 @@ export class AuthService {
       throw new UnauthorizedException('Email hoặc mật khẩu không chính xác');
     }
 
+    if (!user.is_active) {
+      const reason = user.blacklist_reason || 'Vi phạm nội quy hệ thống';
+      throw new ForbiddenException(
+        I18nContext.current()?.t('messages.errors.BLACKLISTED', {
+          args: { reason },
+        }) || `Tài khoản của bạn đã bị khóa. Lý do: ${reason}`,
+      );
+    }
+
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
       throw new UnauthorizedException('Email hoặc mật khẩu không chính xác');
@@ -67,7 +78,10 @@ export class AuthService {
     }
 
     // Kiểm tra Hash của Refresh Token
-    const isRefreshTokenValid = await bcrypt.compare(refreshToken, user.refresh_token);
+    const isRefreshTokenValid = await bcrypt.compare(
+      refreshToken,
+      user.refresh_token,
+    );
     if (!isRefreshTokenValid) {
       throw new UnauthorizedException('Phiên đăng nhập không hợp lệ');
     }
@@ -87,7 +101,7 @@ export class AuthService {
 
     // 2. Tạo Refresh Token ngẫu nhiên (Opaque Token)
     const refreshToken = crypto.randomBytes(40).toString('hex');
-    
+
     // 3. Hash Refresh Token để lưu vào Database bảo mật
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
     await this.usersService.updateRefreshToken(user.id, hashedRefreshToken);
@@ -101,7 +115,7 @@ export class AuthService {
         email: user.email,
         name: user.name,
         role: user.role,
-        avatar_url: (user as any).avatar_url,
+        avatar_url: (user as { avatar_url?: string }).avatar_url,
       },
     };
   }

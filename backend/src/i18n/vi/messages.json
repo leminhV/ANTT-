@@ -1,0 +1,20 @@
+{
+  "errors": {
+    "NOT_FOUND": "Bản ghi không tồn tại",
+    "TIME_INVALID": "Thời gian kết thúc phải lớn hơn thời gian bắt đầu",
+    "PAST_TIME_NOT_ALLOWED": "Không thể đặt lịch trong quá khứ",
+    "MAINTENANCE_MODE": "Hệ thống đang bảo trì, không thể đặt phòng lúc này",
+    "OUT_OF_HOURS": "Chỉ được đặt lịch trong khung giờ từ {startHourLimit}:00 đến {endHourLimit}:00",
+    "MAX_BOOKINGS_EXCEEDED": "Sinh viên chỉ được tạo tối đa {maxBookings} Booking trong cùng 1 ngày",
+    "ROOM_CONFLICT": "Phòng Lab đã được đặt trong khoảng thời gian này",
+    "EQUIPMENT_UNAVAILABLE": "Thiết bị đang ở trạng thái {status} không thể đặt",
+    "EQUIPMENT_CONFLICT": "Thiết bị đã được đặt trong khoảng thời gian này",
+    "BOOKING_NOT_FOUND": "Lịch đặt với ID {id} không tồn tại",
+    "UNAUTHORIZED_CANCEL": "Bạn không có quyền hủy đơn này",
+    "INVALID_STATUS_CANCEL": "Không thể hủy đơn ở trạng thái này",
+    "DURATION_TOO_SHORT": "Thời lượng đặt phòng tối thiểu là {min} phút",
+    "DURATION_TOO_LONG": "Thời lượng đặt phòng tối đa là {max} phút",
+    "BUFFER_TIME_REQUIRED": "Cần ít nhất {buffer} phút trống giữa 2 ca để dọn dẹp",
+    "BLACKLISTED": "Tài khoản của bạn đã bị khóa. Lý do: {reason}"
+  }
+}

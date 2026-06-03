@@ -1,3 +1,5 @@
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import type { UserPayload } from '../auth/interfaces/user-payload.interface';
 import {
   Controller,
   Get,
@@ -7,7 +9,6 @@ import {
   Param,
   Delete,
   UseGuards,
-  Request,
   ParseIntPipe,
 } from '@nestjs/common';
 import { ReportsService } from './reports.service';
@@ -24,8 +25,11 @@ export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
 
   @Post()
-  create(@Body() createReportDto: CreateReportDto, @Request() req: any) {
-    return this.reportsService.create(createReportDto, req.user.userId);
+  create(
+    @Body() createReportDto: CreateReportDto,
+    @CurrentUser() user: UserPayload,
+  ) {
+    return this.reportsService.create(createReportDto, user.userId);
   }
 
   @Get()
@@ -34,8 +38,8 @@ export class ReportsController {
   }
 
   @Get('user/my-reports')
-  findMyReports(@Request() req: any) {
-    return this.reportsService.findMyReports(req.user.userId);
+  findMyReports(@CurrentUser() user: UserPayload) {
+    return this.reportsService.findMyReports(user.userId);
   }
 
   @Get('statistics/overview')
@@ -44,8 +48,11 @@ export class ReportsController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number, @Request() req: any) {
-    return this.reportsService.findOneSecure(id, req.user);
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: UserPayload,
+  ) {
+    return this.reportsService.findOneSecure(id, user);
   }
 
   @Patch(':id')

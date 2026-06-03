@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -44,13 +44,14 @@ export class UsersService {
         name: true,
         role: true,
         is_active: true,
+        blacklist_reason: true,
         created_at: true,
       },
     });
   }
 
   async update(id: number, data: UpdateUserDto) {
-    let updateData = { ...data };
+    const updateData = { ...data };
     if (data.password) {
       updateData.password = await bcrypt.hash(data.password, 10);
     }

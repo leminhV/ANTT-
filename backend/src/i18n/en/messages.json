@@ -1,0 +1,20 @@
+{
+  "errors": {
+    "NOT_FOUND": "Record not found",
+    "TIME_INVALID": "End time must be after start time",
+    "PAST_TIME_NOT_ALLOWED": "Cannot book in the past",
+    "MAINTENANCE_MODE": "System is under maintenance, booking is currently disabled",
+    "OUT_OF_HOURS": "Booking is only allowed between {startHourLimit}:00 and {endHourLimit}:00",
+    "MAX_BOOKINGS_EXCEEDED": "A student can only create up to {maxBookings} bookings per day",
+    "ROOM_CONFLICT": "The Lab Room is already booked during this time",
+    "EQUIPMENT_UNAVAILABLE": "Equipment is in {status} status and cannot be booked",
+    "EQUIPMENT_CONFLICT": "The Equipment is already booked during this time",
+    "BOOKING_NOT_FOUND": "Booking with ID {id} not found",
+    "UNAUTHORIZED_CANCEL": "You are not authorized to cancel this booking",
+    "INVALID_STATUS_CANCEL": "Cannot cancel the booking in its current status",
+    "DURATION_TOO_SHORT": "Minimum booking duration is {min} minutes",
+    "DURATION_TOO_LONG": "Maximum booking duration is {max} minutes",
+    "BUFFER_TIME_REQUIRED": "At least {buffer} minutes buffer time is required between bookings for cleanup",
+    "BLACKLISTED": "Your account has been locked. Reason: {reason}"
+  }
+}

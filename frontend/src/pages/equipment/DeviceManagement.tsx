@@ -4,7 +4,8 @@ import { equipmentService, roomService } from "../../services";
 import { format } from "date-fns";
 import { toast } from "react-hot-toast";
 import { ConfirmModal } from "../../components/common/ConfirmModal";
-import { DatabaseBackup } from "lucide-react";
+import { CommentSection } from "../../components/common/CommentSection";
+import { DatabaseBackup, MessageSquare } from "lucide-react";
 
 function StatusBadge({ status }: { status: string }) {
   const getBadgeStyle = (status: string) => {
@@ -45,26 +46,31 @@ export function DeviceManagement() {
   const [editingDevice, setEditingDevice] = useState({ id: 0, name: "", serial_number: "", room_id: 0, status: "AVAILABLE" });
   const [rooms, setRooms] = useState<any[]>([]);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+  const [selectedDevice, setSelectedDevice] = useState<any | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  
+  const currentUserStr = localStorage.getItem("user");
+  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
 
   useEffect(() => {
     fetchData();
   }, []);
 
-  const fetchData = async () => {
+  async function fetchData() {
     setIsLoading(true);
     setFetchError(null);
     try {
       const res = await equipmentService.getAll();
       setDevices(res.data || []);
-    } catch (error) {
+    } catch {
       setFetchError("Lỗi máy chủ (500). Không thể tải danh sách thiết bị.");
       setDevices([]);
     } finally {
       setIsLoading(false);
     }
-  };
+  }
 
-  const fetchRooms = async () => {
+  async function fetchRooms() {
     try {
       const res = await roomService.getAll();
       setRooms(res.data || []);
@@ -72,9 +78,9 @@ export function DeviceManagement() {
         setNewDevice({ ...newDevice, room_id: res.data[0].id });
       }
     } catch (e) {
-      console.error(e);
+      // apiClient.ts sẽ hiển thị toast lỗi chung
     }
-  };
+  }
 
   const openAddModal = () => {
     fetchRooms();
@@ -89,7 +95,7 @@ export function DeviceManagement() {
       setIsAddingDevice(false);
       setNewDevice({ name: "", serial_number: "", room_id: rooms[0]?.id || 0, status: "AVAILABLE" });
       fetchData();
-    } catch (error) {
+    } catch {
       // toast handles it
     }
   };
@@ -106,7 +112,7 @@ export function DeviceManagement() {
       toast.success("Cập nhật thiết bị thành công!");
       setIsEditingDevice(false);
       fetchData();
-    } catch (error) {
+    } catch {
       // toast handles it
     }
   };
@@ -118,7 +124,7 @@ export function DeviceManagement() {
         setDevices(devices.filter(d => d.id !== deleteConfirmId));
         toast.success("Xóa thiết bị thành công!");
       } catch (error) {
-        console.error(error);
+        // apiClient.ts sẽ hiển thị toast lỗi chung
       }
       setDeleteConfirmId(null);
     }
@@ -235,14 +241,25 @@ export function DeviceManagement() {
                   </td>
                   <td className="px-4 py-3 text-right">
                     <div className="flex justify-end gap-1">
-                      <button onClick={() => { 
+                      <button onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedDevice(dev);
+                        setIsDetailModalOpen(true);
+                      }} className="p-1.5 text-[#757575] hover:text-[#1E5FA5] hover:bg-[#D6E4F7] rounded" title="Bình luận & Chi tiết">
+                        <MessageSquare className="w-4 h-4" />
+                      </button>
+                      <button onClick={(e) => { 
+                        e.stopPropagation();
                         setEditingDevice({ id: dev.id, name: dev.name, serial_number: dev.serial_number, room_id: dev.room_id || 0, status: dev.status }); 
                         fetchRooms(); 
                         setIsEditingDevice(true); 
                       }} className="p-1.5 text-[#757575] hover:text-[#1E5FA5] hover:bg-[#D6E4F7] rounded" title="Sửa">
                         <Edit2 className="w-4 h-4" />
                       </button>
-                      <button onClick={() => setDeleteConfirmId(dev.id)} className="p-1.5 text-[#757575] hover:text-[#C62828] hover:bg-[#FDEDED] rounded" title="Xóa">
+                      <button onClick={(e) => {
+                        e.stopPropagation();
+                        setDeleteConfirmId(dev.id);
+                      }} className="p-1.5 text-[#757575] hover:text-[#C62828] hover:bg-[#FDEDED] rounded" title="Xóa">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -263,6 +280,58 @@ export function DeviceManagement() {
           </table>
         </div>
       </div>
+
+      {/* Detail & Comment Modal */}
+      {isDetailModalOpen && selectedDevice && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-[#E0E0E0] flex justify-between items-center bg-[#F5F5F5]">
+              <div>
+                <h2 className="text-[20px] font-bold text-[#212121]">Chi tiết thiết bị #{selectedDevice.id}</h2>
+                <p className="text-[14px] text-[#757575] mt-1">{selectedDevice.name}</p>
+              </div>
+              <button 
+                onClick={() => setIsDetailModalOpen(false)}
+                className="text-[#757575] hover:text-[#212121] p-2 bg-white rounded-full"
+              >
+                ✕
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto">
+              <div className="space-y-4 mb-8">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <span className="text-[13px] text-[#757575]">Số Serial:</span>
+                    <p className="text-[14px] font-medium text-[#212121] font-mono">{selectedDevice.serial_number}</p>
+                  </div>
+                  <div>
+                    <span className="text-[13px] text-[#757575]">Trạng thái:</span>
+                    <div><StatusBadge status={selectedDevice.status} /></div>
+                  </div>
+                  <div>
+                    <span className="text-[13px] text-[#757575]">Phòng Lab:</span>
+                    <p className="text-[14px] font-medium text-[#212121]">{selectedDevice.room?.name || 'Chưa xếp phòng'}</p>
+                  </div>
+                  <div>
+                    <span className="text-[13px] text-[#757575]">Ngày thêm:</span>
+                    <p className="text-[14px] font-medium text-[#212121]">{format(new Date(selectedDevice.created_at), "dd/MM/yyyy")}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tích hợp Component Comment */}
+              <div className="border-t border-[#E0E0E0] pt-6">
+                <CommentSection
+                  entityType="equipment"
+                  entityId={selectedDevice.id}
+                  currentUser={currentUser}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ConfirmModal
         isOpen={deleteConfirmId !== null}

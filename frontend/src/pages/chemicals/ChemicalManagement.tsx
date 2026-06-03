@@ -27,7 +27,7 @@ export function ChemicalManagement() {
     try {
       const res = await chemicalService.getAll();
       setChemicals(res.data || []);
-    } catch (error) {
+    } catch {
       toast.error("Lỗi khi tải dữ liệu hóa chất");
     } finally {
       setIsLoading(false);
@@ -75,7 +75,7 @@ export function ChemicalManagement() {
       }
       setIsModalOpen(false);
       fetchChemicals();
-    } catch (error) {
+    } catch {
       toast.error(isEditing ? "Cập nhật thất bại" : "Thêm mới thất bại");
     }
   };
@@ -91,7 +91,7 @@ export function ChemicalManagement() {
       toast.success("Ghi nhận sử dụng thành công!");
       setIsUsageModalOpen(false);
       fetchChemicals();
-    } catch (error) {
+    } catch {
       toast.error("Có lỗi xảy ra hoặc số lượng không đủ");
     }
   };
@@ -103,7 +103,7 @@ export function ChemicalManagement() {
         toast.success("Xóa hóa chất thành công");
         setDeleteConfirmId(null);
         fetchChemicals();
-      } catch (error) {
+      } catch {
         toast.error("Xóa thất bại. Hóa chất này có thể đang có lịch sử sử dụng.");
       }
     }

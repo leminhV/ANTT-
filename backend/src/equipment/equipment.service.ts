@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEquipmentDto } from './dto/create-equipment.dto';
 import { UpdateEquipmentDto } from './dto/update-equipment.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -45,14 +45,16 @@ export class EquipmentService {
     await this.findOne(id); // Check existence
 
     const { last_maintenance, ...rest } = updateEquipmentDto;
-    
+
     // Increment row_version for Optimistic Locking
     return this.prisma.equipment.update({
       where: { id },
       data: {
         ...rest,
-        ...(last_maintenance !== undefined && { 
-          last_maintenance: last_maintenance ? new Date(last_maintenance) : null 
+        ...(last_maintenance !== undefined && {
+          last_maintenance: last_maintenance
+            ? new Date(last_maintenance)
+            : null,
         }),
         row_version: {
           increment: 1,

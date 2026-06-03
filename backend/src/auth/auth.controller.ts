@@ -1,4 +1,13 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards, Request } from '@nestjs/common';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import type { UserPayload } from '../auth/interfaces/user-payload.interface';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -31,7 +40,7 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  logout(@Request() req: any) {
-    return this.authService.logout(req.user.userId);
+  logout(@CurrentUser() user: UserPayload) {
+    return this.authService.logout(user.userId);
   }
 }

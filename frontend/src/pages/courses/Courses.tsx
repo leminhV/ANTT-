@@ -39,8 +39,7 @@ export function Courses() {
       const instrs = allUsers.filter((u: any) => u.role === 'INSTRUCTOR' || u.role === 'ADMIN');
       setInstructors(instrs);
     } catch (error) {
-      console.error(error);
-      toast.error("Không thể tải danh sách học phần");
+      // apiClient.ts đã xử lý toast
     } finally {
       setIsLoading(false);
     }

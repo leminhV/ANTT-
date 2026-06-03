@@ -1,3 +1,4 @@
+import { UserPayload } from '../auth/interfaces/user-payload.interface';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
@@ -43,14 +44,18 @@ export class ReportsService {
   async getStatistics() {
     const total = await this.prisma.report.count();
     const open = await this.prisma.report.count({ where: { status: 'OPEN' } });
-    const inProgress = await this.prisma.report.count({ where: { status: 'IN_PROGRESS' } });
-    const resolved = await this.prisma.report.count({ where: { status: 'RESOLVED' } });
-    
+    const inProgress = await this.prisma.report.count({
+      where: { status: 'IN_PROGRESS' },
+    });
+    const resolved = await this.prisma.report.count({
+      where: { status: 'RESOLVED' },
+    });
+
     return {
       total,
       open,
       inProgress,
-      resolved
+      resolved,
     };
   }
 
@@ -71,7 +76,7 @@ export class ReportsService {
     return report;
   }
 
-  async findOneSecure(id: number, currentUser: any) {
+  async findOneSecure(id: number, currentUser: UserPayload) {
     const report = await this.findOne(id);
     checkOwnership(report.user_id, currentUser);
     return report;
