@@ -25,7 +25,7 @@ export function ProtectedRoute({ allowedRoles }: ProtectedRouteProps) {
           : <Navigate to="/student-dashboard" replace />;
       }
     } catch (e) {
-      console.error("Failed to parse user data", e);
+      // ignore
       // In case of corrupted user data, force re-login
       authService.logout();
       return <Navigate to="/" replace />;

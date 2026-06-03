@@ -45,7 +45,7 @@ export function CalendarView() {
         setSelectedRooms(roomsRes.data.map((r: any) => r.id));
       }
     } catch (error) {
-      console.error(error);
+      // apiClient.ts đã xử lý toast
     } finally {
       setIsLoading(false);
     }
@@ -125,7 +125,7 @@ export function CalendarView() {
       setIsModalOpen(false);
       fetchData();
     } catch (error: any) {
-      console.error(error);
+      // apiClient.ts đã xử lý toast
     } finally {
       setIsSubmitting(false);
     }
@@ -216,6 +216,17 @@ export function CalendarView() {
           </div>
           
           <div className="flex items-center gap-2">
+            <input 
+              type="date"
+              value={format(currentDate, "yyyy-MM-dd")}
+              onChange={(e) => {
+                if (e.target.value) {
+                  setCurrentDate(new Date(e.target.value));
+                }
+              }}
+              className="px-2 py-1.5 text-[13px] font-medium text-[#212121] bg-white border border-[#E0E0E0] hover:border-[#1E5FA5] rounded transition-colors focus:outline-none focus:ring-1 focus:ring-[#1E5FA5] cursor-pointer cursor-text"
+              title="Chọn một ngày bất kỳ"
+            />
             <button 
               onClick={() => setCurrentDate(new Date())}
               className="px-3 py-1.5 text-[13px] font-bold text-[#757575] bg-white border border-[#E0E0E0] hover:bg-[#F5F5F5] hover:text-[#212121] rounded transition-colors"

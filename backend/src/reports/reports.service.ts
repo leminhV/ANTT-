@@ -1,14 +1,16 @@
+import { UserPayload } from '../auth/interfaces/user-payload.interface';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { PrismaService } from '../prisma/prisma.service';
+import { checkOwnership } from '../common/utils/ownership.util';
 
 @Injectable()
 export class ReportsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createReportDto: CreateReportDto, userId: number) {
-    return (this.prisma as any).report.create({
+    return this.prisma.report.create({
       data: {
         ...createReportDto,
         user_id: userId,
@@ -17,7 +19,7 @@ export class ReportsService {
   }
 
   async findAll() {
-    return (this.prisma as any).report.findMany({
+    return this.prisma.report.findMany({
       include: {
         user: { select: { id: true, name: true, email: true } },
         equipment: { select: { id: true, name: true } },
@@ -28,7 +30,7 @@ export class ReportsService {
   }
 
   async findMyReports(userId: number) {
-    return (this.prisma as any).report.findMany({
+    return this.prisma.report.findMany({
       where: { user_id: userId },
       include: {
         user: { select: { id: true, name: true, email: true } },
@@ -40,21 +42,25 @@ export class ReportsService {
   }
 
   async getStatistics() {
-    const total = await (this.prisma as any).report.count();
-    const open = await (this.prisma as any).report.count({ where: { status: 'OPEN' } });
-    const inProgress = await (this.prisma as any).report.count({ where: { status: 'IN_PROGRESS' } });
-    const resolved = await (this.prisma as any).report.count({ where: { status: 'RESOLVED' } });
-    
+    const total = await this.prisma.report.count();
+    const open = await this.prisma.report.count({ where: { status: 'OPEN' } });
+    const inProgress = await this.prisma.report.count({
+      where: { status: 'IN_PROGRESS' },
+    });
+    const resolved = await this.prisma.report.count({
+      where: { status: 'RESOLVED' },
+    });
+
     return {
       total,
       open,
       inProgress,
-      resolved
+      resolved,
     };
   }
 
   async findOne(id: number) {
-    const report = await (this.prisma as any).report.findUnique({
+    const report = await this.prisma.report.findUnique({
       where: { id },
       include: {
         user: { select: { id: true, name: true, email: true } },
@@ -70,10 +76,16 @@ export class ReportsService {
     return report;
   }
 
+  async findOneSecure(id: number, currentUser: UserPayload) {
+    const report = await this.findOne(id);
+    checkOwnership(report.user_id, currentUser);
+    return report;
+  }
+
   async update(id: number, updateReportDto: UpdateReportDto) {
     await this.findOne(id);
 
-    return (this.prisma as any).report.update({
+    return this.prisma.report.update({
       where: { id },
       data: updateReportDto,
     });
@@ -81,7 +93,7 @@ export class ReportsService {
 
   async remove(id: number) {
     await this.findOne(id);
-    return (this.prisma as any).report.delete({
+    return this.prisma.report.delete({
       where: { id },
     });
   }

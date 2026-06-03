@@ -29,7 +29,7 @@ export const userService = {
 
   getOne: (id: string) => apiClient.get(`/api/users/${id}`),
 
-  update: (id: string, data: any) => apiClient.put(`/api/users/${id}`, data),
+  update: (id: string, data: Record<string, unknown>) => apiClient.patch(`/api/users/${id}`, data),
 
   delete: (id: string) => apiClient.delete(`/api/users/${id}`),
 };
@@ -42,7 +42,7 @@ export const roomService = {
 
   getOne: (id: string) => apiClient.get(`/api/rooms/${id}`),
 
-  update: (id: string, data: any) => apiClient.put(`/api/rooms/${id}`, data),
+  update: (id: string, data: Record<string, unknown>) => apiClient.patch(`/api/rooms/${id}`, data),
 
   delete: (id: string) => apiClient.delete(`/api/rooms/${id}`),
 };
@@ -57,7 +57,7 @@ export const equipmentService = {
 
   getOne: (id: string) => apiClient.get(`/api/equipment/${id}`),
 
-  update: (id: string, data: any) => apiClient.put(`/api/equipment/${id}`, data),
+  update: (id: string, data: Record<string, unknown>) => apiClient.patch(`/api/equipment/${id}`, data),
 
   delete: (id: string) => apiClient.delete(`/api/equipment/${id}`),
 };
@@ -77,7 +77,7 @@ export const bookingService = {
 
   getMyBookings: () => apiClient.get('/api/bookings/user/my-bookings'),
 
-  update: (id: string, data: any) => apiClient.patch(`/api/bookings/${id}`, data),
+  update: (id: string, data: Record<string, unknown>) => apiClient.patch(`/api/bookings/${id}`, data),
 
   cancel: (id: string) => apiClient.post(`/api/bookings/${id}/cancel`),
 
@@ -85,8 +85,8 @@ export const bookingService = {
 };
 
 export const chemicalService = {
-  create: (data: { name: string; quantity: number; unit: string }) =>
-    apiClient.post('/api/chemicals', { name: data.name, quantity_stock: Number(data.quantity), unit: data.unit }),
+  create: (data: Record<string, unknown>) =>
+    apiClient.post('/api/chemicals', data),
 
   getAll: () => apiClient.get('/api/chemicals'),
 
@@ -98,7 +98,7 @@ export const chemicalService = {
   getUsageHistory: (chemicalId?: string) =>
     apiClient.get(`/api/chemicals/history/usage${chemicalId ? `?chemicalId=${chemicalId}` : ''}`),
 
-  update: (id: string, data: any) => apiClient.put(`/api/chemicals/${id}`, data),
+  update: (id: string, data: Record<string, unknown>) => apiClient.patch(`/api/chemicals/${id}`, data),
 
   delete: (id: string) => apiClient.delete(`/api/chemicals/${id}`),
 };
@@ -115,9 +115,34 @@ export const reportService = {
 
   getStatistics: () => apiClient.get('/api/reports/statistics/overview'),
 
-  update: (id: string, data: any) => apiClient.patch(`/api/reports/${id}`, data),
+  update: (id: string, data: Record<string, unknown>) => apiClient.patch(`/api/reports/${id}`, data),
 
   delete: (id: string) => apiClient.delete(`/api/reports/${id}`),
+};
+
+export const commentService = {
+  getAll: (reportId?: number, bookingId?: number, equipmentId?: number) => {
+    const params = new URLSearchParams();
+    if (reportId) params.append('reportId', reportId.toString());
+    if (bookingId) params.append('bookingId', bookingId.toString());
+    if (equipmentId) params.append('equipmentId', equipmentId.toString());
+    return apiClient.get(`/api/comments?${params.toString()}`);
+  },
+  create: (data: { content: string; reportId?: number; bookingId?: number; equipmentId?: number; parentId?: number }) => 
+    apiClient.post('/api/comments', data),
+  delete: (id: number) => apiClient.delete(`/api/comments/${id}`)
+};
+
+export const courseService = {
+  getAll: () => apiClient.get('/api/courses'),
+
+  getOne: (id: string) => apiClient.get(`/api/courses/${id}`),
+
+  create: (data: Record<string, unknown>) => apiClient.post('/api/courses', data),
+
+  update: (id: string, data: Record<string, unknown>) => apiClient.patch(`/api/courses/${id}`, data),
+
+  delete: (id: string) => apiClient.delete(`/api/courses/${id}`),
 };
 
 export const checkInService = {

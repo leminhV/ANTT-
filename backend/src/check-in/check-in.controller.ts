@@ -1,3 +1,5 @@
+import { CurrentUser } from '../common/decorators/current-user.decorator';
+import type { UserPayload } from '../auth/interfaces/user-payload.interface';
 import {
   Controller,
   Get,
@@ -7,7 +9,6 @@ import {
   Param,
   Delete,
   UseGuards,
-  Request,
   ParseIntPipe,
 } from '@nestjs/common';
 import { CheckInService } from './check-in.service';
@@ -24,8 +25,11 @@ export class CheckInController {
   constructor(private readonly checkInService: CheckInService) {}
 
   @Post()
-  create(@Body() createCheckInDto: CreateCheckInDto, @Request() req: any) {
-    return this.checkInService.create(createCheckInDto, req.user.userId);
+  create(
+    @Body() createCheckInDto: CreateCheckInDto,
+    @CurrentUser() user: UserPayload,
+  ) {
+    return this.checkInService.create(createCheckInDto, user.userId);
   }
 
   @Get()
@@ -40,26 +44,33 @@ export class CheckInController {
   }
 
   @Get('history/user')
-  getHistory(@Request() req: any) {
-    return this.checkInService.getUserHistory(req.user.userId);
+  getHistory(@CurrentUser() user: UserPayload) {
+    return this.checkInService.getUserHistory(user.userId);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.checkInService.findOne(id);
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: UserPayload,
+  ) {
+    return this.checkInService.findOneSecure(id, user);
   }
 
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateCheckInDto: UpdateCheckInDto,
+    @CurrentUser() user: UserPayload,
   ) {
-    return this.checkInService.update(id, updateCheckInDto);
+    return this.checkInService.update(id, updateCheckInDto, user);
   }
 
   @Post(':id/check-out')
-  checkOut(@Param('id', ParseIntPipe) id: number) {
-    return this.checkInService.checkOut(id);
+  checkOut(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: UserPayload,
+  ) {
+    return this.checkInService.checkOut(id, user);
   }
 
   @Delete(':id')

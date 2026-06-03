@@ -24,7 +24,7 @@ export function MyBookings() {
       const res = await bookingService.getMyBookings();
       setBookings(res.data || []);
     } catch (error) {
-      console.error(error);
+      // apiClient.ts đã xử lý toast
     } finally {
       setIsLoading(false);
     }
@@ -37,7 +37,7 @@ export function MyBookings() {
         toast.success("Hủy thành công");
         fetchData();
       } catch (error) {
-        console.error(error);
+        // apiClient.ts đã xử lý toast
       }
       setCancelConfirmId(null);
     }

@@ -55,6 +55,9 @@ model User {
   password   String     @db.VarChar(255)
   role       Role       @default(STUDENT)
   avatar_url String?    @db.VarChar(500) // Hình ảnh đại diện (Media)
+  is_active  Boolean    @default(true)   // Trạng thái khóa/mở khóa tài khoản
+  blacklist_reason String? @db.Text      // Lý do bị khóa tài khoản
+  refresh_token String? @db.Text         // Token làm mới cấp lại Access Token
   created_at DateTime   @default(now())
   updated_at DateTime   @updatedAt
 
@@ -63,6 +66,7 @@ model User {
   courses          Course[]   // Học phần do giảng viên quản lý
   reports          Report[]
   check_in_records CheckInRecord[]
+  comments         Comment[]
   
   @@map("users")
 }
@@ -115,7 +119,9 @@ model Equipment {
   bookings         Booking[]
   reports          Report[]
   check_in_records CheckInRecord[]
+  comments         Comment[]
 
+  @@index([status])
   @@map("equipment")
 }
 
@@ -155,10 +161,12 @@ model Booking {
   course          Course?         @relation(fields: [course_id], references: [id], onDelete: SetNull)
   chemical_usages ChemicalUsage[]
   check_in_records CheckInRecord[]
+  comments        Comment[]
 
   // Tạo chỉ mục Index giống hệt SQL để tăng tốc truy vấn kiểm tra trùng lịch
   @@index([room_id, start_time, end_time])
   @@index([equipment_id, start_time, end_time])
+  @@index([status])
   @@map("bookings")
 }
 
@@ -206,6 +214,7 @@ model Report {
   user         User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
   equipment    Equipment?   @relation(fields: [equipment_id], references: [id], onDelete: SetNull)
   room         Room?        @relation(fields: [room_id], references: [id], onDelete: SetNull)
+  comments     Comment[]
 
   @@map("reports")
 }
@@ -226,4 +235,37 @@ model CheckInRecord {
   room         Room?     @relation(fields: [room_id], references: [id], onDelete: SetNull)
 
   @@map("check_in_records")
+}
+
+model Comment {
+  id           Int       @id @default(autoincrement())
+  content      String    @db.Text
+  user_id      Int
+  report_id    Int?
+  booking_id   Int?
+  equipment_id Int?
+  parent_id    Int?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+
+  user         User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  report       Report?   @relation(fields: [report_id], references: [id], onDelete: Cascade)
+  booking      Booking?  @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  equipment    Equipment? @relation(fields: [equipment_id], references: [id], onDelete: Cascade)
+  
+  parent       Comment?  @relation("CommentReplies", fields: [parent_id], references: [id], onDelete: Cascade)
+  replies      Comment[] @relation("CommentReplies")
+
+  @@map("comments")
+}
+
+model SystemSetting {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique @db.VarChar(100)
+  value       String   @db.Text
+  description String?  @db.VarChar(255)
+  category    String   @default("GENERAL") @db.VarChar(50)
+  updated_at  DateTime @updatedAt
+
+  @@map("system_settings")
 }

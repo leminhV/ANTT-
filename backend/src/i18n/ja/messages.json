@@ -1,0 +1,20 @@
+{
+  "errors": {
+    "NOT_FOUND": "レコードが見つかりません",
+    "TIME_INVALID": "終了時間は開始時間より後である必要があります",
+    "PAST_TIME_NOT_ALLOWED": "過去の時間は予約できません",
+    "MAINTENANCE_MODE": "システムはメンテナンス中です。現在予約はできません",
+    "OUT_OF_HOURS": "予約は {startHourLimit}:00 から {endHourLimit}:00 の間のみ可能です",
+    "MAX_BOOKINGS_EXCEEDED": "学生は1日に最大 {maxBookings} 件の予約しか作成できません",
+    "ROOM_CONFLICT": "このラボ室は既に予約されています",
+    "EQUIPMENT_UNAVAILABLE": "機器は {status} 状態のため予約できません",
+    "EQUIPMENT_CONFLICT": "この機器は既に予約されています",
+    "BOOKING_NOT_FOUND": "ID {id} の予約が見つかりません",
+    "UNAUTHORIZED_CANCEL": "この予約をキャンセルする権限がありません",
+    "INVALID_STATUS_CANCEL": "現在のステータスでは予約をキャンセルできません",
+    "DURATION_TOO_SHORT": "予約の最小時間は {min} 分です",
+    "DURATION_TOO_LONG": "予約の最大時間は {max} 分です",
+    "BUFFER_TIME_REQUIRED": "清掃のため、予約間に最低 {buffer} 分の間隔が必要です",
+    "BLACKLISTED": "アカウントはロックされています。理由: {reason}"
+  }
+}

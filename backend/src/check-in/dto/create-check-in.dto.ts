@@ -1,4 +1,10 @@
-import { IsInt, IsOptional, IsDateString, IsString, MaxLength } from 'class-validator';
+import {
+  IsInt,
+  IsOptional,
+  IsDateString,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
 export class CreateCheckInDto {
   @IsOptional()

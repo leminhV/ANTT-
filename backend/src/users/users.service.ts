@@ -1,6 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+
+import * as bcrypt from 'bcrypt';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -18,9 +21,18 @@ export class UsersService {
     });
   }
 
-  async create(data: Prisma.UserCreateInput) {
+  async create(data: CreateUserDto) {
+    const existingUser = await this.findByEmail(data.email);
+    if (existingUser) {
+      throw new BadRequestException('Email đã tồn tại');
+    }
+
+    const hashedPassword = await bcrypt.hash(data.password, 10);
     return this.prisma.user.create({
-      data,
+      data: {
+        ...data,
+        password: hashedPassword,
+      },
     });
   }
 
@@ -31,15 +43,29 @@ export class UsersService {
         email: true,
         name: true,
         role: true,
+        is_active: true,
+        blacklist_reason: true,
         created_at: true,
       },
     });
   }
 
-  async update(id: number, data: Prisma.UserUpdateInput) {
+  async update(id: number, data: UpdateUserDto) {
+    const updateData = { ...data };
+    if (data.password) {
+      updateData.password = await bcrypt.hash(data.password, 10);
+    }
+
     return this.prisma.user.update({
       where: { id },
-      data,
+      data: updateData,
+    });
+  }
+
+  async updateRefreshToken(id: number, refresh_token: string | null) {
+    return this.prisma.user.update({
+      where: { id },
+      data: { refresh_token },
     });
   }
 

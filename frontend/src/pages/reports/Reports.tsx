@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
-import { Download, FileText, Settings, AlertTriangle, CheckCircle, Plus, Search, RefreshCw, X, FileX } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Download, FileText, Settings, AlertTriangle, CheckCircle, Plus, Search, RefreshCw, X, FileX, Trash2 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { reportService, equipmentService, roomService } from "../../services";
 import { format } from "date-fns";
 import { timeAgo } from "../../utils/timeAgo";
 import { LoadingSpinner } from "../../components/common/LoadingSpinner";
+import { ConfirmModal } from "../../components/common/ConfirmModal";
 import { toast } from "react-hot-toast";
 
 function StatusBadge({ status }: { status: string }) {
@@ -18,6 +19,7 @@ function StatusBadge({ status }: { status: string }) {
 
 export function Reports() {
   const [activeTab, setActiveTab] = useState("Sự cố"); // 'Thống kê' hoặc 'Sự cố'
+  const [chartMonth, setChartMonth] = useState(format(new Date(), 'yyyy-MM'));
   
   // States cho Sự cố
   const [reports, setReports] = useState<any[]>([]);
@@ -26,16 +28,13 @@ export function Reports() {
   const [formData, setFormData] = useState({ title: "", description: "", equipment_id: "", room_id: "" });
   const [equipments, setEquipments] = useState<any[]>([]);
   const [rooms, setRooms] = useState<any[]>([]);
+  const [deleteConfirmReportId, setDeleteConfirmReportId] = useState<number | null>(null);
 
   const currentUserStr = localStorage.getItem("user");
   const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
   const isAdmin = currentUser?.role === 'ADMIN' || currentUser?.role === 'TECHNICIAN';
 
-  useEffect(() => {
-    if (activeTab === "Sự cố") fetchData();
-  }, [activeTab]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setIsLoading(true);
     try {
       const [repRes, eqRes, roomRes] = await Promise.all([
@@ -47,11 +46,15 @@ export function Reports() {
       setEquipments(eqRes.data || []);
       setRooms(roomRes.data || []);
     } catch (error) {
-      console.error(error);
+      // apiClient.ts sẽ tự hiển thị toast lỗi
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isAdmin]);
+
+  useEffect(() => {
+    if (activeTab === "Sự cố") fetchData();
+  }, [activeTab, fetchData]);
 
   const handleCreateReport = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,7 +70,7 @@ export function Reports() {
       setFormData({ title: "", description: "", equipment_id: "", room_id: "" });
       fetchData();
     } catch (error) {
-      console.error(error);
+      // apiClient.ts sẽ tự hiển thị toast lỗi
     }
   };
 
@@ -77,7 +80,20 @@ export function Reports() {
       toast.success("Đã cập nhật trạng thái");
       fetchData();
     } catch (error) {
-      console.error(error);
+      // apiClient.ts sẽ tự hiển thị toast lỗi
+    }
+  };
+
+  const executeDeleteReport = async () => {
+    if (deleteConfirmReportId) {
+      try {
+        await reportService.delete(deleteConfirmReportId.toString());
+        toast.success("Xóa báo cáo thành công");
+        setDeleteConfirmReportId(null);
+        fetchData();
+      } catch (error) {
+        toast.error("Xóa báo cáo thất bại");
+      }
     }
   };
 
@@ -103,6 +119,26 @@ export function Reports() {
     link.click();
     document.body.removeChild(link);
     toast.success("Xuất báo cáo thành công!");
+  };
+
+  const getChartData = () => {
+    const [year, month] = chartMonth.split('-');
+    if (!year || !month) return [];
+    
+    // Lọc báo cáo trong tháng được chọn
+    const filteredReports = reports.filter(r => {
+      const date = new Date(r.created_at);
+      return date.getFullYear() === parseInt(year) && date.getMonth() + 1 === parseInt(month);
+    });
+
+    // Gom nhóm theo ngày
+    const daysInMonth = new Date(parseInt(year), parseInt(month), 0).getDate();
+    const data = [];
+    for (let i = 1; i <= daysInMonth; i++) {
+      const count = filteredReports.filter(r => new Date(r.created_at).getDate() === i).length;
+      data.push({ name: `${i}/${month}`, value: count });
+    }
+    return data;
   };
 
   return (
@@ -150,16 +186,23 @@ export function Reports() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="bg-white rounded-xl shadow-sm border border-[#E0E0E0] p-6 flex flex-col items-center justify-center text-center">
-              <h2 className="text-[16px] font-bold text-[#212121] mb-2">Biểu đồ sự cố theo ngày</h2>
-              <div className="text-[13px] text-[#757575] mb-6">(Tính năng đang được phát triển)</div>
-              <div className="h-[200px] w-full flex items-center justify-center opacity-50 grayscale">
+            <div className="bg-white rounded-xl shadow-sm border border-[#E0E0E0] p-6 flex flex-col">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-[16px] font-bold text-[#212121]">Biểu đồ sự cố</h2>
+                <input 
+                  type="month" 
+                  value={chartMonth}
+                  onChange={(e) => setChartMonth(e.target.value)}
+                  className="px-3 py-1.5 border border-[#E0E0E0] rounded text-[13px] text-[#757575] focus:outline-none focus:border-[#1E5FA5] outline-none"
+                />
+              </div>
+              <div className="h-[200px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={[{name: 'T2', value: 2}, {name: 'T3', value: 5}, {name: 'T4', value: 1}]}>
+                  <BarChart data={getChartData()}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E0E0E0" />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#757575', fontSize: 12}} dy={10} />
-                    <YAxis axisLine={false} tickLine={false} tick={{fill: '#757575', fontSize: 12}} />
-                    <Tooltip cursor={{fill: '#F5F5F5'}} />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fill: '#757575', fontSize: 10}} dy={10} interval="preserveStartEnd" minTickGap={20} />
+                    <YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={{fill: '#757575', fontSize: 12}} />
+                    <Tooltip cursor={{fill: '#F5F5F5'}} contentStyle={{ borderRadius: '8px', border: '1px solid #E0E0E0' }} />
                     <Bar dataKey="value" fill="#1E5FA5" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -252,16 +295,21 @@ export function Reports() {
                     <td className="px-6 py-4"><StatusBadge status={r.status} /></td>
                     {isAdmin && (
                       <td className="px-6 py-4 text-center">
-                        {r.status === 'OPEN' && (
-                          <button onClick={() => handleUpdateStatus(r.id, "IN_PROGRESS")} className="text-[12px] px-3 py-1 bg-[#FFF8E1] text-[#F59E0B] border border-[#FFECB3] hover:bg-[#FFECB3] rounded transition-colors mr-2">
-                            Bắt đầu sửa
+                        <div className="flex items-center justify-center gap-2">
+                          {r.status === 'OPEN' && (
+                            <button onClick={() => handleUpdateStatus(r.id, "IN_PROGRESS")} className="text-[12px] px-3 py-1 bg-[#FFF8E1] text-[#F59E0B] border border-[#FFECB3] hover:bg-[#FFECB3] rounded transition-colors">
+                              Bắt đầu sửa
+                            </button>
+                          )}
+                          {r.status === 'IN_PROGRESS' && (
+                            <button onClick={() => handleUpdateStatus(r.id, "RESOLVED")} className="text-[12px] px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] border border-[#C8E6C9] hover:bg-[#C8E6C9] rounded transition-colors">
+                              Hoàn tất
+                            </button>
+                          )}
+                          <button onClick={() => setDeleteConfirmReportId(r.id)} className="p-1.5 text-[#757575] hover:text-[#C62828] hover:bg-[#FDEDED] rounded transition-colors" title="Xóa báo cáo">
+                            <Trash2 className="w-4 h-4" />
                           </button>
-                        )}
-                        {r.status === 'IN_PROGRESS' && (
-                          <button onClick={() => handleUpdateStatus(r.id, "RESOLVED")} className="text-[12px] px-3 py-1 bg-[#E8F5E9] text-[#2E7D32] border border-[#C8E6C9] hover:bg-[#C8E6C9] rounded transition-colors">
-                            Hoàn tất
-                          </button>
-                        )}
+                        </div>
                       </td>
                     )}
                   </tr>
@@ -321,6 +369,16 @@ export function Reports() {
           </div>
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={deleteConfirmReportId !== null}
+        title="Xóa báo cáo sự cố"
+        message="Bạn có chắc chắn muốn xóa báo cáo này không? Hành động này không thể hoàn tác!"
+        confirmText="Xóa báo cáo"
+        isDestructive={true}
+        onConfirm={executeDeleteReport}
+        onCancel={() => setDeleteConfirmReportId(null)}
+      />
     </div>
   );
 }

@@ -1,0 +1,19 @@
+# Ngăn rò rỉ mã nguồn và dữ liệu nhạy cảm
+# OWASP Rule: Tuyệt đối không copy file .env chứa Secret/Password vào trong Image
+.env
+.env.*
+
+# Bỏ qua thư mục build cục bộ
+node_modules/
+dist/
+build/
+
+# Bỏ qua thư mục hệ thống
+.git
+.gitignore
+
+# Bỏ qua logs
+npm-debug.log
+npm-debug.log.*
+yarn-error.log
+yarn-debug.log*

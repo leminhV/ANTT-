@@ -1,4 +1,11 @@
-import { IsString, IsInt, IsOptional, MaxLength, IsDateString, IsEnum } from 'class-validator';
+import {
+  IsString,
+  IsInt,
+  IsOptional,
+  MaxLength,
+  IsDateString,
+  IsEnum,
+} from 'class-validator';
 import { EquipmentStatus } from '@prisma/client';
 
 export class CreateEquipmentDto {

@@ -2,16 +2,52 @@ version: '3.8'
 
 services:
   db:
-    image: mysql:8
+    # OWASP Rule: Sử dụng image tag cố định (v8.0.35) thay vì latest
+    image: mysql:8.0.35
     container_name: lab-booking-db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 123456
-      MYSQL_DATABASE: lab_management_system
+      # Đọc credentials trực tiếp từ file .env ngoài hệ thống, KHÔNG hardcode
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-lab_management_system}
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    # OWASP API Security: Unrestricted Resource Consumption (Chống DoS cấp hệ thống)
+    # Giới hạn RAM (512MB) và CPU (0.5 core) để ngăn DB bị nghẽn dẫn đến sập server
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    # Tự động Healthcheck để xác định Container có thực sự đang xử lý data không
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  nestjs-app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: lab-booking-api
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-mysql://root:123456@db:3306/lab_management_system}
+      JWT_SECRET: ${JWT_SECRET}
+    # Chỉ bật Backend khi DB đã sẵn sàng (Passed Healthcheck)
+    depends_on:
+      db:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
 
 volumes:
   mysql_data:

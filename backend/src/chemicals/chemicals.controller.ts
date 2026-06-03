@@ -8,10 +8,12 @@ import {
   Delete,
   UseGuards,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { ChemicalsService } from './chemicals.service';
 import { CreateChemicalDto } from './dto/create-chemical.dto';
 import { UpdateChemicalDto } from './dto/update-chemical.dto';
+import { RecordUsageDto } from './dto/record-usage.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -26,6 +28,19 @@ export class ChemicalsController {
   @Roles(Role.ADMIN, Role.TECHNICIAN)
   create(@Body() createChemicalDto: CreateChemicalDto) {
     return this.chemicalsService.create(createChemicalDto);
+  }
+
+  @Post('usage/record')
+  @Roles(Role.ADMIN, Role.TECHNICIAN, Role.INSTRUCTOR)
+  recordUsage(@Body() recordUsageDto: RecordUsageDto) {
+    return this.chemicalsService.recordUsage(recordUsageDto);
+  }
+
+  @Get('history/usage')
+  getUsageHistory(@Query('chemicalId') chemicalId?: string) {
+    return this.chemicalsService.getUsageHistory(
+      chemicalId ? parseInt(chemicalId, 10) : undefined,
+    );
   }
 
   @Get()

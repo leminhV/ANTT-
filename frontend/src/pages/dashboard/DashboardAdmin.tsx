@@ -36,7 +36,7 @@ export function DashboardAdmin() {
         // Get 5 most recent pending bookings
         setRecentBookings(pending.slice(0, 5));
       } catch (error) {
-        console.error("Failed to fetch dashboard data:", error);
+        // apiClient.ts đã xử lý toast
       } finally {
         setIsLoading(false);
       }
@@ -51,7 +51,7 @@ export function DashboardAdmin() {
       setRecentBookings(recentBookings.filter(b => b.id !== id));
       setStats(prev => ({ ...prev, pendingRequests: prev.pendingRequests - 1 }));
     } catch (error) {
-      console.error("Failed to approve booking:", error);
+      // apiClient.ts đã xử lý toast
     }
   };
 
@@ -61,7 +61,7 @@ export function DashboardAdmin() {
       setRecentBookings(recentBookings.filter(b => b.id !== id));
       setStats(prev => ({ ...prev, pendingRequests: prev.pendingRequests - 1 }));
     } catch (error) {
-      console.error("Failed to reject booking:", error);
+      // apiClient.ts đã xử lý toast
     }
   };
 

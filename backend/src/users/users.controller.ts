@@ -14,6 +14,8 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('users')
@@ -22,11 +24,7 @@ export class UsersController {
 
   @Post()
   @Roles(Role.ADMIN)
-  async create(@Body() createUserDto: any) {
-    if (createUserDto.password) {
-      const bcrypt = require('bcrypt');
-      createUserDto.password = await bcrypt.hash(createUserDto.password, 10);
-    }
+  create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
@@ -46,7 +44,7 @@ export class UsersController {
   @Roles(Role.ADMIN)
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateUserDto: any,
+    @Body() updateUserDto: UpdateUserDto,
   ) {
     return this.usersService.update(id, updateUserDto);
   }
