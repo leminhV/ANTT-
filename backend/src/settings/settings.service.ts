@@ -87,7 +87,9 @@ export class SettingsService implements OnModuleInit {
     ];
 
     for (const item of defaults) {
-      const existing = await this.prisma.systemSetting.findUnique({ where: { key: item.key } });
+      const existing = await this.prisma.systemSetting.findUnique({
+        where: { key: item.key },
+      });
       if (!existing) {
         await this.prisma.systemSetting.create({ data: item });
       }
@@ -103,7 +105,9 @@ export class SettingsService implements OnModuleInit {
 
   async get(key: string, defaultValue?: string): Promise<string> {
     const cachedValue = await this.cacheManager.get<string>(key);
-    return cachedValue !== undefined && cachedValue !== null ? cachedValue : (defaultValue || '');
+    return cachedValue !== undefined && cachedValue !== null
+      ? cachedValue
+      : defaultValue || '';
   }
 
   async getRawCache(): Promise<Record<string, string>> {
@@ -122,7 +126,12 @@ export class SettingsService implements OnModuleInit {
         this.prisma.systemSetting.upsert({
           where: { key: setting.key },
           update: { value: setting.value },
-          create: { key: setting.key, value: setting.value, category: 'GENERAL', description: '' },
+          create: {
+            key: setting.key,
+            value: setting.value,
+            category: 'GENERAL',
+            description: '',
+          },
         }),
       ),
     );

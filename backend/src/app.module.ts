@@ -24,8 +24,8 @@ import { I18nModule, AcceptLanguageResolver } from 'nestjs-i18n';
 import * as path from 'path';
 import { NotificationsModule } from './notifications/notifications.module';
 import { CacheModule } from '@nestjs/cache-manager';
-import * as redisStore from 'cache-manager-redis-store';
-import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis';
+import { SearchModule } from './search/search.module';
+import { AiChatModule } from './ai-chat/ai-chat.module';
 
 @Module({
   imports: [
@@ -68,6 +68,8 @@ import { ThrottlerStorageRedisService } from '@nest-lab/throttler-storage-redis'
       },
       resolvers: [AcceptLanguageResolver],
     }),
+    SearchModule,
+    AiChatModule,
   ],
   controllers: [AppController],
   providers: [

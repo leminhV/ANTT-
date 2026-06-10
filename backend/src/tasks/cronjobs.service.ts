@@ -35,7 +35,9 @@ export class CronjobsService {
           data: { status: 'CANCELED' },
         });
 
-        this.logger.log(`[Auto Cancel] Đã hủy tự động ${ids.length} đơn PENDING quá hạn 24h.`);
+        this.logger.log(
+          `[Auto Cancel] Đã hủy tự động ${ids.length} đơn PENDING quá hạn 24h.`,
+        );
       });
     } catch (error) {
       this.logger.error('[Auto Cancel] Transaction Failed:', error);
@@ -60,21 +62,23 @@ export class CronjobsService {
             status: 'APPROVED',
             start_time: { lte: fifteenMinutesAgo },
             check_in_records: {
-              none: {} // Không có bản ghi nào
-            }
+              none: {}, // Không có bản ghi nào
+            },
           },
         });
 
         if (noShowBookings.length === 0) return;
 
         const ids = noShowBookings.map((b) => b.id);
-        
+
         await tx.booking.updateMany({
           where: { id: { in: ids } },
           data: { status: 'CANCELED' },
         });
 
-        this.logger.log(`[No-show] Đã hủy tự động ${ids.length} đơn do vắng mặt quá 15 phút (Chưa Check-in).`);
+        this.logger.log(
+          `[No-show] Đã hủy tự động ${ids.length} đơn do vắng mặt quá 15 phút (Chưa Check-in).`,
+        );
       });
     } catch (error) {
       this.logger.error('[No-show] Transaction Failed:', error);
@@ -96,26 +100,38 @@ export class CronjobsService {
         where: {
           OR: [
             { quantity_stock: { lte: 0 } },
-            { expiration_date: { lte: thirtyDaysLater } }
-          ]
-        }
+            { expiration_date: { lte: thirtyDaysLater } },
+          ],
+        },
       });
 
       if (expiringOrEmptyChemicals.length === 0) return;
 
-      this.logger.warn(`[Chemical Warning] Phát hiện ${expiringOrEmptyChemicals.length} hóa chất cần lưu ý:`);
-      
+      this.logger.warn(
+        `[Chemical Warning] Phát hiện ${expiringOrEmptyChemicals.length} hóa chất cần lưu ý:`,
+      );
+
       expiringOrEmptyChemicals.forEach((chemical) => {
         if (chemical.quantity_stock <= 0) {
-          this.logger.warn(`- Hóa chất [${chemical.name}] đã hết hàng (Số lượng: 0).`);
-        } else if (chemical.expiration_date && chemical.expiration_date <= thirtyDaysLater) {
-          const formattedDate = chemical.expiration_date.toISOString().split('T')[0];
-          this.logger.warn(`- Hóa chất [${chemical.name}] sắp/đã hết hạn (HSD: ${formattedDate}).`);
+          this.logger.warn(
+            `- Hóa chất [${chemical.name}] đã hết hàng (Số lượng: 0).`,
+          );
+        } else if (
+          chemical.expiration_date &&
+          chemical.expiration_date <= thirtyDaysLater
+        ) {
+          const formattedDate = chemical.expiration_date
+            .toISOString()
+            .split('T')[0];
+          this.logger.warn(
+            `- Hóa chất [${chemical.name}] sắp/đã hết hạn (HSD: ${formattedDate}).`,
+          );
         }
       });
-      
-      this.logger.warn('[Chemical Warning] Giả lập: Đã gửi email cảnh báo tới Quản trị viên (Admin).');
 
+      this.logger.warn(
+        '[Chemical Warning] Giả lập: Đã gửi email cảnh báo tới Quản trị viên (Admin).',
+      );
     } catch (error) {
       this.logger.error('[Chemical Warning] Failed:', error);
     }
@@ -140,7 +156,7 @@ export class CronjobsService {
         if (readyBookings.length === 0) return;
 
         const ids = readyBookings.map((b) => b.id);
-        
+
         await tx.booking.updateMany({
           where: { id: { in: ids } },
           data: { status: 'IN_USE' },
@@ -148,8 +164,8 @@ export class CronjobsService {
 
         const equipmentIds = readyBookings
           .map((b) => b.equipment_id)
-          .filter((id) => id !== null) as number[];
-        
+          .filter((id) => id !== null);
+
         if (equipmentIds.length > 0) {
           await tx.equipment.updateMany({
             where: { id: { in: equipmentIds } },
@@ -157,7 +173,9 @@ export class CronjobsService {
           });
         }
 
-        this.logger.log(`[Auto Start] Đã kích hoạt ${ids.length} đơn sang trạng thái IN_USE.`);
+        this.logger.log(
+          `[Auto Start] Đã kích hoạt ${ids.length} đơn sang trạng thái IN_USE.`,
+        );
       });
     } catch (error) {
       this.logger.error('[Auto Start] Transaction Failed:', error);
@@ -182,7 +200,7 @@ export class CronjobsService {
         if (finishedBookings.length === 0) return;
 
         const ids = finishedBookings.map((b) => b.id);
-        
+
         await tx.booking.updateMany({
           where: { id: { in: ids } },
           data: { status: 'COMPLETED' },
@@ -190,19 +208,21 @@ export class CronjobsService {
 
         const equipmentIds = finishedBookings
           .map((b) => b.equipment_id)
-          .filter((id) => id !== null) as number[];
+          .filter((id) => id !== null);
 
         if (equipmentIds.length > 0) {
           await tx.equipment.updateMany({
-            where: { 
+            where: {
               id: { in: equipmentIds },
-              status: 'IN_USE'
+              status: 'IN_USE',
             },
             data: { status: 'AVAILABLE' },
           });
         }
 
-        this.logger.log(`[Auto Complete] Đã kết thúc ${ids.length} đơn sang trạng thái COMPLETED.`);
+        this.logger.log(
+          `[Auto Complete] Đã kết thúc ${ids.length} đơn sang trạng thái COMPLETED.`,
+        );
       });
     } catch (error) {
       this.logger.error('[Auto Complete] Transaction Failed:', error);

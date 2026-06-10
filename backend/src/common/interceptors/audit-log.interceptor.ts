@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import type { Request } from 'express';
 import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
@@ -16,7 +17,9 @@ export class AuditLogInterceptor implements NestInterceptor {
   constructor(private readonly prisma: PrismaService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    const request = context.switchToHttp().getRequest();
+    const request = context
+      .switchToHttp()
+      .getRequest<Request & { user?: { id?: number; userId?: number } }>();
     const method = request.method;
 
     // Chỉ bắt các request làm thay đổi dữ liệu
@@ -26,13 +29,13 @@ export class AuditLogInterceptor implements NestInterceptor {
 
     const url = request.url;
     const user = request.user;
-    const body = request.body;
+    const body = request.body as Record<string, unknown>;
     const params = request.params;
 
     // Cố gắng trích xuất record_id từ URL params
     let recordId = 0;
     if (params && params.id) {
-      recordId = parseInt(params.id, 10);
+      recordId = parseInt(params.id as string, 10);
       if (isNaN(recordId)) recordId = 0;
     }
 
@@ -42,8 +45,13 @@ export class AuditLogInterceptor implements NestInterceptor {
     return next.handle().pipe(
       tap((data) => {
         // Nếu response trả về một record có id (Thường là khi CREATE), ưu tiên lấy id đó
-        if (data && data.id && recordId === 0) {
-          recordId = data.id;
+        if (
+          data &&
+          typeof data === 'object' &&
+          'id' in (data as Record<string, unknown>) &&
+          recordId === 0
+        ) {
+          recordId = Number((data as Record<string, unknown>).id);
         }
 
         // Fire-and-forget ghi log bất đồng bộ
@@ -53,12 +61,16 @@ export class AuditLogInterceptor implements NestInterceptor {
               action: `${method} ${url}`,
               table_name: tableName,
               record_id: recordId,
-              user_id: user?.id || null, // Có thể null nếu api public (Login/Register)
-              details: body && Object.keys(body).length > 0 ? JSON.stringify(body) : null,
+              user_id: user?.id || user?.userId || null, // Có thể null nếu api public (Login/Register)
+              details:
+                body && Object.keys(body).length > 0
+                  ? JSON.stringify(body)
+                  : null,
             },
           })
-          .catch((err) => {
-            this.logger.error(`Lỗi khi ghi Audit Log: ${err.message}`);
+          .catch((err: unknown) => {
+            const error = err as Error;
+            this.logger.error(`Lỗi khi ghi Audit Log: ${error.message}`);
           });
       }),
     );

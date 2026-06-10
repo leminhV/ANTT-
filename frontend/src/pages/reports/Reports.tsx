@@ -146,20 +146,22 @@ export function Reports() {
       {/* Header */}
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-[24px] font-bold text-[#212121] mb-4">Báo cáo & Thống kê</h1>
-          <div className="flex border-b border-[#E0E0E0]">
-            {['Thống kê', 'Sự cố'].map(tab => (
-              <button 
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-6 py-2 text-[14px] font-medium border-b-2 transition-colors ${
-                  activeTab === tab ? 'border-[#1E5FA5] text-[#1E5FA5]' : 'border-transparent text-[#757575] hover:text-[#212121]'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
+          <h1 className="text-[24px] font-bold text-[#212121] mb-4">{isAdmin ? "Báo cáo & Thống kê" : "Báo cáo sự cố"}</h1>
+          {isAdmin && (
+            <div className="flex border-b border-[#E0E0E0]">
+              {['Thống kê', 'Sự cố'].map(tab => (
+                <button 
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-6 py-2 text-[14px] font-medium border-b-2 transition-colors ${
+                    activeTab === tab ? 'border-[#1E5FA5] text-[#1E5FA5]' : 'border-transparent text-[#757575] hover:text-[#212121]'
+                  }`}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         {activeTab === "Thống kê" && (
           <button onClick={handleExportCSV} className="flex items-center gap-2 bg-white border border-[#E0E0E0] hover:bg-[#F5F5F5] text-[#212121] px-4 py-2.5 rounded-md font-medium transition-colors text-[14px] shadow-sm mb-2">

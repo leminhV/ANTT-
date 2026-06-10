@@ -10,13 +10,21 @@ import { JwtService } from '@nestjs/jwt';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+export interface JwtPayload {
+  sub: number;
+  email: string;
+  role: string;
+}
+
 @WebSocketGateway({
   cors: {
     origin: 'http://localhost:5173', // Frontend URL
     credentials: true,
   },
 })
-export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class NotificationsGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer()
   server: Server;
 
@@ -27,26 +35,34 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
     private readonly configService: ConfigService,
   ) {}
 
-  async handleConnection(client: Socket) {
+  handleConnection(client: Socket) {
     try {
-      const auth = client.handshake.auth.token || client.handshake.headers.authorization;
+      const auth =
+        (client.handshake.auth.token as string | undefined) ||
+        client.handshake.headers.authorization;
       if (!auth) {
         throw new WsException('Unauthorized: No token provided');
       }
 
       const token = auth.replace('Bearer ', '');
       const secret = this.configService.get<string>('JWT_SECRET');
-      const payload = this.jwtService.verify(token, { secret });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const verified = this.jwtService.verify(token, { secret });
+      const payload = verified as JwtPayload;
 
       // Attach user payload to the socket
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       client.data.user = payload;
 
       // Join a room specific to this user to allow targeted notifications
-      client.join(`user_${payload.sub}`);
-      
-      this.logger.log(`Client connected successfully: ${client.id} (User ID: ${payload.sub})`);
+      void client.join(`user_${payload.sub}`);
+
+      this.logger.log(
+        `Client connected successfully: ${client.id} (User ID: ${payload.sub})`,
+      );
     } catch (error) {
-      this.logger.warn(`Connection rejected: ${client.id} - ${error.message}`);
+      const err = error as Error;
+      this.logger.warn(`Connection rejected: ${client.id} - ${err.message}`);
       client.disconnect();
     }
   }
@@ -56,7 +72,12 @@ export class NotificationsGateway implements OnGatewayConnection, OnGatewayDisco
   }
 
   // Public method for other services (like BookingsService) to call
-  sendNotificationToUser(userId: number, title: string, message: string, type: 'success' | 'error' | 'info' | 'warning' = 'info') {
+  sendNotificationToUser(
+    userId: number,
+    title: string,
+    message: string,
+    type: 'success' | 'error' | 'info' | 'warning' = 'info',
+  ) {
     this.server.to(`user_${userId}`).emit('notification', {
       title,
       message,

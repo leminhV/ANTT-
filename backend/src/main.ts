@@ -6,6 +6,7 @@ import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 import { ThrottlerExceptionFilter } from './common/filters/throttler-exception.filter';
 import { PrismaClientExceptionFilter } from './common/filters/prisma-client-exception.filter';
 import { HttpAdapterHost } from '@nestjs/core';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,8 +14,16 @@ async function bootstrap() {
   // 1. Prefix cho toàn bộ API
   app.setGlobalPrefix('api');
 
-  // 2. Helmet: Kích hoạt các HTTP Security Headers (CSP, HSTS, X-Frame-Options...)
-  // Giải thích: Ngăn chặn XSS (CSP), buộc dùng HTTPS (HSTS), chặn Clickjacking (X-Frame-Options)
+  // Khởi tạo cookie-parser để đọc HttpOnly cookies
+  app.use(cookieParser());
+
+  // -----------------------------------------------------------------------
+  // 🛡️ BẢO MẬT: CHỐNG LỖ HỔNG XSS VÀ CLICKJACKING
+  // -----------------------------------------------------------------------
+  // Giải thích cho Đồ án: Sử dụng Helmet để gắn các HTTP Security Headers.
+  // - Content-Security-Policy (CSP): Ngăn chặn mã độc XSS chạy ngầm.
+  // - X-Frame-Options (DENY): Không cho phép trang web khác nhúng iframe hệ thống này
+  // (Chống Clickjacking).
   app.use(
     helmet({
       contentSecurityPolicy: {
@@ -31,26 +40,30 @@ async function bootstrap() {
         preload: true,
       },
       frameguard: {
-        action: 'deny', // Chống Clickjacking triệt để
+        action: 'deny',
       },
     }),
   );
 
   // 3. CORS: Giới hạn danh sách trắng (Whitelist) chỉ cho Frontend truy cập
-  // Giải thích: Không cho phép các Domain lạ nhúng URL của API này vào
   app.enableCors({
-    origin: 'http://localhost:5173', // Chỉ cho phép domain frontend này truy cập
+    origin: 'http://localhost:5173',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, // Cho phép truyền cookie nếu cần thiết
+    credentials: true,
   });
 
-  // 4. ValidationPipe: Ngăn chặn BOPLA và Mass Assignment
-  // Giải thích: Lọc bỏ các thuộc tính rác, chặn ngay nếu có dữ liệu thừa
+  // -----------------------------------------------------------------------
+  // 🛡️ BẢO MẬT: CHỐNG MASS ASSIGNMENT (BOPLA)
+  // -----------------------------------------------------------------------
+  // Giải thích cho Đồ án: ValidationPipe được thiết lập Global.
+  // - whitelist: Tự động vứt bỏ các dữ liệu rác hacker cố ý nhét vào Body.
+  // - forbidNonWhitelisted: Trả về lỗi 400 ngay lập tức nếu phát hiện trường lạ.
+  // Giúp chặn đứng hành vi chèn thêm trường 'role: ADMIN' để chiếm quyền.
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true, // Tự động loại bỏ các field không có trong DTO
-      forbidNonWhitelisted: true, // Ném lỗi 400 Bad Request nếu có field lạ
-      transform: true, // Tự động ép kiểu dữ liệu (vd: param id dạng chuỗi thành số)
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
     }),
   );
 

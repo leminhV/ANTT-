@@ -8,6 +8,7 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Gửi kèm HttpOnly Cookie tự động
 });
 
 // Thêm Access Token vào mọi Request
@@ -65,13 +66,11 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = localStorage.getItem('refresh_token');
       const userStr = localStorage.getItem('user');
 
-      if (!refreshToken || !userStr) {
+      if (!userStr) {
         isRefreshing = false;
         localStorage.removeItem('token');
-        localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
         window.location.href = '/login';
         return Promise.reject(error);
@@ -79,17 +78,18 @@ apiClient.interceptors.response.use(
 
       try {
         const user = JSON.parse(userStr);
-        // Gọi thẳng axios gốc để không dính vào vòng lặp của apiClient
+        // Gọi thẳng axios gốc nhưng nhớ bật withCredentials để trình duyệt tự gửi Cookie
         const response = await axios.post(`${API_BASE_URL}/api/auth/refresh`, {
           userId: user.id,
-          refreshToken: refreshToken,
+        }, {
+          withCredentials: true
         });
 
-        const { access_token, refresh_token: new_refresh_token } = response.data;
+        const { access_token } = response.data;
         
         // Cập nhật Token mới
         localStorage.setItem('token', access_token);
-        localStorage.setItem('refresh_token', new_refresh_token);
+        // Không còn lưu refresh_token vào localStorage nữa!
 
         apiClient.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
         originalRequest.headers['Authorization'] = `Bearer ${access_token}`;
@@ -99,7 +99,6 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         processQueue(refreshError, null);
         localStorage.removeItem('token');
-        localStorage.removeItem('refresh_token');
         localStorage.removeItem('user');
         window.location.href = '/login';
         toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');

@@ -37,6 +37,7 @@ async function main() {
     prisma.user.create({ data: { name: 'Hoàng Mai H', email: 'hoangmaih@st.vju.ac.vn', password: defaultPassword, role: Role.STUDENT } }),
     prisma.user.create({ data: { name: 'Đỗ Tuấn K', email: 'dotuank@st.vju.ac.vn', password: defaultPassword, role: Role.STUDENT } }),
   ]);
+  const instructors = users.filter(u => u.role === Role.INSTRUCTOR);
   const students = users.filter(u => u.role === Role.STUDENT);
 
   // 2. TẠO 5 PHÒNG LAB
@@ -46,6 +47,18 @@ async function main() {
     prisma.room.create({ data: { name: 'Lab Cơ điện tử', location: 'Tầng 1 - Tòa A', capacity: 40 } }),
     prisma.room.create({ data: { name: 'Lab Sinh học phân tử', location: 'Tầng 4 - Tòa C', capacity: 20 } }),
     prisma.room.create({ data: { name: 'Lab Máy tính hiệu năng cao', location: 'Tầng 5 - Tòa A', capacity: 50 } }),
+    prisma.room.create({ data: { name: 'Lab Trí tuệ nhân tạo (AI)', location: 'Tầng 6 - Tòa A', capacity: 40 } }),
+    prisma.room.create({ data: { name: 'Lab Mạng máy tính', location: 'Tầng 3 - Tòa C', capacity: 35 } }),
+    prisma.room.create({ data: { name: 'Lab Năng lượng tái tạo', location: 'Tầng 1 - Tòa B', capacity: 20 } }),
+  ]);
+
+  // 2.5. TẠO 3 KHÓA HỌC (COURSES)
+  const courses = await Promise.all([
+    prisma.course.create({ data: { name: 'Thực hành Vi điều khiển', code: 'VDK2026', instructor_id: instructors[0].id } }),
+    prisma.course.create({ data: { name: 'Thí nghiệm Hóa vô cơ', code: 'HVC2026', instructor_id: instructors[1].id } }),
+    prisma.course.create({ data: { name: 'Thực hành Robot công nghiệp', code: 'ROB2026', instructor_id: instructors[0].id } }),
+    prisma.course.create({ data: { name: 'Thực hành Lập trình Mạng', code: 'LTM2026', instructor_id: instructors[1].id } }),
+    prisma.course.create({ data: { name: 'Thiết kế Vi mạch', code: 'ICD2026', instructor_id: instructors[0].id } }),
   ]);
 
   // 3. TẠO 20 THIẾT BỊ
@@ -53,8 +66,8 @@ async function main() {
     'Máy đo dao động Oscilloscope', 'Kính hiển vi điện tử', 'Cánh tay robot DOBOT', 'Máy ly tâm tốc độ cao', 
     'Máy in 3D Resin', 'Trạm hàn khò kĩ thuật số', 'Máy phân tích phổ', 'Tủ sấy chân không',
     'Máy PCR sinh học', 'Bể rung siêu âm', 'Nguồn DC điều chỉnh', 'Máy phát xung',
-    'Kính lúp công nghiệp', 'Máy khuấy từ gia nhiệt', 'Cân phân tích điện tử', 'Tủ hút khí độc',
-    'Máy quang phổ UV-Vis', 'Bộ điều khiển PLC', 'Cảm biến lực Force Gauge', 'Máy đo pH để bàn'
+    'Máy quang phổ UV-Vis', 'Bộ điều khiển PLC', 'Cảm biến lực Force Gauge', 'Máy đo pH để bàn',
+    'Máy quét 3D Laser', 'Trạm khí tượng mini', 'Bộ KIT FPGA', 'Mô hình tua-bin gió', 'Cảm biến quang học'
   ];
   const statuses = [EquipmentStatus.AVAILABLE, EquipmentStatus.AVAILABLE, EquipmentStatus.IN_USE, EquipmentStatus.MAINTENANCE, EquipmentStatus.BROKEN];
   
@@ -68,6 +81,25 @@ async function main() {
       }
     });
   }));
+
+  // 4. TẠO HÓA CHẤT
+  const nextYear = new Date();
+  nextYear.setFullYear(nextYear.getFullYear() + 1);
+  const expiredDate = new Date();
+  expiredDate.setMonth(expiredDate.getMonth() - 1); // 1 hóa chất hết hạn để test
+
+  await prisma.chemical.createMany({
+    data: [
+      { name: 'Axit Sunfuric', formula: 'H2SO4', quantity_stock: 5.5, unit: 'Lít', expiration_date: nextYear },
+      { name: 'Natri Clorua', formula: 'NaCl', quantity_stock: 10.0, unit: 'kg', expiration_date: nextYear },
+      { name: 'Ethanol 90%', formula: 'C2H5OH', quantity_stock: 20.0, unit: 'Lít', expiration_date: nextYear },
+      { name: 'Axit Clohidric', formula: 'HCl', quantity_stock: 5.0, unit: 'Lít', expiration_date: nextYear },
+      { name: 'Đồng(II) Sunfat', formula: 'CuSO4', quantity_stock: 2.5, unit: 'kg', expiration_date: expiredDate },
+      { name: 'Axit Nitric', formula: 'HNO3', quantity_stock: 8.0, unit: 'Lít', expiration_date: nextYear },
+      { name: 'Thuốc tím', formula: 'KMnO4', quantity_stock: 1.5, unit: 'kg', expiration_date: expiredDate },
+      { name: 'Amoniac', formula: 'NH3', quantity_stock: 15.0, unit: 'Lít', expiration_date: nextYear },
+    ]
+  });
 
   // 4. TẠO SYSTEM SETTINGS
   await prisma.systemSetting.createMany({
@@ -114,9 +146,81 @@ async function main() {
         end_time: endTime,
         status: bookingStatuses[i % bookingStatuses.length],
         purpose: purposes[i % purposes.length],
+        course_id: (i % 3 === 0) ? courses[i % courses.length].id : null,
       }
     });
   }
+
+  // 6. TẠO BÁO CÁO SỰ CỐ (REPORTS) ĐỂ DEMO
+  const reports = await Promise.all([
+    prisma.report.create({
+      data: {
+        title: 'Kính hiển vi bị mờ thấu kính',
+        description: 'Khi quan sát mẫu vật ở độ phóng đại 100x thì hình ảnh bị nhòe, không rõ nét.',
+        user_id: students[0].id,
+        equipment_id: equipments[1].id, // Kính hiển vi
+        room_id: rooms[3].id,
+        status: 'OPEN',
+      }
+    }),
+    prisma.report.create({
+      data: {
+        title: 'Máy in 3D bị kẹt nhựa',
+        description: 'Đầu phun bị tắc nhựa Resin, cần vệ sinh gấp.',
+        user_id: students[1].id,
+        equipment_id: equipments[4].id, // Máy in 3D
+        room_id: rooms[0].id,
+        status: 'IN_PROGRESS',
+      }
+    }),
+    prisma.report.create({
+      data: {
+        title: 'Điều hòa phòng máy tính không mát',
+        description: 'Phòng nóng, điều hòa số 2 bị chảy nước và không phả hơi lạnh.',
+        user_id: instructors[0].id,
+        room_id: rooms[4].id,
+        status: 'RESOLVED',
+      }
+    }),
+    prisma.report.create({
+      data: {
+        title: 'Tủ hút khí độc phát tiếng ồn lớn',
+        description: 'Khi bật quạt hút mức cao, tủ có tiếng kêu lạch cạch rất to.',
+        user_id: instructors[1].id,
+        equipment_id: equipments[15].id,
+        room_id: rooms[1].id,
+        status: 'OPEN',
+      }
+    }),
+    prisma.report.create({
+      data: {
+        title: 'Máy tính số 5 không lên màn hình',
+        description: 'Bật case vẫn chạy nhưng màn hình báo No Signal.',
+        user_id: students[4].id,
+        room_id: rooms[4].id,
+        status: 'OPEN',
+      }
+    })
+  ]);
+
+  // 7. TẠO DỮ LIỆU ĐIỂM DANH (CHECK-IN)
+  await prisma.checkInRecord.create({
+    data: {
+      user_id: students[2].id,
+      room_id: rooms[0].id,
+      status: 'ACTIVE',
+      check_in: new Date(),
+    }
+  });
+  await prisma.checkInRecord.create({
+    data: {
+      user_id: students[3].id,
+      room_id: rooms[1].id,
+      status: 'COMPLETED',
+      check_in: new Date(new Date().getTime() - 2 * 60 * 60 * 1000), // 2 tiếng trước
+      check_out: new Date(),
+    }
+  });
 
   console.log('Seed dữ liệu hoàn tất!');
 }

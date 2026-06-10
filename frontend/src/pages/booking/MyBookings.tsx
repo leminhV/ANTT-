@@ -59,12 +59,12 @@ export function MyBookings() {
   );
 
   return (
-    <div className="max-w-[1200px] mx-auto space-y-6 animate-in fade-in duration-300">
+    <div className="max-w-[1200px] mx-auto space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex justify-between items-center">
-        <h1 className="text-[24px] font-bold text-[#212121]">Đơn đặt lịch của tôi</h1>
+        <h1 className="text-[24px] font-bold text-[#0F172A] tracking-tight">Đơn đặt lịch của tôi</h1>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-[#E0E0E0] overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#E2E8F0] overflow-hidden">
         {/* Toolbar */}
         <div className="p-4 border-b border-[#E0E0E0] bg-[#F5F5F5] flex justify-between items-center">
           <div className="relative w-[300px]">
@@ -94,11 +94,11 @@ export function MyBookings() {
             </thead>
             <tbody className="divide-y divide-[#E0E0E0]">
               {isLoading ? (
-                <tr>
-                  <td colSpan={6} className="py-12">
-                    <LoadingSpinner text="Đang tải lịch sử đặt phòng..." />
-                  </td>
-                </tr>
+                <>
+                  <SkeletonRow />
+                  <SkeletonRow />
+                  <SkeletonRow />
+                </>
               ) : filteredBookings.map((bk) => (
                 <tr key={bk.id} className="hover:bg-[#F5F5F5] bg-white transition-colors">
                   <td className="px-6 py-4">
@@ -126,10 +126,22 @@ export function MyBookings() {
               ))}
               {!isLoading && filteredBookings.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="py-12 text-center text-[#757575]">
-                    <CalendarX className="w-12 h-12 mx-auto mb-3 text-[#E0E0E0]" />
-                    <p className="mb-4">Chưa có lịch đặt nào</p>
-                    <button onClick={() => navigate('/calendar')} className="px-4 py-2 bg-[#1E5FA5] text-white rounded-md text-[14px]">Đặt lịch ngay</button>
+                  <td colSpan={6} className="py-24 text-center">
+                    <div className="flex flex-col items-center justify-center max-w-sm mx-auto space-y-4">
+                      <div className="w-24 h-24 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-full flex items-center justify-center mb-2 shadow-inner">
+                        <CalendarX className="w-10 h-10 text-blue-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-slate-800">Chưa có lịch đặt nào</h3>
+                      <p className="text-sm text-slate-500 text-center leading-relaxed">
+                        Bạn chưa thực hiện bất kỳ phiên đặt phòng nào. Hãy tạo mới một đơn đặt lịch để sử dụng tài nguyên của phòng Lab.
+                      </p>
+                      <button 
+                        onClick={() => navigate('/calendar')} 
+                        className="mt-4 px-6 py-2.5 bg-[#1E40AF] hover:bg-[#1D4ED8] text-white rounded-lg text-[14px] font-medium shadow-md shadow-blue-500/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+                      >
+                        Đặt lịch ngay
+                      </button>
+                    </div>
                   </td>
                 </tr>
               )}
@@ -150,3 +162,32 @@ export function MyBookings() {
     </div>
   );
 }
+
+// ── Skeleton shimmer component ──
+function SkeletonRow() {
+  return (
+    <tr>
+      <td className="px-6 py-4">
+        <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse w-24"></div>
+      </td>
+      <td className="px-6 py-4">
+        <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse w-32"></div>
+      </td>
+      <td className="px-6 py-4">
+        <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse w-40"></div>
+      </td>
+      <td className="px-6 py-4">
+        <div className="h-4 bg-gray-200 dark:bg-slate-700 rounded animate-pulse w-32"></div>
+      </td>
+      <td className="px-6 py-4">
+        <div className="h-6 bg-gray-200 dark:bg-slate-700 rounded animate-pulse w-20"></div>
+      </td>
+      <td className="px-6 py-4 text-right">
+        <div className="flex justify-end">
+          <div className="h-8 bg-gray-200 dark:bg-slate-700 rounded animate-pulse w-20"></div>
+        </div>
+      </td>
+    </tr>
+  );
+}
+

@@ -110,7 +110,14 @@ export class BookingsService {
     }
 
     return this.prisma.$transaction(async (tx) => {
-      // 3. Pessimistic Locking: Khóa Room để ngăn Race Condition (Double Booking)
+      // -----------------------------------------------------------------------
+      // 🛡️ BẢO MẬT & ĐỒNG BỘ: PESSIMISTIC LOCKING (Khóa Bi Quan)
+      // -----------------------------------------------------------------------
+      // Giải thích cho Đồ án: Đây là kỹ thuật cực kỳ quan trọng (Chống Double-Booking).
+      // Khi hàng chục sinh viên cùng ấn đặt 1 phòng trong 1 giây, nếu chỉ dùng lệnh
+      // SELECT bình thường (Race Condition), hệ thống có thể duyệt cho cả 10 người.
+      // Dùng 'FOR UPDATE', Database (MySQL) sẽ xếp hàng các lượt truy cập.
+      // Yêu cầu thứ 2 phải chờ yêu cầu thứ 1 xử lý xong mới được chạy tiếp.
       await tx.$executeRaw`SELECT id FROM rooms WHERE id = ${room_id} FOR UPDATE`;
 
       if (equipment_id) {
@@ -267,7 +274,9 @@ export class BookingsService {
   }
 
   async approveAllPending() {
-    const pendings = await this.prisma.booking.findMany({ where: { status: 'PENDING' } });
+    const pendings = await this.prisma.booking.findMany({
+      where: { status: 'PENDING' },
+    });
     const result = await this.prisma.booking.updateMany({
       where: { status: 'PENDING' },
       data: {
@@ -281,7 +290,7 @@ export class BookingsService {
         booking.user_id,
         'Phê duyệt hàng loạt',
         `Đơn đặt phòng #${booking.id} của bạn đã được phê duyệt.`,
-        'success'
+        'success',
       );
     }
 
@@ -335,14 +344,18 @@ export class BookingsService {
     });
 
     // Bắn thông báo nếu có đổi status thành APPROVED hoặc REJECTED
-    if (updateBookingDto.status && ['APPROVED', 'REJECTED'].includes(updateBookingDto.status)) {
-      const statusVi = updateBookingDto.status === 'APPROVED' ? 'phê duyệt' : 'từ chối';
+    if (
+      updateBookingDto.status &&
+      ['APPROVED', 'REJECTED'].includes(updateBookingDto.status)
+    ) {
+      const statusVi =
+        updateBookingDto.status === 'APPROVED' ? 'phê duyệt' : 'từ chối';
       const type = updateBookingDto.status === 'APPROVED' ? 'success' : 'error';
       this.notificationsGateway.sendNotificationToUser(
         result.user_id,
         `Cập nhật Đơn đặt phòng #${result.id}`,
         `Đơn đặt phòng của bạn đã bị ${statusVi} bởi Quản trị viên.`,
-        type
+        type,
       );
     }
 

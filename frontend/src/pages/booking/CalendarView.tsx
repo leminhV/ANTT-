@@ -144,17 +144,17 @@ export function CalendarView() {
         </button>
 
         {/* Filter Box */}
-        <div className="bg-white rounded-xl shadow-sm border border-[#E0E0E0] overflow-hidden flex flex-col">
-          <div className="p-4 border-b border-[#E0E0E0] bg-[#F5F5F5] flex items-center gap-2">
-            <Filter className="w-4 h-4 text-[#757575]" />
-            <h3 className="text-[14px] font-bold text-[#212121]">Bộ lọc tìm kiếm</h3>
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-[#E0E0E0] dark:border-slate-800 overflow-hidden flex flex-col transition-colors duration-300">
+          <div className="p-4 border-b border-[#E0E0E0] dark:border-slate-800 bg-[#F5F5F5] dark:bg-slate-800/50 flex items-center gap-2">
+            <Filter className="w-4 h-4 text-[#757575] dark:text-slate-400" />
+            <h3 className="text-[14px] font-bold text-[#212121] dark:text-slate-200">Bộ lọc tìm kiếm</h3>
           </div>
           
           <div className="p-4 overflow-y-auto flex-1 space-y-6">
             
             {/* Lọc theo Phòng */}
             <div className="space-y-3">
-              <h4 className="text-[13px] font-bold text-[#212121] uppercase tracking-wide">Phòng Lab</h4>
+              <h4 className="text-[13px] font-bold text-[#212121] dark:text-slate-200 uppercase tracking-wide">Phòng Lab</h4>
               <div className="space-y-2">
                 {rooms.map((room) => (
                   <label key={room.id} className="flex items-center gap-3 cursor-pointer group">
@@ -162,9 +162,9 @@ export function CalendarView() {
                       type="checkbox" 
                       checked={selectedRooms.includes(room.id)}
                       onChange={() => toggleRoom(room.id)}
-                      className="w-4 h-4 rounded border-[#E0E0E0] text-[#1E5FA5] focus:ring-[#1E5FA5]"
+                      className="w-4 h-4 rounded border-[#E0E0E0] dark:border-slate-700 text-[#1E5FA5] focus:ring-[#1E5FA5]"
                     />
-                    <span className="text-[13px] text-[#212121] group-hover:text-[#1E5FA5] transition-colors">{room.name}</span>
+                    <span className="text-[13px] text-[#212121] dark:text-slate-300 group-hover:text-[#1E5FA5] dark:group-hover:text-blue-400 transition-colors">{room.name}</span>
                   </label>
                 ))}
               </div>
@@ -173,45 +173,45 @@ export function CalendarView() {
         </div>
 
         {/* Legend */}
-        <div className="bg-white rounded-xl shadow-sm border border-[#E0E0E0] p-4 space-y-3">
-          <h4 className="text-[13px] font-bold text-[#212121]">Chú thích trạng thái</h4>
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-[#E0E0E0] dark:border-slate-800 p-4 space-y-3 transition-colors duration-300">
+          <h4 className="text-[13px] font-bold text-[#212121] dark:text-slate-200">Chú thích trạng thái</h4>
           <div className="space-y-2">
             <div className="flex items-center gap-3">
-              <div className="w-4 h-4 bg-white border border-[#E0E0E0] rounded-sm"></div>
-              <span className="text-[13px] text-[#757575]">Trống (Có thể đặt)</span>
+              <div className="w-4 h-4 bg-white dark:bg-slate-900 border border-[#E0E0E0] dark:border-slate-700 rounded-sm"></div>
+              <span className="text-[13px] text-[#757575] dark:text-slate-400">Trống (Có thể đặt)</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-4 h-4 bg-[#F5F5F5] border border-[#E0E0E0] rounded-sm flex items-center justify-center"><Lock className="w-3 h-3 text-[#9E9E9E]" /></div>
-              <span className="text-[13px] text-[#757575]">Đã có người đặt / Khóa</span>
+              <div className="w-4 h-4 bg-[#F5F5F5] dark:bg-slate-800/50 border border-[#E0E0E0] dark:border-slate-700 rounded-sm flex items-center justify-center"><Lock className="w-3 h-3 text-[#9E9E9E] dark:text-slate-500" /></div>
+              <span className="text-[13px] text-[#757575] dark:text-slate-400">Đã có người đặt / Khóa</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-4 h-4 bg-[#FFF8E1] border border-[#FFE082] rounded-sm"></div>
-              <span className="text-[13px] text-[#757575]">Đang chờ duyệt của bạn</span>
+              <div className="w-4 h-4 bg-[#FFF8E1] dark:bg-yellow-900/30 border border-[#FFE082] dark:border-yellow-700/50 rounded-sm"></div>
+              <span className="text-[13px] text-[#757575] dark:text-slate-400">Đang chờ duyệt của bạn</span>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-4 h-4 bg-[#D6E4F7] border border-[#1E5FA5] rounded-sm"></div>
-              <span className="text-[13px] text-[#757575]">Lịch của bạn (Approved)</span>
+              <div className="w-4 h-4 bg-[#D6E4F7] dark:bg-blue-900/30 border border-[#1E5FA5] dark:border-blue-700/50 rounded-sm"></div>
+              <span className="text-[13px] text-[#757575] dark:text-slate-400">Lịch của bạn (Approved)</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Calendar Area */}
-      <div className="flex-1 bg-white rounded-xl shadow-sm border border-[#E0E0E0] overflow-hidden flex flex-col min-w-0 relative">
+      <div className="flex-1 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-[#E0E0E0] dark:border-slate-800 overflow-hidden flex flex-col min-w-0 relative transition-colors duration-300">
         {isLoading && (
-          <div className="absolute inset-0 bg-white/50 backdrop-blur-sm z-10 flex items-center justify-center">
+          <div className="absolute inset-0 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm z-10 flex items-center justify-center">
             <LoadingSpinner size={32} text="Đang tải lịch..." />
           </div>
         )}
         
         {/* Calendar Header */}
-        <div className="h-[64px] border-b border-[#E0E0E0] px-6 flex items-center justify-between bg-white flex-shrink-0">
+        <div className="h-[64px] border-b border-[#E0E0E0] dark:border-slate-800 px-6 flex items-center justify-between bg-white dark:bg-slate-900 flex-shrink-0 transition-colors duration-300">
           <div className="flex items-center gap-4">
-            <div className="p-2 bg-[#F5F5F5] rounded-md text-[#212121]">
+            <div className="p-2 bg-[#F5F5F5] dark:bg-slate-800 rounded-md text-[#212121] dark:text-slate-200">
               <Calendar className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-[18px] font-bold text-[#212121]">{format(startOfCurrentWeek, "dd/MM/yyyy")} - {format(addDays(startOfCurrentWeek, 6), "dd/MM/yyyy")}</h2>
+              <h2 className="text-[18px] font-bold text-[#212121] dark:text-slate-100">{format(startOfCurrentWeek, "dd/MM/yyyy")} - {format(addDays(startOfCurrentWeek, 6), "dd/MM/yyyy")}</h2>
             </div>
           </div>
           
@@ -224,25 +224,25 @@ export function CalendarView() {
                   setCurrentDate(new Date(e.target.value));
                 }
               }}
-              className="px-2 py-1.5 text-[13px] font-medium text-[#212121] bg-white border border-[#E0E0E0] hover:border-[#1E5FA5] rounded transition-colors focus:outline-none focus:ring-1 focus:ring-[#1E5FA5] cursor-pointer cursor-text"
+              className="px-2 py-1.5 text-[13px] font-medium text-[#212121] dark:text-slate-200 bg-white dark:bg-slate-800 border border-[#E0E0E0] dark:border-slate-700 hover:border-[#1E5FA5] rounded transition-colors focus:outline-none focus:ring-1 focus:ring-[#1E5FA5] cursor-pointer cursor-text color-scheme-light dark:color-scheme-dark"
               title="Chọn một ngày bất kỳ"
             />
             <button 
               onClick={() => setCurrentDate(new Date())}
-              className="px-3 py-1.5 text-[13px] font-bold text-[#757575] bg-white border border-[#E0E0E0] hover:bg-[#F5F5F5] hover:text-[#212121] rounded transition-colors"
+              className="px-3 py-1.5 text-[13px] font-bold text-[#757575] dark:text-slate-300 bg-white dark:bg-slate-800 border border-[#E0E0E0] dark:border-slate-700 hover:bg-[#F5F5F5] dark:hover:bg-slate-700 hover:text-[#212121] dark:hover:text-white rounded transition-colors"
             >
               Hôm nay
             </button>
-            <div className="w-px h-6 bg-[#E0E0E0] mx-1"></div>
+            <div className="w-px h-6 bg-[#E0E0E0] dark:bg-slate-700 mx-1"></div>
             <button 
               onClick={() => setCurrentDate(addDays(currentDate, -7))}
-              className="p-1.5 text-[#757575] border border-[#E0E0E0] hover:bg-[#F5F5F5] hover:text-[#212121] rounded transition-colors"
+              className="p-1.5 text-[#757575] dark:text-slate-400 border border-[#E0E0E0] dark:border-slate-700 hover:bg-[#F5F5F5] dark:hover:bg-slate-700 hover:text-[#212121] dark:hover:text-white rounded transition-colors"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button 
               onClick={() => setCurrentDate(addDays(currentDate, 7))}
-              className="p-1.5 text-[#757575] border border-[#E0E0E0] hover:bg-[#F5F5F5] hover:text-[#212121] rounded transition-colors"
+              className="p-1.5 text-[#757575] dark:text-slate-400 border border-[#E0E0E0] dark:border-slate-700 hover:bg-[#F5F5F5] dark:hover:bg-slate-700 hover:text-[#212121] dark:hover:text-white rounded transition-colors"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
@@ -250,31 +250,31 @@ export function CalendarView() {
         </div>
 
         {/* Calendar Grid */}
-        <div className="flex-1 overflow-auto bg-[#F5F5F5] relative p-4">
-          <div className="min-w-[800px] bg-white border border-[#E0E0E0] rounded-lg overflow-hidden shadow-sm">
+        <div className="flex-1 overflow-auto bg-[#F5F5F5] dark:bg-slate-950 relative p-4 transition-colors duration-300">
+          <div className="min-w-[800px] bg-white dark:bg-slate-900 border border-[#E0E0E0] dark:border-slate-800 rounded-lg overflow-hidden shadow-sm">
             
             {/* Days Header Row */}
-            <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-[#E0E0E0] bg-[#FAFAFA]">
-              <div className="p-3 border-r border-[#E0E0E0] flex items-center justify-center">
-                <Clock className="w-4 h-4 text-[#9E9E9E]" />
+            <div className="grid grid-cols-[60px_repeat(7,1fr)] border-b border-[#E0E0E0] dark:border-slate-800 bg-[#FAFAFA] dark:bg-slate-800/50">
+              <div className="p-3 border-r border-[#E0E0E0] dark:border-slate-800 flex items-center justify-center">
+                <Clock className="w-4 h-4 text-[#9E9E9E] dark:text-slate-500" />
               </div>
               {DAYS.map((d, i) => {
                 const isToday = isSameDay(d.fullDate, new Date());
                 return (
-                  <div key={i} className={`p-3 border-r border-[#E0E0E0] text-center ${isToday ? 'bg-[#D6E4F7]/30' : ''}`}>
-                    <div className={`text-[14px] font-bold ${isToday ? 'text-[#1E5FA5]' : 'text-[#212121]'}`}>{d.name}</div>
-                    <div className={`text-[12px] mt-0.5 ${isToday ? 'text-[#1E5FA5] font-semibold' : 'text-[#757575]'}`}>{d.date}</div>
+                  <div key={i} className={`p-3 border-r border-[#E0E0E0] dark:border-slate-800 text-center ${isToday ? 'bg-[#D6E4F7]/30 dark:bg-blue-900/20' : ''}`}>
+                    <div className={`text-[14px] font-bold ${isToday ? 'text-[#1E5FA5] dark:text-blue-400' : 'text-[#212121] dark:text-slate-200'}`}>{d.name}</div>
+                    <div className={`text-[12px] mt-0.5 ${isToday ? 'text-[#1E5FA5] dark:text-blue-400 font-semibold' : 'text-[#757575] dark:text-slate-400'}`}>{d.date}</div>
                   </div>
                 );
               })}
             </div>
 
             {/* Time Slots */}
-            <div className="relative bg-white">
+            <div className="relative bg-white dark:bg-slate-900">
               {HOURS.map((hour) => (
                 <div key={hour} className="grid grid-cols-[60px_repeat(7,1fr)] relative group">
                   {/* Time Label */}
-                  <div className="h-[60px] border-b border-r border-[#E0E0E0] flex items-start justify-center pt-2 text-[12px] font-medium text-[#757575] bg-[#FAFAFA]">
+                  <div className="h-[60px] border-b border-r border-[#E0E0E0] dark:border-slate-800 flex items-start justify-center pt-2 text-[12px] font-medium text-[#757575] dark:text-slate-500 bg-[#FAFAFA] dark:bg-slate-800/30">
                     {hour.toString().padStart(2, '0')}:00
                   </div>
                   
@@ -282,40 +282,40 @@ export function CalendarView() {
                   {DAYS.map((_, dayIdx) => {
                     const slot = getSlot(dayIdx, hour);
                     
-                    let cellClasses = "border-b border-r border-[#E0E0E0] transition-colors relative h-[60px] p-1 ";
+                    let cellClasses = "border-b border-r border-[#E0E0E0] dark:border-slate-800 transition-all relative h-[60px] p-1 ";
                     let content = null;
 
                     if (!slot) {
-                      cellClasses += "bg-white hover:bg-[#F5F5F5] cursor-pointer";
+                      cellClasses += "bg-white dark:bg-slate-900 hover:bg-[#F5F5F5] dark:hover:bg-slate-800 cursor-pointer hover:scale-[1.02] hover:z-10 hover:shadow-md";
                     } else if (slot.type === "locked") {
-                      cellClasses += "bg-[#F5F5F5] cursor-not-allowed";
+                      cellClasses += "bg-[#F5F5F5] dark:bg-slate-800/50 cursor-not-allowed";
                       if (slot.duration) {
                         content = (
-                          <div className="w-full h-full flex items-center justify-center flex-col opacity-60 text-[#757575]">
+                          <div className="w-full h-full flex items-center justify-center flex-col opacity-60 text-[#757575] dark:text-slate-400">
                             <Lock className="w-4 h-4 mb-1" />
                             <span className="text-[10px] font-medium">Đã đặt</span>
                           </div>
                         );
                       }
                     } else if (slot.type === "pending") {
-                      cellClasses += "bg-[#FFF8E1] border-l-4 border-l-[#FFC107] cursor-pointer";
+                      cellClasses += "bg-[#FFF8E1] dark:bg-yellow-900/20 border-l-4 border-l-[#FFC107] dark:border-l-yellow-600 cursor-pointer hover:brightness-95 dark:hover:brightness-110";
                       if (slot.duration) {
                         content = (
                           <div className="w-full h-full p-1 overflow-hidden">
-                            <div className="text-[12px] font-bold text-[#F57F17] line-clamp-1 leading-tight">{slot.title}</div>
-                            <div className="text-[10px] text-[#F57F17] mt-1 flex items-center gap-1">
+                            <div className="text-[12px] font-bold text-[#F57F17] dark:text-yellow-500 line-clamp-1 leading-tight">{slot.title}</div>
+                            <div className="text-[10px] text-[#F57F17] dark:text-yellow-600 mt-1 flex items-center gap-1">
                               <Info className="w-3 h-3" /> Chờ duyệt
                             </div>
                           </div>
                         );
                       }
                     } else if (slot.type === "approved") {
-                      cellClasses += "bg-[#D6E4F7] border-l-4 border-l-[#1E5FA5] cursor-pointer hover:bg-[#C2D6F2]";
+                      cellClasses += "bg-[#D6E4F7] dark:bg-blue-900/30 border-l-4 border-l-[#1E5FA5] dark:border-l-blue-500 cursor-pointer hover:bg-[#C2D6F2] dark:hover:bg-blue-800/40";
                       if (slot.duration) {
                         content = (
                           <div className="w-full h-full p-1 overflow-hidden">
-                            <div className="text-[12px] font-bold text-[#1E5FA5] line-clamp-1 leading-tight">{slot.title}</div>
-                            <div className="text-[10px] text-[#1E5FA5] mt-1 font-medium">Lịch của bạn</div>
+                            <div className="text-[12px] font-bold text-[#1E5FA5] dark:text-blue-400 line-clamp-1 leading-tight">{slot.title}</div>
+                            <div className="text-[10px] text-[#1E5FA5] dark:text-blue-500 mt-1 font-medium">Lịch của bạn</div>
                           </div>
                         );
                       }

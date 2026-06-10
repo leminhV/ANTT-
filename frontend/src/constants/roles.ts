@@ -1,0 +1,21 @@
+export enum UserRole {
+  STUDENT = 'STUDENT',
+  LECTURER = 'LECTURER',
+  TECHNICIAN = 'TECHNICIAN',
+  ADMIN = 'ADMIN',
+}
+
+export enum BookingStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+}
+
+export enum DeviceStatus {
+  AVAILABLE = 'AVAILABLE',
+  IN_USE = 'IN_USE',
+  MAINTENANCE = 'MAINTENANCE',
+  BROKEN = 'BROKEN',
+}

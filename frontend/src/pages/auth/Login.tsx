@@ -20,10 +20,9 @@ export function Login() {
     
     try {
       const response = await authService.login({ email: email.trim(), password });
-      const { access_token, refresh_token, user } = response.data;
+      const { access_token, user } = response.data;
       
       authService.saveToken(access_token);
-      localStorage.setItem("refresh_token", refresh_token);
       localStorage.setItem("userRole", user.role.toLowerCase());
       localStorage.setItem("user", JSON.stringify(user));
       
@@ -56,8 +55,8 @@ export function Login() {
           className="absolute inset-0 w-full h-full object-cover opacity-20 mix-blend-overlay pointer-events-none"
         />
         <div className="relative z-10 flex flex-col items-center">
-          <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-            <span className="text-[#1E5FA5] text-3xl font-bold">L</span>
+          <div className="w-24 h-24 bg-white rounded-full p-2 flex items-center justify-center mb-6 shadow-2xl ring-4 ring-white/20">
+            <img src="/Logo-Dai-Hoc-Viet-Nhat-VJU.png" alt="VJU Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-[32px] font-bold text-white tracking-tight mb-2">
             LabBook
@@ -178,13 +177,7 @@ export function Login() {
         </div>
       </div>
       
-      {/* Dev helper */}
-      <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-xl text-xs text-[#212121] border border-[#E0E0E0] z-50">
-        <p className="font-bold mb-2 border-b pb-1">Demo Logins</p>
-        <p className="flex justify-between gap-4"><span>Student:</span> <span className="font-mono bg-[#F5F5F5] px-1 rounded">lehoangc@st.vju.ac.vn</span></p>
-        <p className="flex justify-between gap-4 mt-1"><span>Admin:</span> <span className="font-mono bg-[#F5F5F5] px-1 rounded">admin@vju.ac.vn</span></p>
-        <p className="mt-2 text-[10px] text-[#757575]">Password: <span className="font-mono">password</span></p>
-      </div>
+
     </div>
   );
 }

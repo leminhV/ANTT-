@@ -60,8 +60,9 @@ export function ChemicalManagement() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const { id, ...restData } = formData;
       const payload = {
-        ...formData,
+        ...restData,
         quantity_stock: Number(formData.quantity_stock),
         expiration_date: formData.expiration_date ? new Date(formData.expiration_date).toISOString() : undefined
       };
