@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, Send, X } from 'lucide-react';
-import { ScrollArea } from '../ui/scroll-area';
 import apiClient from '../../services/apiClient';
 
 export interface BookingData {
@@ -112,7 +111,7 @@ export function AIAssistant({ userRole, bookings = [], equipment = [], onAction 
       </div>
 
       {/* Chat Area */}
-      <ScrollArea className="flex-1 p-4 bg-[#F9FAFB]">
+      <div className="flex-1 overflow-y-auto p-4 bg-[#F9FAFB] dark:bg-slate-900/50">
         <div className="space-y-4 pr-3" ref={scrollRef}>
           {messages.map(msg => (
             <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -127,7 +126,7 @@ export function AIAssistant({ userRole, bookings = [], equipment = [], onAction 
             </div>
           ))}
         </div>
-      </ScrollArea>
+      </div>
 
       {/* Input Area */}
       <div className="p-3 bg-white dark:bg-slate-900 border-t border-[#E0E0E0] dark:border-slate-800">
