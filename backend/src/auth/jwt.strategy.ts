@@ -28,7 +28,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     if (!user.is_active) {
-      throw new UnauthorizedException(`Tài khoản của bạn đã bị khóa. Lý do: ${user.blacklist_reason || 'Không xác định'}`);
+      throw new UnauthorizedException(
+        `Tài khoản của bạn đã bị khóa. Lý do: ${user.blacklist_reason || 'Không xác định'}`,
+      );
     }
 
     return { userId: payload.sub, email: payload.email, role: payload.role };

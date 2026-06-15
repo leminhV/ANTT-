@@ -117,7 +117,10 @@ export class AuthController {
     @Body() body: { userId: number; code: string },
     @Res({ passthrough: true }) res: Response,
   ) {
-    const result: any = await this.authService.verifyMfa(body.userId, body.code);
+    const result: any = await this.authService.verifyMfa(
+      body.userId,
+      body.code,
+    );
     if (result.refresh_token) {
       this.setRefreshTokenCookie(res, result.refresh_token);
       delete result.refresh_token; // don't send back in body
@@ -139,7 +142,9 @@ export class AuthController {
   @Post('mfa/disable')
   async disableMfa(@CurrentUser() user: UserPayload) {
     if (user.role !== 'ADMIN') {
-      throw new UnauthorizedException('Chỉ Quản trị viên mới được phép tác động đến 2FA');
+      throw new UnauthorizedException(
+        'Chỉ Quản trị viên mới được phép tác động đến 2FA',
+      );
     }
     await this.authService.disableMfa(user.userId);
     return { message: 'Đã tắt xác thực 2 bước thành công' };

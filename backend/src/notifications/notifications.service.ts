@@ -34,7 +34,10 @@ export class NotificationsService {
 
       return notification;
     } catch (error) {
-      this.logger.error(`Error creating notification for user ${userId}:`, error);
+      this.logger.error(
+        `Error creating notification for user ${userId}:`,
+        error,
+      );
       // Không ném lỗi ra để tránh ảnh hưởng luồng chính
     }
   }

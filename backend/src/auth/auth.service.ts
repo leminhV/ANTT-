@@ -157,12 +157,14 @@ export class AuthService {
   async generateMfaSecret(userId: number, email: string) {
     const user = await this.usersService.findById(userId);
     if (user?.role !== Role.ADMIN) {
-      throw new ForbiddenException('Chỉ Quản trị viên mới được phép sử dụng tính năng 2FA');
+      throw new ForbiddenException(
+        'Chỉ Quản trị viên mới được phép sử dụng tính năng 2FA',
+      );
     }
 
     const secret = authenticator.generateSecret();
     const otpauthUrl = authenticator.keyuri(email, 'LabBook System', secret);
-    
+
     // Lưu tạm secret vào database (chưa enable)
     await this.usersService.updateMfaSecret(userId, secret);
 

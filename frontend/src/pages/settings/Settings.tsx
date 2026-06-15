@@ -33,7 +33,7 @@ export function Settings() {
       try {
         const user = JSON.parse(userStr);
         setIsMfaEnabled(!!user.is_mfa_enabled);
-      } catch (e) {}
+      } catch (e) { console.error(e); }
     }
   }, []);
 

@@ -112,7 +112,7 @@ export function Layout() {
     try {
       await apiClient.patch(`/api/notifications/${id}/read`);
       setNotifications(prev => prev.filter(n => n.id !== id));
-    } catch (e) {}
+    } catch (e) { console.error(e); }
   };
 
   const handleAIAction = async (action: string, payload?: any) => {
