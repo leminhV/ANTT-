@@ -16,9 +16,11 @@ export class UsersService {
   }
 
   async findById(id: number) {
-    return this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { id },
     });
+    if (user && user.is_deleted) return null;
+    return user;
   }
 
   async create(data: CreateUserDto) {
@@ -38,6 +40,7 @@ export class UsersService {
 
   async findAll() {
     return this.prisma.user.findMany({
+      where: { is_deleted: false },
       select: {
         id: true,
         email: true,
@@ -70,8 +73,9 @@ export class UsersService {
   }
 
   async remove(id: number) {
-    return this.prisma.user.delete({
+    return this.prisma.user.update({
       where: { id },
+      data: { is_deleted: true },
     });
   }
 

@@ -15,6 +15,8 @@ export class RoomsService {
 
   async findAll() {
     return this.prisma.room.findMany({
+      where: { is_deleted: false },
+      take: 1000,
       include: {
         _count: {
           select: { equipment: true },
@@ -27,11 +29,13 @@ export class RoomsService {
     const room = await this.prisma.room.findUnique({
       where: { id },
       include: {
-        equipment: true,
+        equipment: {
+          where: { is_deleted: false }
+        },
       },
     });
 
-    if (!room) {
+    if (!room || room.is_deleted) {
       throw new NotFoundException(`Phòng Lab với ID ${id} không tồn tại`);
     }
 
@@ -52,8 +56,9 @@ export class RoomsService {
     // Check if exists
     await this.findOne(id);
 
-    return this.prisma.room.delete({
+    return this.prisma.room.update({
       where: { id },
+      data: { is_deleted: true }
     });
   }
 }

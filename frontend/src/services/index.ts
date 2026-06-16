@@ -4,7 +4,7 @@ export const authService = {
   register: (data: { email: string; password: string; fullName: string; code?: string }) =>
     apiClient.post('/api/auth/register', { email: data.email, password: data.password, name: data.fullName }),
 
-  login: (data: { email: string; password: string }) =>
+  login: (data: { email: string; password: string; recaptchaToken?: string }) =>
     apiClient.post('/api/auth/login', data),
 
   generateMfa: () => apiClient.post('/api/auth/mfa/generate'),
@@ -75,7 +75,13 @@ export const bookingService = {
       purpose: data.purpose,
     }),
 
-  getAll: () => apiClient.get('/api/bookings'),
+  getAll: (startDate?: string, endDate?: string) => {
+    let url = '/api/bookings';
+    if (startDate && endDate) {
+      url += `?startDate=${startDate}&endDate=${endDate}`;
+    }
+    return apiClient.get(url);
+  },
 
   getOne: (id: string) => apiClient.get(`/api/bookings/${id}`),
 

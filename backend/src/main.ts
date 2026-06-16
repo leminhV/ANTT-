@@ -7,7 +7,6 @@ import { ThrottlerExceptionFilter } from './common/filters/throttler-exception.f
 import { PrismaClientExceptionFilter } from './common/filters/prisma-client-exception.filter';
 import { HttpAdapterHost } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
-import { SanitizePipe } from './common/pipes/sanitize.pipe';
 import { XssSanitizerPipe } from './common/pipes/xss-sanitizer.pipe';
 
 async function bootstrap() {
@@ -61,7 +60,6 @@ async function bootstrap() {
   // - forbidNonWhitelisted: Trả về lỗi 400 ngay lập tức nếu phát hiện trường lạ.
   // Giúp chặn đứng hành vi chèn thêm trường 'role: ADMIN' để chiếm quyền.
   app.useGlobalPipes(
-    new SanitizePipe(),
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,

@@ -3,7 +3,7 @@ import * as crypto from 'crypto';
 const ALGORITHM = 'aes-256-gcm';
 // In a real application, this should be a 32-byte key stored securely in environment variables.
 // For this thesis, we will use a hardcoded 32-byte key or derive it.
-const ENCRYPTION_KEY = Buffer.from('12345678901234567890123456789012', 'utf8'); // 32 chars
+const ENCRYPTION_KEY = Buffer.from(process.env.ENCRYPTION_KEY || '12345678901234567890123456789012', 'utf8'); // 32 chars
 const IV_LENGTH = 12; // For GCM
 
 export class EncryptionUtil {

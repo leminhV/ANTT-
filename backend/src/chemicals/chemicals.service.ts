@@ -23,7 +23,9 @@ export class ChemicalsService {
   }
 
   async findAll() {
-    return this.prisma.chemical.findMany();
+    return this.prisma.chemical.findMany({
+      where: { is_deleted: false },
+    });
   }
 
   async recordUsage(recordUsageDto: RecordUsageDto) {
@@ -92,7 +94,7 @@ export class ChemicalsService {
       },
     });
 
-    if (!chemical) {
+    if (!chemical || chemical.is_deleted) {
       throw new NotFoundException(`Hóa chất với ID ${id} không tồn tại`);
     }
 
@@ -117,8 +119,9 @@ export class ChemicalsService {
 
   async remove(id: number) {
     await this.findOne(id);
-    return this.prisma.chemical.delete({
+    return this.prisma.chemical.update({
       where: { id },
+      data: { is_deleted: true },
     });
   }
 }

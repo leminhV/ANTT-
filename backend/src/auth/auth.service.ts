@@ -60,6 +60,24 @@ export class AuthService {
     }
 
     // -----------------------------------------------------------------------
+    // 🛡️ BẢO MẬT: KIỂM TRA reCAPTCHA
+    // -----------------------------------------------------------------------
+    const recaptchaToken = (loginDto as any).recaptchaToken;
+    if (recaptchaToken) {
+      const secretKey = process.env.RECAPTCHA_SECRET_KEY || '6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe'; // Google Test Secret Key
+      try {
+        const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptchaToken}`;
+        const recaptchaRes = await fetch(verifyUrl, { method: 'POST' });
+        const data = await recaptchaRes.json();
+        if (!data.success || data.score < 0.5) {
+          throw new ForbiddenException('Hành vi đáng ngờ. Vui lòng thử lại!');
+        }
+      } catch (err) {
+        throw new ForbiddenException('Không thể xác thực reCAPTCHA');
+      }
+    }
+
+    // -----------------------------------------------------------------------
     // 🛡️ BẢO MẬT: KIỂM TRA ACCOUNT LOCKOUT
     // -----------------------------------------------------------------------
     if (user.locked_until && user.locked_until > new Date()) {
@@ -113,7 +131,10 @@ export class AuthService {
       user.refresh_token,
     );
     if (!isRefreshTokenValid) {
-      throw new UnauthorizedException('Phiên đăng nhập không hợp lệ');
+      // 🛡️ BẢO MẬT: PHÁT HIỆN TÁI SỬ DỤNG TOKEN (REUSE DETECTION)
+      // Kẻ gian có thể đã dùng một token cũ đã hết hạn hoặc không khớp. Xóa toàn bộ token của người dùng này!
+      await this.usersService.updateRefreshToken(userId, null);
+      throw new ForbiddenException('Cảnh báo bảo mật: Phát hiện sử dụng lại Token cũ. Phiên đăng nhập đã bị vô hiệu hóa.');
     }
 
     return this.generateAuthResponse(user);

@@ -1,58 +1,50 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Search, Edit2, Trash2, AlertCircle, RefreshCw, ShieldAlert, CheckCircle2, AlertTriangle, FileText, FileClock } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, AlertCircle, RefreshCw, ShieldAlert, CheckCircle2, AlertTriangle, FileText, FileClock, DatabaseBackup, MessageSquare } from "lucide-react";
 import { equipmentService, roomService } from "../../services";
 import { format } from "date-fns";
 import { toast } from "react-hot-toast";
 import { ConfirmModal } from "../../components/common/ConfirmModal";
-import { CommentSection } from "../../components/common/CommentSection";
-import { DatabaseBackup, MessageSquare } from "lucide-react";
+import { StatusBadge } from "../../components/equipment/StatusBadge";
+import { AddDeviceModal } from "../../components/equipment/AddDeviceModal";
+import { EditDeviceModal } from "../../components/equipment/EditDeviceModal";
+import { DeviceDetailModal } from "../../components/equipment/DeviceDetailModal";
 
-function StatusBadge({ status }: { status: string }) {
-  const { t } = useTranslation();
+// --- B. Khai báo TypeScript chặt chẽ (Thay thế any) ---
+export interface Room {
+  id: number;
+  name: string;
+}
 
-  const getBadgeStyle = (status: string) => {
-    switch (status) {
-      case 'AVAILABLE': return 'bg-[#E8F5E9] dark:bg-green-900/30 text-[#2E7D32]'; // Khả dụng
-      case 'IN_USE': return 'bg-[#D6E4F7] dark:bg-blue-900/30 text-[#1E5FA5] dark:text-blue-400'; // Đang dùng
-      case 'MAINTENANCE': return 'bg-[#FFF3E0] dark:bg-orange-900/30 text-[#E65100]'; // Bảo trì
-      case 'BROKEN': return 'bg-[#FDEDED] dark:bg-red-900/30 text-[#C62828]'; // Hỏng
-      default: return 'bg-[#F5F5F5] dark:bg-slate-800/50 text-[#757575] dark:text-slate-400';
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'AVAILABLE': return t('status_available');
-      case 'IN_USE': return t('status_in_use');
-      case 'MAINTENANCE': return t('status_maintenance');
-      case 'BROKEN': return t('status_broken');
-      default: return status;
-    }
-  };
-
-  return (
-    <span className={`inline-flex items-center px-2 py-1 rounded text-[12px] font-medium ${getBadgeStyle(status)}`}>
-      {getStatusText(status)}
-    </span>
-  );
+export interface Device {
+  id: number;
+  name: string;
+  serial_number: string;
+  room_id: number;
+  status: string;
+  room?: { name: string };
+  created_at?: string;
+  last_maintenance?: string;
 }
 
 export function DeviceManagement() {
   const { t } = useTranslation();
 
-  const [devices, setDevices] = useState<any[]>([]);
+  const [devices, setDevices] = useState<Device[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  
   const [isAddingDevice, setIsAddingDevice] = useState(false);
   const [isEditingDevice, setIsEditingDevice] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  
   const [newDevice, setNewDevice] = useState({ name: "", serial_number: "", room_id: 0, status: "AVAILABLE" });
   const [editingDevice, setEditingDevice] = useState({ id: 0, name: "", serial_number: "", room_id: 0, status: "AVAILABLE" });
-  const [rooms, setRooms] = useState<any[]>([]);
+  const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
-  const [selectedDevice, setSelectedDevice] = useState<any | null>(null);
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  
+  const [rooms, setRooms] = useState<Room[]>([]);
   
   const currentUserStr = localStorage.getItem("user");
   const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
@@ -84,7 +76,7 @@ export function DeviceManagement() {
         setNewDevice({ ...newDevice, room_id: res.data[0].id });
       }
     } catch (e) {
-      // apiClient.ts sẽ hiển thị toast lỗi chung
+      // apiClient.ts sẽ tự hiển thị toast
     }
   }
 
@@ -95,11 +87,15 @@ export function DeviceManagement() {
 
   const handleAddDevice = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (newDevice.room_id === 0) {
+      toast.error("Vui lòng tạo ít nhất 1 Phòng Lab trước khi lưu Thiết bị.");
+      return;
+    }
     try {
       await equipmentService.create(newDevice);
       toast.success(t("add_device_success"));
       setIsAddingDevice(false);
-      setNewDevice({ name: "", serial_number: "", room_id: rooms[0]?.id || 0, status: "AVAILABLE" });
+      setNewDevice({ name: "", serial_number: "", room_id: 0, status: "AVAILABLE" });
       fetchData();
     } catch (error: any) {
       const msg = error.response?.data?.message || t("add_device_failed");
@@ -109,6 +105,10 @@ export function DeviceManagement() {
 
   const handleUpdateDevice = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (editingDevice.room_id === 0) {
+      toast.error("Vui lòng tạo ít nhất 1 Phòng Lab trước khi lưu Thiết bị.");
+      return;
+    }
     try {
       await equipmentService.update(editingDevice.id.toString(), {
         name: editingDevice.name,
@@ -139,18 +139,23 @@ export function DeviceManagement() {
     }
   };
 
-  const filteredDevices = devices.filter(d => 
-    d.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    d.serial_number.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // --- A. Tối ưu Hiệu năng Tìm kiếm bằng useMemo ---
+  const filteredDevices = useMemo(() => {
+    return devices.filter(d => 
+      d.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      d.serial_number.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [devices, searchTerm]);
 
-  const stats = {
-    total: devices.length,
-    available: devices.filter(d => d.status === 'AVAILABLE').length,
-    inUse: devices.filter(d => d.status === 'IN_USE').length,
-    maintenance: devices.filter(d => d.status === 'MAINTENANCE').length,
-    broken: devices.filter(d => d.status === 'BROKEN').length,
-  };
+  const stats = useMemo(() => {
+    return {
+      total: devices.length,
+      available: devices.filter(d => d.status === 'AVAILABLE').length,
+      inUse: devices.filter(d => d.status === 'IN_USE').length,
+      maintenance: devices.filter(d => d.status === 'MAINTENANCE').length,
+      broken: devices.filter(d => d.status === 'BROKEN').length,
+    };
+  }, [devices]);
 
   return (
     <div className="max-w-[1200px] mx-auto space-y-6 animate-in fade-in duration-300 pb-8">
@@ -290,57 +295,31 @@ export function DeviceManagement() {
         </div>
       </div>
 
-      {/* Detail & Comment Modal */}
-      {isDetailModalOpen && selectedDevice && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl dark:shadow-slate-900/50 w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-[#E0E0E0] dark:border-slate-800 flex justify-between items-center bg-[#F5F5F5] dark:bg-slate-800/50">
-              <div>
-                <h2 className="text-[20px] font-bold text-[#212121] dark:text-slate-100">{t("device_details")} #{selectedDevice.id}</h2>
-                <p className="text-[14px] text-[#757575] dark:text-slate-400 mt-1">{selectedDevice.name}</p>
-              </div>
-              <button 
-                onClick={() => setIsDetailModalOpen(false)}
-                className="text-[#757575] dark:text-slate-400 hover:text-[#212121] dark:text-slate-100 p-2 bg-white dark:bg-slate-900 rounded-full"
-              >
-                ✕
-              </button>
-            </div>
-            
-            <div className="p-6 overflow-y-auto">
-              <div className="space-y-4 mb-8">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <span className="text-[13px] text-[#757575] dark:text-slate-400">{t("serial_num_label")}</span>
-                    <p className="text-[14px] font-medium text-[#212121] dark:text-slate-100 font-mono">{selectedDevice.serial_number}</p>
-                  </div>
-                  <div>
-                    <span className="text-[13px] text-[#757575] dark:text-slate-400">{t("status_label")}</span>
-                    <div><StatusBadge status={selectedDevice.status} /></div>
-                  </div>
-                  <div>
-                    <span className="text-[13px] text-[#757575] dark:text-slate-400">{t("lab_room_label")}</span>
-                    <p className="text-[14px] font-medium text-[#212121] dark:text-slate-100">{selectedDevice.room?.name || t("no_room_assigned")}</p>
-                  </div>
-                  <div>
-                    <span className="text-[13px] text-[#757575] dark:text-slate-400">{t("date_added_label")}</span>
-                    <p className="text-[14px] font-medium text-[#212121] dark:text-slate-100">{format(new Date(selectedDevice.created_at), "dd/MM/yyyy")}</p>
-                  </div>
-                </div>
-              </div>
+      {/* --- C. Tách các Component Modal (Clean Code) --- */}
+      <DeviceDetailModal
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        selectedDevice={selectedDevice}
+        currentUser={currentUser}
+      />
 
-              {/* Tích hợp Component Comment */}
-              <div className="border-t border-[#E0E0E0] dark:border-slate-800 pt-6">
-                <CommentSection
-                  entityType="equipment"
-                  entityId={selectedDevice.id}
-                  currentUser={currentUser}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <AddDeviceModal
+        isOpen={isAddingDevice}
+        onClose={() => setIsAddingDevice(false)}
+        onSubmit={handleAddDevice}
+        newDevice={newDevice}
+        setNewDevice={setNewDevice}
+        rooms={rooms}
+      />
+
+      <EditDeviceModal
+        isOpen={isEditingDevice}
+        onClose={() => setIsEditingDevice(false)}
+        onSubmit={handleUpdateDevice}
+        editingDevice={editingDevice}
+        setEditingDevice={setEditingDevice}
+        rooms={rooms}
+      />
 
       <ConfirmModal
         isOpen={deleteConfirmId !== null}
@@ -351,76 +330,6 @@ export function DeviceManagement() {
         onConfirm={executeDelete}
         onCancel={() => setDeleteConfirmId(null)}
       />
-
-      {isAddingDevice && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg dark:shadow-slate-900/50 w-full max-w-md p-6">
-            <h2 className="text-[20px] font-bold text-[#212121] dark:text-slate-100 mb-4">{t("add_new_device")}</h2>
-            <form onSubmit={handleAddDevice} className="space-y-4">
-              <div>
-                <label className="block text-[13px] font-medium text-[#757575] dark:text-slate-400 mb-1">{t("device_name")}</label>
-                <input required type="text" value={newDevice.name} onChange={e => setNewDevice({...newDevice, name: e.target.value})} className="w-full px-3 py-2 border border-[#E0E0E0] dark:border-slate-800 rounded-md focus:outline-none focus:border-[#1E5FA5] dark:focus:border-blue-500" />
-              </div>
-              <div>
-                <label className="block text-[13px] font-medium text-[#757575] dark:text-slate-400 mb-1">{t("serial_number_label")}</label>
-                <input required type="text" value={newDevice.serial_number} onChange={e => setNewDevice({...newDevice, serial_number: e.target.value})} className="w-full px-3 py-2 border border-[#E0E0E0] dark:border-slate-800 rounded-md focus:outline-none focus:border-[#1E5FA5] dark:focus:border-blue-500" />
-              </div>
-              <div>
-                <label className="block text-[13px] font-medium text-[#757575] dark:text-slate-400 mb-1">{t("lab_room")}</label>
-                <select value={newDevice.room_id} onChange={e => setNewDevice({...newDevice, room_id: parseInt(e.target.value)})} className="w-full px-3 py-2 border border-[#E0E0E0] dark:border-slate-800 rounded-md focus:outline-none focus:border-[#1E5FA5] dark:focus:border-blue-500">
-                  {rooms.map(r => (
-                    <option key={r.id} value={r.id}>{r.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="flex justify-end gap-3 mt-6">
-                <button type="button" onClick={() => setIsAddingDevice(false)} className="px-4 py-2 text-[#757575] dark:text-slate-400 hover:bg-[#F5F5F5] dark:hover:bg-slate-800 dark:bg-slate-800/50 rounded-md transition-colors">{t("cancel")}</button>
-                <button type="submit" className="px-4 py-2 bg-[#1E5FA5] dark:bg-blue-600 hover:bg-[#154a85] dark:hover:bg-blue-700 text-white rounded-md transition-colors">{t("save_device")}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {isEditingDevice && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-lg dark:shadow-slate-900/50 w-full max-w-md p-6">
-            <h2 className="text-[20px] font-bold text-[#212121] dark:text-slate-100 mb-4">{t("edit_device_info")}</h2>
-            <form onSubmit={handleUpdateDevice} className="space-y-4">
-              <div>
-                <label className="block text-[13px] font-medium text-[#757575] dark:text-slate-400 mb-1">{t("device_name")}</label>
-                <input required type="text" value={editingDevice.name} onChange={e => setEditingDevice({...editingDevice, name: e.target.value})} className="w-full px-3 py-2 border border-[#E0E0E0] dark:border-slate-800 rounded-md focus:outline-none focus:border-[#1E5FA5] dark:focus:border-blue-500" />
-              </div>
-              <div>
-                <label className="block text-[13px] font-medium text-[#757575] dark:text-slate-400 mb-1">{t("serial_number_label")}</label>
-                <input required type="text" value={editingDevice.serial_number} onChange={e => setEditingDevice({...editingDevice, serial_number: e.target.value})} className="w-full px-3 py-2 border border-[#E0E0E0] dark:border-slate-800 rounded-md focus:outline-none focus:border-[#1E5FA5] dark:focus:border-blue-500" />
-              </div>
-              <div>
-                <label className="block text-[13px] font-medium text-[#757575] dark:text-slate-400 mb-1">{t("lab_room")}</label>
-                <select value={editingDevice.room_id} onChange={e => setEditingDevice({...editingDevice, room_id: parseInt(e.target.value)})} className="w-full px-3 py-2 border border-[#E0E0E0] dark:border-slate-800 rounded-md focus:outline-none focus:border-[#1E5FA5] dark:focus:border-blue-500">
-                  <option value={0}>{t("no_room_assigned_option")}</option>
-                  {rooms.map(r => (
-                    <option key={r.id} value={r.id}>{r.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-[13px] font-medium text-[#757575] dark:text-slate-400 mb-1">{t("status")}</label>
-                <select value={editingDevice.status} onChange={e => setEditingDevice({...editingDevice, status: e.target.value})} className="w-full px-3 py-2 border border-[#E0E0E0] dark:border-slate-800 rounded-md focus:outline-none focus:border-[#1E5FA5] dark:focus:border-blue-500">
-                  <option value="AVAILABLE">Khả dụng</option>
-                  <option value="IN_USE">Đang dùng</option>
-                  <option value="MAINTENANCE">Bảo trì</option>
-                  <option value="BROKEN">Hỏng hóc</option>
-                </select>
-              </div>
-              <div className="flex justify-end gap-3 mt-6">
-                <button type="button" onClick={() => setIsEditingDevice(false)} className="px-4 py-2 text-[#757575] dark:text-slate-400 hover:bg-[#F5F5F5] dark:hover:bg-slate-800 dark:bg-slate-800/50 rounded-md transition-colors">{t("cancel")}</button>
-                <button type="submit" className="px-4 py-2 bg-[#1E5FA5] dark:bg-blue-600 hover:bg-[#154a85] dark:hover:bg-blue-700 text-white rounded-md transition-colors">{t("update")}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

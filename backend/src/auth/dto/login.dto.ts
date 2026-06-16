@@ -1,4 +1,4 @@
-import { IsEmail, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsString, MinLength, IsOptional } from 'class-validator';
 
 export class LoginDto {
   @IsEmail({}, { message: 'Email không hợp lệ' })
@@ -7,4 +7,8 @@ export class LoginDto {
   @IsString()
   @MinLength(6, { message: 'Mật khẩu phải từ 6 ký tự trở lên' })
   password: string;
+
+  @IsOptional()
+  @IsString()
+  recaptchaToken?: string;
 }

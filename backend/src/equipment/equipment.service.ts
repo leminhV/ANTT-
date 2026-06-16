@@ -18,8 +18,13 @@ export class EquipmentService {
   }
 
   async findAll(roomId?: number) {
+    const where: any = { is_deleted: false };
+    if (roomId) {
+      where.room_id = roomId;
+    }
     return this.prisma.equipment.findMany({
-      where: roomId ? { room_id: roomId } : undefined,
+      where,
+      take: 1000,
       include: {
         room: true,
       },
@@ -34,7 +39,7 @@ export class EquipmentService {
       },
     });
 
-    if (!equipment) {
+    if (!equipment || equipment.is_deleted) {
       throw new NotFoundException(`Thiết bị với ID ${id} không tồn tại`);
     }
 
@@ -66,8 +71,9 @@ export class EquipmentService {
   async remove(id: number) {
     await this.findOne(id);
 
-    return this.prisma.equipment.delete({
+    return this.prisma.equipment.update({
       where: { id },
+      data: { is_deleted: true },
     });
   }
 }

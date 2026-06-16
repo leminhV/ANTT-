@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router";
 import { useTranslation } from "react-i18next";
 import { AlertCircle, User, Lock, Eye, EyeOff } from "lucide-react";
 import { toast } from 'react-hot-toast';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { authService } from "../../services";
 import { ImageWithFallback } from "../../components/figma/ImageWithFallback";
 
@@ -21,13 +22,24 @@ export function Login() {
   const [mfaCode, setMfaCode] = useState("");
   const [tempUserId, setTempUserId] = useState<number | null>(null);
 
+  const { executeRecaptcha } = useGoogleReCaptcha();
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage("");
     
     try {
-      const response = await authService.login({ email: email.trim(), password });
+      let recaptchaToken = undefined;
+      if (executeRecaptcha) {
+        recaptchaToken = await executeRecaptcha('login');
+      }
+
+      const response = await authService.login({ 
+        email: email.trim(), 
+        password, 
+        recaptchaToken 
+      });
       
       if (response.data.requires_mfa) {
         setTempUserId(response.data.user_id);

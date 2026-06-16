@@ -272,11 +272,23 @@ export class BookingsService {
       })
       .catch((err) => console.error('Lỗi gửi thông báo cho Admin:', err));
 
+    // Phát sự kiện để cập nhật lịch Real-time cho toàn bộ user
+    this.notificationsService.broadcastCalendarUpdate();
+
     return result;
   }
 
-  async findAll() {
+  async findAll(startDate?: string, endDate?: string) {
+    const whereClause: any = { is_deleted: false };
+    if (startDate && endDate) {
+      whereClause.start_time = {
+        gte: new Date(startDate),
+        lte: new Date(endDate),
+      };
+    }
+
     const bookings = await this.prisma.booking.findMany({
+      where: whereClause,
       include: {
         user: { select: { id: true, name: true, email: true } },
         room: { select: { id: true, name: true } },
@@ -294,7 +306,7 @@ export class BookingsService {
 
   async findMyBookings(userId: number) {
     const bookings = await this.prisma.booking.findMany({
-      where: { user_id: userId },
+      where: { user_id: userId, is_deleted: false },
       include: {
         room: { select: { id: true, name: true } },
         equipment: { select: { id: true, name: true } },
@@ -330,6 +342,9 @@ export class BookingsService {
       );
     }
 
+    // Phát sự kiện cập nhật lịch
+    this.notificationsService.broadcastCalendarUpdate();
+
     return result;
   }
 
@@ -344,7 +359,7 @@ export class BookingsService {
       },
     });
 
-    if (!booking) {
+    if (!booking || booking.is_deleted) {
       throw new NotFoundException(
         I18nContext.current()?.t('messages.errors.BOOKING_NOT_FOUND', {
           args: { id },
@@ -404,6 +419,9 @@ export class BookingsService {
       );
     }
 
+    // Phát sự kiện cập nhật lịch
+    this.notificationsService.broadcastCalendarUpdate();
+
     return result;
   }
 
@@ -421,19 +439,25 @@ export class BookingsService {
           'Không thể hủy đơn ở trạng thái này',
       );
     }
-    return this.prisma.booking.update({
+    const result = await this.prisma.booking.update({
       where: { id },
       data: {
         status: 'CANCELED',
         row_version: { increment: 1 },
       },
     });
+    
+    this.notificationsService.broadcastCalendarUpdate();
+    return result;
   }
 
   async remove(id: number) {
     await this.findOne(id);
-    return this.prisma.booking.delete({
+    const result = await this.prisma.booking.update({
       where: { id },
+      data: { is_deleted: true },
     });
+    this.notificationsService.broadcastCalendarUpdate();
+    return result;
   }
 }

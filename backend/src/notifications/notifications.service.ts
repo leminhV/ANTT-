@@ -78,4 +78,8 @@ export class NotificationsService {
       },
     });
   }
+
+  broadcastCalendarUpdate() {
+    this.gateway.broadcastCalendarUpdate();
+  }
 }

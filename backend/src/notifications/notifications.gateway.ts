@@ -86,4 +86,12 @@ export class NotificationsGateway
     });
     this.logger.log(`Sent notification to user_${userId}: [${type}] ${title}`);
   }
+
+  // Public method to broadcast calendar updates to all clients
+  broadcastCalendarUpdate() {
+    this.server.emit('calendar_updated', {
+      timestamp: new Date(),
+    });
+    this.logger.log(`Broadcasted calendar update to all clients`);
+  }
 }

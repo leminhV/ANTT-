@@ -5,6 +5,7 @@ import { bookingService, roomService } from "../../services";
 import { format, startOfWeek, addDays, getHours, getDay, differenceInHours, isSameDay } from "date-fns";
 import { toast } from "react-hot-toast";
 import { LoadingSpinner } from "../../components/common/LoadingSpinner";
+import { socketService } from "../../services/socket";
 
 const HOURS = Array.from({ length: 16 }, (_, i) => i + 7); // 07:00 to 22:00
 
@@ -17,6 +18,7 @@ export function CalendarView() {
   const [selectedRooms, setSelectedRooms] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,15 +33,37 @@ export function CalendarView() {
   const currentUserStr = localStorage.getItem("user");
   const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
 
+  const startOfCurrentWeek = startOfWeek(currentDate, { weekStartsOn: 1 }); // Monday
+
   useEffect(() => {
     fetchData();
+  }, [startOfCurrentWeek.getTime(), refreshTrigger]);
+
+  useEffect(() => {
+    const socket = socketService.connect();
+    if (!socket) return;
+    
+    const onCalendarUpdated = () => {
+      // Trigger a re-fetch of the calendar data
+      setRefreshTrigger(prev => prev + 1);
+    };
+    
+    socket.on('calendar_updated', onCalendarUpdated);
+    
+    return () => {
+      socket.off('calendar_updated', onCalendarUpdated);
+    };
   }, []);
 
   const fetchData = async () => {
     setIsLoading(true);
     try {
+      const endOfCurrentWeek = addDays(startOfCurrentWeek, 6);
+      const startDateStr = format(startOfCurrentWeek, "yyyy-MM-ddT00:00:00");
+      const endDateStr = format(endOfCurrentWeek, "yyyy-MM-ddT23:59:59");
+
       const [bookingsRes, roomsRes] = await Promise.all([
-        bookingService.getAll(),
+        bookingService.getAll(startDateStr, endDateStr),
         roomService.getAll()
       ]);
       setBookings(bookingsRes.data || []);
@@ -61,7 +85,7 @@ export function CalendarView() {
     );
   };
 
-  const startOfCurrentWeek = startOfWeek(currentDate, { weekStartsOn: 1 }); // Monday
+
   const DAYS = Array.from({ length: 7 }).map((_, i) => {
     const d = addDays(startOfCurrentWeek, i);
     const dayNames = [t("sun"), t("mon"), t("tue"), t("wed"), t("thu"), t("fri"), t("sat")];
@@ -82,7 +106,8 @@ export function CalendarView() {
     DAYS.forEach((day, dayIdx) => {
       if (isSameDay(start, day.fullDate)) {
         const startHour = getHours(start);
-        const duration = differenceInHours(end, start) || 1;
+        const startMinute = start.getMinutes();
+        const durationMinutes = (end.getTime() - start.getTime()) / 60000;
         
         let type = "locked";
         if (b.status === "PENDING") {
@@ -91,17 +116,18 @@ export function CalendarView() {
           type = currentUser && b.user_id === currentUser.id ? "approved" : "locked";
         }
 
-        // Fill slots
-        for (let i = 0; i < duration; i++) {
-          const h = startHour + i;
-          if (h >= 7 && h <= 22) {
-            gridBookings[`${dayIdx}-${h}`] = {
-              type,
-              title: b.purpose,
-              duration: i === 0 ? duration : undefined, // Only first cell has title and duration
-              isTail: i > 0
-            };
+        // Only place the slot in the starting hour cell
+        if (startHour >= 7 && startHour <= 22) {
+          // If there's already a booking, we might need an array, but for now we just assign
+          if (!gridBookings[`${dayIdx}-${startHour}`]) {
+            gridBookings[`${dayIdx}-${startHour}`] = [];
           }
+          gridBookings[`${dayIdx}-${startHour}`].push({
+            type,
+            title: b.purpose,
+            startMinute,
+            durationMinutes
+          });
         }
       }
     });
@@ -285,61 +311,61 @@ export function CalendarView() {
                   
                   {/* Day Slots for this hour */}
                   {DAYS.map((_, dayIdx) => {
-                    const slot = getSlot(dayIdx, hour);
+                    const slots = getSlot(dayIdx, hour) || [];
                     
-                    let cellClasses = "border-b border-r border-[#E0E0E0] dark:border-slate-800 transition-all relative h-[60px] p-1 ";
-                    let content = null;
-
-                    if (!slot) {
-                      cellClasses += "bg-white dark:bg-slate-900 hover:bg-[#F5F5F5] dark:hover:bg-slate-800 dark:bg-slate-800/50 dark:hover:bg-slate-800 cursor-pointer hover:scale-[1.02] hover:z-10 hover:shadow-md dark:shadow-slate-900/50";
-                    } else if (slot.type === "locked") {
-                      cellClasses += "bg-red-50 dark:bg-red-900/10 cursor-not-allowed";
-                      if (slot.duration) {
-                        content = (
-                          <div className="w-full h-full flex items-center justify-center flex-col text-red-500 dark:text-red-400">
-                            <Lock className="w-4 h-4 mb-1" />
-                            <span className="text-[10px] font-bold">{t("booked")}</span>
-                          </div>
-                        );
-                      }
-                    } else if (slot.type === "pending") {
-                      cellClasses += "bg-[#FFF8E1] dark:bg-yellow-900/20 border-l-4 border-l-[#FFC107] dark:border-l-yellow-600 cursor-pointer hover:brightness-95 dark:hover:brightness-110";
-                      if (slot.duration) {
-                        content = (
-                          <div className="w-full h-full p-1 overflow-hidden">
-                            <div className="text-[12px] font-bold text-[#F57F17] dark:text-yellow-500 line-clamp-1 leading-tight">{slot.title}</div>
-                            <div className="text-[10px] text-[#F57F17] dark:text-yellow-600 mt-1 flex items-center gap-1">
-                              <Info className="w-3 h-3" /> {t("pending_approval")}
-                            </div>
-                          </div>
-                        );
-                      }
-                    } else if (slot.type === "approved") {
-                      cellClasses += "bg-[#D6E4F7] dark:bg-blue-900/30 border-l-4 border-l-[#1E5FA5] dark:border-l-blue-500 cursor-pointer hover:bg-[#C2D6F2] dark:hover:bg-blue-800/40";
-                      if (slot.duration) {
-                        content = (
-                          <div className="w-full h-full p-1 overflow-hidden">
-                            <div className="text-[12px] font-bold text-[#1E5FA5] dark:text-blue-400 line-clamp-1 leading-tight">{slot.title}</div>
-                            <div className="text-[10px] text-[#1E5FA5] dark:text-blue-500 mt-1 font-medium">{t("your_schedule")}</div>
-                          </div>
-                        );
-                      }
-                    }
-
+                    let cellClasses = "border-b border-r border-[#E0E0E0] dark:border-slate-800 transition-all relative h-[60px] p-0 ";
                     if (dayIdx === 6) cellClasses = cellClasses.replace("border-r", "");
 
                     return (
                       <div 
                         key={dayIdx} 
-                        className={cellClasses} 
+                        className={cellClasses + "bg-white dark:bg-slate-900 hover:bg-[#F5F5F5] dark:hover:bg-slate-800 cursor-pointer"} 
                         onClick={() => {
-                          if (!slot) {
-                            setFormData(prev => ({ ...prev, date: format(DAYS[dayIdx].fullDate, "yyyy-MM-dd"), startTime: `${hour.toString().padStart(2, '0')}:00` }));
-                            setIsModalOpen(true);
-                          }
+                          setFormData(prev => ({ ...prev, date: format(DAYS[dayIdx].fullDate, "yyyy-MM-dd"), startTime: `${hour.toString().padStart(2, '0')}:00` }));
+                          setIsModalOpen(true);
                         }}
                       >
-                        {content}
+                        {slots.map((slot: any, idx: number) => {
+                          let slotClasses = "absolute left-1 right-1 rounded-sm overflow-hidden z-10 shadow-sm ";
+                          if (slot.type === "locked") {
+                            slotClasses += "bg-red-50 dark:bg-red-900/40 border border-red-200 dark:border-red-800/50 cursor-not-allowed text-red-500 dark:text-red-400 flex items-center justify-center flex-col";
+                          } else if (slot.type === "pending") {
+                            slotClasses += "bg-[#FFF8E1] dark:bg-yellow-900/40 border-l-4 border-l-[#FFC107] dark:border-l-yellow-600 border-t border-r border-b border-[#FFE082] dark:border-yellow-700/50 cursor-pointer p-1";
+                          } else if (slot.type === "approved") {
+                            slotClasses += "bg-[#D6E4F7] dark:bg-blue-900/40 border-l-4 border-l-[#1E5FA5] dark:border-l-blue-500 border-t border-r border-b border-[#BBDEFB] dark:border-blue-800/50 cursor-pointer p-1";
+                          }
+
+                          return (
+                            <div 
+                              key={idx}
+                              className={slotClasses}
+                              style={{ 
+                                top: `${slot.startMinute}px`, 
+                                height: `${slot.durationMinutes}px`,
+                                minHeight: '24px' // Ensure it's clickable even if 0 duration
+                              }}
+                              onClick={(e) => e.stopPropagation()} // Prevent triggering cell click
+                            >
+                              {slot.type === "locked" ? (
+                                <>
+                                  <Lock className="w-3 h-3 mb-0.5" />
+                                  {slot.durationMinutes >= 30 && <span className="text-[9px] font-bold">{t("booked")}</span>}
+                                </>
+                              ) : (
+                                <>
+                                  <div className={`text-[11px] font-bold line-clamp-1 leading-tight ${slot.type === 'pending' ? 'text-[#F57F17] dark:text-yellow-500' : 'text-[#1E5FA5] dark:text-blue-400'}`}>
+                                    {slot.title}
+                                  </div>
+                                  {slot.durationMinutes >= 45 && (
+                                    <div className={`text-[9px] mt-0.5 flex items-center gap-1 ${slot.type === 'pending' ? 'text-[#F57F17] dark:text-yellow-600' : 'text-[#1E5FA5] dark:text-blue-500'}`}>
+                                      {slot.type === 'pending' ? <><Info className="w-2.5 h-2.5" /> {t("pending_approval")}</> : t("your_schedule")}
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          );
+                        })}
                       </div>
                     );
                   })}
