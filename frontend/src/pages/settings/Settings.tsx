@@ -4,7 +4,6 @@ import apiClient from '../../services/apiClient';
 import { toast } from 'react-hot-toast';
 import { Save, AlertCircle, ShieldCheck, QrCode, Settings as SettingsIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { authService } from '../../services';
 import { useAuthStore } from '../../store/authStore';
 import { Profile } from '../profile/Profile';
 
