@@ -239,12 +239,12 @@ export function Layout() {
     '/users': t('users'),
     '/reports': isAdmin ? t('reports') : t('incident_reports'),
     '/settings': t('settings'),
-    '/borrow-tools': 'Mượn dụng cụ học tập',
-    '/community': 'Cộng đồng Lab',
-    '/strategic': 'Quản lý Chiến lược',
-    '/scan-qr': 'Quét Mã QR Check-in',
-    '/combos': 'Quản lý Combo thiết bị',
-    '/maintenance': 'Quản lý Lịch bảo trì',
+    '/borrow-tools': t('borrow_tools'),
+    '/community': t('lab_community'),
+    '/strategic': t('strategic_management'),
+    '/scan-qr': t('scan_qr_checkin'),
+    '/combos': t('combos_management'),
+    '/maintenance': t('maintenance_management'),
   };
   const currentPath = location.pathname;
   const pageTitle = breadcrumbMap[currentPath] || t('dashboard');
@@ -286,39 +286,39 @@ export function Layout() {
             {isAdmin ? (
               <>
                 <NavItem to="/admin-dashboard" icon={<LayoutDashboard />} label={t('dashboard')} isSidebarCollapsed={isSidebarCollapsed} />
-                <NavItem to="/calendar" icon={<Calendar />} label="Lịch biểu / Đặt phòng" isSidebarCollapsed={isSidebarCollapsed} />
-                <NavItem to="/borrow-tools" icon={<FlaskConical />} label="Mượn dụng cụ học tập" isSidebarCollapsed={isSidebarCollapsed} />
-                <NavItem to="/community" icon={<Users />} label="Cộng đồng Lab" isSidebarCollapsed={isSidebarCollapsed} />
+                <NavItem to="/calendar" icon={<Calendar />} label={t('calendar')} isSidebarCollapsed={isSidebarCollapsed} />
+                <NavItem to="/borrow-tools" icon={<FlaskConical />} label={t('borrow_tools')} isSidebarCollapsed={isSidebarCollapsed} />
+                <NavItem to="/community" icon={<Users />} label={t('lab_community')} isSidebarCollapsed={isSidebarCollapsed} />
                 <NavItem to="/approvals" icon={<FileText />} label={t('approvals')} isSidebarCollapsed={isSidebarCollapsed} />
                 <NavItem to="/resources" icon={<Server />} label={t('resources')} isSidebarCollapsed={isSidebarCollapsed} />
                 <NavItem to="/courses" icon={<BookOpen />} label={t('courses')} isSidebarCollapsed={isSidebarCollapsed} />
-                <NavItem to="/scan-qr" icon={<QrCode />} label="Quét QR Check-in" isSidebarCollapsed={isSidebarCollapsed} />
+                <NavItem to="/scan-qr" icon={<QrCode />} label={t('scan_qr')} isSidebarCollapsed={isSidebarCollapsed} />
                 <NavItem to="/users" icon={<Users />} label={t('users')} isSidebarCollapsed={isSidebarCollapsed} />
                 <NavItem to="/reports" icon={<BarChart2 />} label={t('reports')} isSidebarCollapsed={isSidebarCollapsed} />
-                <NavItem to="/strategic" icon={<TrendingUp />} label="Chiến lược" isSidebarCollapsed={isSidebarCollapsed} />
+                <NavItem to="/strategic" icon={<TrendingUp />} label={t('strategic')} isSidebarCollapsed={isSidebarCollapsed} />
                 <NavItem to="/settings" icon={<Settings />} label={t('settings')} isSidebarCollapsed={isSidebarCollapsed} />
               </>
             ) : isInstructor ? (
               <>
                 <NavItem to="/instructor-dashboard" icon={<LayoutDashboard />} label={t('dashboard')} isSidebarCollapsed={isSidebarCollapsed} />
-                <NavItem to="/calendar" icon={<Calendar />} label="Lịch biểu / Đặt phòng" isSidebarCollapsed={isSidebarCollapsed} />
-                <NavItem to="/borrow-tools" icon={<FlaskConical />} label="Mượn dụng cụ học tập" isSidebarCollapsed={isSidebarCollapsed} />
+                <NavItem to="/calendar" icon={<Calendar />} label={t('calendar')} isSidebarCollapsed={isSidebarCollapsed} />
+                <NavItem to="/borrow-tools" icon={<FlaskConical />} label={t('borrow_tools')} isSidebarCollapsed={isSidebarCollapsed} />
                 <NavItem to="/my-bookings" icon={<FileText />} label={t('my_bookings')} isSidebarCollapsed={isSidebarCollapsed} />
                 <NavItem to="/approvals" icon={<FileText />} label={t('approvals')} isSidebarCollapsed={isSidebarCollapsed} />
-                <NavItem to="/scan-qr" icon={<QrCode />} label="Quét QR Check-in" isSidebarCollapsed={isSidebarCollapsed} />
+                <NavItem to="/scan-qr" icon={<QrCode />} label={t('scan_qr')} isSidebarCollapsed={isSidebarCollapsed} />
                 <NavItem to="/courses" icon={<BookOpen />} label={t('courses')} isSidebarCollapsed={isSidebarCollapsed} />
                 <NavItem to="/reports" icon={<AlertTriangle />} label={t('incident_reports')} isSidebarCollapsed={isSidebarCollapsed} />
-                <NavItem to="/settings" icon={<Settings />} label="Hồ sơ cá nhân" isSidebarCollapsed={isSidebarCollapsed} />
+                <NavItem to="/settings" icon={<Settings />} label={t('personal_profile')} isSidebarCollapsed={isSidebarCollapsed} />
               </>
             ) : (
               <>
                 <NavItem to="/student-dashboard" icon={<LayoutDashboard />} label={t('dashboard')} isSidebarCollapsed={isSidebarCollapsed} />
-                <NavItem to="/calendar" icon={<Calendar />} label="Lịch biểu / Đặt phòng" isSidebarCollapsed={isSidebarCollapsed} />
-                <NavItem to="/borrow-tools" icon={<FlaskConical />} label="Mượn dụng cụ học tập" isSidebarCollapsed={isSidebarCollapsed} />
-                <NavItem to="/community" icon={<Users />} label="Cộng đồng Lab" isSidebarCollapsed={isSidebarCollapsed} />
+                <NavItem to="/calendar" icon={<Calendar />} label={t('calendar')} isSidebarCollapsed={isSidebarCollapsed} />
+                <NavItem to="/borrow-tools" icon={<FlaskConical />} label={t('borrow_tools')} isSidebarCollapsed={isSidebarCollapsed} />
+                <NavItem to="/community" icon={<Users />} label={t('lab_community')} isSidebarCollapsed={isSidebarCollapsed} />
                 <NavItem to="/my-bookings" icon={<FileText />} label={t('my_bookings')} isSidebarCollapsed={isSidebarCollapsed} />
                 <NavItem to="/reports" icon={<AlertTriangle />} label={t('incident_reports')} isSidebarCollapsed={isSidebarCollapsed} />
-                <NavItem to="/settings" icon={<Settings />} label="Hồ sơ cá nhân" isSidebarCollapsed={isSidebarCollapsed} />
+                <NavItem to="/settings" icon={<Settings />} label={t('personal_profile')} isSidebarCollapsed={isSidebarCollapsed} />
               </>
             )}
           </div>

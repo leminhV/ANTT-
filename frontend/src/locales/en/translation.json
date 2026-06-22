@@ -524,7 +524,7 @@
   "quick_actions": "Quick Actions",
   "book_room": "Book Room",
   "report_issue": "Report Issue",
-  "borrow_tools": "Borrow Tools",
+  "borrow_tools": "Borrow Study Tools",
   "no_practice_today": "You have no practice sessions today",
   "free_time_hint": "You can spend time approving student booking requests.",
   "no_pending_bookings": "Great! There are no pending booking requests.",
@@ -613,7 +613,7 @@
   "change_avatar": "Change Avatar",
   "not_updated": "Not updated",
   "status_normal": "Operating normally",
-  "strategic_management": "Strategic Management (Investment & Research)",
+  "strategic_management": "Strategic Management",
   "tab_investment": "Lab Investment",
   "tab_publications": "Publications",
   "tab_roi_charts": "Performance (ROI) & Charts",
@@ -632,5 +632,13 @@
   "pub_journal_year": "Journal / Year",
   "pub_category": "Category",
   "pub_lab_room": "Lab Room",
-  "pub_action": "Action"
+  "pub_action": "Action",
+  "lab_community": "Lab Community",
+  "strategic": "Strategy",
+  "scan_qr": "Scan QR Check-in",
+  "scan_qr_checkin": "Scan QR Check-in Code",
+  "combos_management": "Equipment Combos",
+  "maintenance_management": "Maintenance Schedule",
+  "personal_profile": "Personal Profile",
+  "system_settings": "System Settings"
 }

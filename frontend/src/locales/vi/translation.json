@@ -524,7 +524,7 @@
   "quick_actions": "Thao tác nhanh",
   "book_room": "Đặt phòng",
   "report_issue": "Báo hỏng",
-  "borrow_tools": "Mượn dụng cụ",
+  "borrow_tools": "Mượn dụng cụ học tập",
   "no_practice_today": "Hôm nay bạn không có ca thực hành nào",
   "free_time_hint": "Bạn có thể dành thời gian để duyệt các đơn đặt phòng của sinh viên.",
   "no_pending_bookings": "Tuyệt vời! Không có đơn đặt phòng nào đang chờ duyệt.",
@@ -613,7 +613,7 @@
   "change_avatar": "Đổi ảnh đại diện",
   "not_updated": "Chưa cập nhật",
   "status_normal": "Hoạt động bình thường",
-  "strategic_management": "Quản lý Chiến lược (Đầu tư & NC Khoa học)",
+  "strategic_management": "Quản lý Chiến lược",
   "tab_investment": "Đầu tư Phòng Lab",
   "tab_publications": "Công bố Khoa học",
   "tab_roi_charts": "Hiệu suất (ROI) & Biểu đồ",
@@ -632,5 +632,13 @@
   "pub_journal_year": "Tạp chí / Năm",
   "pub_category": "Phân loại",
   "pub_lab_room": "Phòng Lab",
-  "pub_action": "Thao tác"
+  "pub_action": "Thao tác",
+  "lab_community": "Cộng đồng Lab",
+  "strategic": "Chiến lược",
+  "scan_qr": "Quét QR Check-in",
+  "scan_qr_checkin": "Quét Mã QR Check-in",
+  "combos_management": "Quản lý Combo thiết bị",
+  "maintenance_management": "Quản lý Lịch bảo trì",
+  "personal_profile": "Hồ sơ cá nhân",
+  "system_settings": "Cài đặt hệ thống"
 }

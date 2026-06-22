@@ -92,7 +92,7 @@ export function Settings() {
           <div>
             <h1 className="text-2xl font-bold text-[#1E5FA5] dark:text-blue-400 flex items-center gap-2">
               <SettingsIcon className="w-6 h-6" />
-              Cài đặt hệ thống
+              {t('system_settings')}
             </h1>
             <p className="text-[#757575] dark:text-slate-400 mt-1">{t('settings_desc')}</p>
           </div>

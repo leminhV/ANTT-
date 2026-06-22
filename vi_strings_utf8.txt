@@ -1,0 +1,671 @@
+frontend/src\components\AIAssistant\AIAssistant.tsx:42:content: 'Xin chào! Tôi là Trợ lý LabBook. Tôi có thể giúp gì cho bạn?',
+frontend/src\components\AIAssistant\AIAssistant.tsx:95:content: 'Xin lỗi, não bộ AI của tôi đang gặp chút sự cố kết nối.',
+frontend/src\components\AIAssistant\AIAssistant.tsx:118:<span className="font-semibold text-sm">Trợ lý AI LabBook</span>
+frontend/src\components\AIAssistant\AIAssistant.tsx:168:placeholder="Nhập lệnh (vd: thống kê)..."
+frontend/src\components\common\CommentSection.tsx:48:// apiClient.ts đã xử lý toast
+frontend/src\components\common\CommentSection.tsx:69:// apiClient.ts đã xử lý toast
+frontend/src\components\common\CommentSection.tsx:81:// apiClient.ts đã xử lý toast
+frontend/src\components\common\CommentSection.tsx:137:<CornerDownRight className="w-3 h-3" /> Phản hồi
+frontend/src\components\common\CommentSection.tsx:145:<Trash2 className="w-3 h-3" /> Xóa
+frontend/src\components\common\ConfirmModal.tsx:20:confirmText = 'Xác nhận',
+frontend/src\components\common\ConfirmModal.tsx:21:cancelText = 'Hủy',
+frontend/src\components\common\ErrorBoundary.tsx:6:toast.error(error?.message || 'Đã xảy ra lỗi hệ thống, vui lòng thử lại sau.');
+frontend/src\components\common\ErrorBoundary.tsx:9:<h1 className="font-bold">Đã xảy ra lỗi hệ thống!</h1>
+frontend/src\components\common\ErrorBoundary.tsx:10:<p className="mt-2 text-sm">Vui lòng tải lại trang hoặc liên hệ quản trị viên.</p>
+frontend/src\components\equipment\AddDeviceModal.tsx:82:Ngày mua
+frontend/src\components\equipment\AddDeviceModal.tsx:93:Giá trị (VNĐ)
+frontend/src\components\equipment\AddDeviceModal.tsx:107:Chu kỳ bảo trì (tháng)
+frontend/src\components\equipment\AddDeviceModal.tsx:119:Bảo trì lần cuối
+frontend/src\components\equipment\AddDeviceModal.tsx:131:Ảnh (Tùy chọn)
+frontend/src\components\equipment\AddDeviceModal.tsx:135:<Upload className="w-4 h-4" /> Chọn ảnh
+frontend/src\components\equipment\AddDeviceModal.tsx:144:const toastId = toast.loading('Đang tải ảnh lên...');
+frontend/src\components\equipment\AddDeviceModal.tsx:148:toast.success('Tải ảnh lên thành công', { id: toastId });
+frontend/src\components\equipment\AddDeviceModal.tsx:150:toast.error('Lỗi tải ảnh lên');
+frontend/src\components\equipment\DeviceDetailModal.tsx:44:Tài liệu HDSD
+frontend/src\components\equipment\DeviceDetailModal.tsx:99:Vòng đời thiết bị (Lifecycle)
+frontend/src\components\equipment\DeviceDetailModal.tsx:109:<p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Mua mới và đưa vào sử dụng</p>
+frontend/src\components\equipment\DeviceDetailModal.tsx:118:<p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Bảo trì định kỳ lần cuối</p>
+frontend/src\components\equipment\DeviceDetailModal.tsx:122:<p className="text-sm font-bold text-slate-800 dark:text-slate-200">Hiện tại</p>
+frontend/src\components\equipment\DeviceDetailModal.tsx:123:<p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Trạng thái: {selectedDevice.status === 'AVAILABLE' ? 'Đang rảnh' : selectedDevice.status === 'IN_USE' ? 'Đang được mượn' : 'Bảo trì/Hỏng'}</p>
+frontend/src\components\equipment\EditDeviceModal.tsx:108:Ngày mua
+frontend/src\components\equipment\EditDeviceModal.tsx:119:Giá trị (VNĐ)
+frontend/src\components\equipment\EditDeviceModal.tsx:133:Chu kỳ bảo trì (tháng)
+frontend/src\components\equipment\EditDeviceModal.tsx:145:Bảo trì lần cuối
+frontend/src\components\equipment\EditDeviceModal.tsx:159:Ảnh (Tùy chọn)
+frontend/src\components\equipment\EditDeviceModal.tsx:163:<Upload className="w-4 h-4" /> Chọn ảnh
+frontend/src\components\equipment\EditDeviceModal.tsx:173:const toastId = toast.loading('Đang tải ảnh lên...');
+frontend/src\components\equipment\EditDeviceModal.tsx:177:toast.success('Tải ảnh lên thành công', { id: toastId });
+frontend/src\components\equipment\EditDeviceModal.tsx:180:toast.error('Lỗi tải ảnh lên');
+frontend/src\components\layout\Layout.tsx:36:{ code: 'vi', label: 'VI', name: 'Tiếng Việt', flag: 'https://flagcdn.com/w40/vn.png' },
+frontend/src\components\layout\Layout.tsx:50:// Secure Role UI: Chỉ lấy role từ thông tin user JWT, không phụ thuộc localStorage dễ bị can thiệp
+frontend/src\components\layout\Layout.tsx:55:// Điều hướng người dùng nếu truy cập trái phép
+frontend/src\components\layout\Layout.tsx:65:// Các trang /reports, /calendar, /my-bookings dùng chung
+frontend/src\components\layout\Layout.tsx:135:// Xử lý click ra ngoài để đóng dropdown
+frontend/src\components\layout\Layout.tsx:146:// Kết nối Socket.io để nhận thông báo realtime
+frontend/src\components\layout\Layout.tsx:159:// Tự động tải lại danh sách Booking khi có sự thay đổi
+frontend/src\components\layout\Layout.tsx:169:// Dọn dẹp listener cũ trước khi đăng ký mới để chống memory leak
+frontend/src\components\layout\Layout.tsx:214:// Dùng PATCH thay vì PUT theo đúng chuẩn Controller Backend hiện tại
+frontend/src\components\layout\Layout.tsx:219:// Nạp lại danh sách Booking sau khi AI thực hiện action thành công
+frontend/src\components\layout\Layout.tsx:242:'/borrow-tools': 'Mượn dụng cụ học tập',
+frontend/src\components\layout\Layout.tsx:243:'/community': 'Cộng đồng Lab',
+frontend/src\components\layout\Layout.tsx:244:'/strategic': 'Quản lý Chiến lược',
+frontend/src\components\layout\Layout.tsx:245:'/scan-qr': 'Quét Mã QR Check-in',
+frontend/src\components\layout\Layout.tsx:246:'/combos': 'Quản lý Combo thiết bị',
+frontend/src\components\layout\Layout.tsx:247:'/maintenance': 'Quản lý Lịch bảo trì',
+frontend/src\components\layout\Layout.tsx:275:title={isSidebarCollapsed ? "Mở rộng menu" : "Thu gọn menu"}
+frontend/src\components\layout\Layout.tsx:289:<NavItem to="/calendar" icon={<Calendar />} label="Lịch biểu / Đặt phòng" isSidebarCollapsed={isSidebarCollapsed} />
+frontend/src\components\layout\Layout.tsx:290:<NavItem to="/borrow-tools" icon={<FlaskConical />} label="Mượn dụng cụ học tập" isSidebarCollapsed={isSidebarCollapsed} />
+frontend/src\components\layout\Layout.tsx:291:<NavItem to="/community" icon={<Users />} label="Cộng đồng Lab" isSidebarCollapsed={isSidebarCollapsed} />
+frontend/src\components\layout\Layout.tsx:295:<NavItem to="/scan-qr" icon={<QrCode />} label="Quét QR Check-in" isSidebarCollapsed={isSidebarCollapsed} />
+frontend/src\components\layout\Layout.tsx:298:<NavItem to="/strategic" icon={<TrendingUp />} label="Chiến lược" isSidebarCollapsed={isSidebarCollapsed} />
+frontend/src\components\layout\Layout.tsx:304:<NavItem to="/calendar" icon={<Calendar />} label="Lịch biểu / Đặt phòng" isSidebarCollapsed={isSidebarCollapsed} />
+frontend/src\components\layout\Layout.tsx:305:<NavItem to="/borrow-tools" icon={<FlaskConical />} label="Mượn dụng cụ học tập" isSidebarCollapsed={isSidebarCollapsed} />
+frontend/src\components\layout\Layout.tsx:308:<NavItem to="/scan-qr" icon={<QrCode />} label="Quét QR Check-in" isSidebarCollapsed={isSidebarCollapsed} />
+frontend/src\components\layout\Layout.tsx:311:<NavItem to="/settings" icon={<Settings />} label="Hồ sơ cá nhân" isSidebarCollapsed={isSidebarCollapsed} />
+frontend/src\components\layout\Layout.tsx:316:<NavItem to="/calendar" icon={<Calendar />} label="Lịch biểu / Đặt phòng" isSidebarCollapsed={isSidebarCollapsed} />
+frontend/src\components\layout\Layout.tsx:317:<NavItem to="/borrow-tools" icon={<FlaskConical />} label="Mượn dụng cụ học tập" isSidebarCollapsed={isSidebarCollapsed} />
+frontend/src\components\layout\Layout.tsx:318:<NavItem to="/community" icon={<Users />} label="Cộng đồng Lab" isSidebarCollapsed={isSidebarCollapsed} />
+frontend/src\components\layout\Layout.tsx:321:<NavItem to="/settings" icon={<Settings />} label="Hồ sơ cá nhân" isSidebarCollapsed={isSidebarCollapsed} />
+frontend/src\components\layout\Layout.tsx:354:? 'Giảng viên'
+frontend/src\components\layout\Layout.tsx:355:: 'Nguyễn Văn A'}
+frontend/src\components\layout\Layout.tsx:558:Đánh dấu đã đọc tất cả
+frontend/src\components\users\UserActivityModal.tsx:30:toast.error('Không thể tải lịch sử hoạt động');
+frontend/src\components\users\UserActivityModal.tsx:46:Nhật ký hoạt động
+frontend/src\components\users\UserActivityModal.tsx:48:<p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Người dùng: <span className="font-semibold text-slate-700 dark:text-slate-200">{userName}</span></p>
+frontend/src\components\users\UserActivityModal.tsx:66:<p className="text-sm font-medium text-slate-500 dark:text-slate-400">Tổng lượt mượn/đặt phòng</p>
+frontend/src\components\users\UserActivityModal.tsx:75:<p className="text-sm font-medium text-slate-500 dark:text-slate-400">Vi phạm (No-show)</p>
+frontend/src\components\users\UserActivityModal.tsx:92:Lịch sử đăng nhập
+frontend/src\components\users\UserActivityModal.tsx:102:Lịch sử mượn phòng
+frontend/src\components\users\UserActivityModal.tsx:113:<div className="text-center py-12 text-slate-500">Chưa có dữ liệu</div>
+frontend/src\components\users\UserActivityModal.tsx:117:<div className="text-center py-8 text-slate-500">Không có lịch sử đăng nhập.</div>
+frontend/src\components\users\UserActivityModal.tsx:122:<div className={`p-2 rounded-lg ${log.status.includes('Thành công') ? 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400' : 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400'}`}>
+frontend/src\components\users\UserActivityModal.tsx:123:{log.status.includes('Thành công') ? <CheckCircle2 className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
+frontend/src\components\users\UserActivityModal.tsx:143:<div className="text-center py-8 text-slate-500">Không có lịch sử mượn phòng.</div>
+frontend/src\components\users\UserActivityModal.tsx:148:<p className="font-semibold text-slate-800 dark:text-slate-200 text-sm">Phòng: {booking.room?.name || 'Không xác định'}</p>
+frontend/src\components\users\UserActivityModal.tsx:149:<p className="text-xs text-slate-500 mt-1">Mục đích: {booking.purpose}</p>
+frontend/src\components\users\UserActivityModal.tsx:151:<span className="bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">Từ: {new Date(booking.start_time).toLocaleString('vi-VN')}</span>
+frontend/src\components\users\UserActivityModal.tsx:152:<span className="bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded">Đến: {new Date(booking.end_time).toLocaleString('vi-VN')}</span>
+frontend/src\constants\messages.ts:2:NETWORK_ERROR: 'Lỗi kết nối mạng. Vui lòng kiểm tra lại đường truyền.',
+frontend/src\constants\messages.ts:3:UNAUTHORIZED: 'Bạn không có quyền thực hiện thao tác này. (Lỗi 403)',
+frontend/src\constants\messages.ts:4:SESSION_EXPIRED: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.',
+frontend/src\constants\messages.ts:5:DOUBLE_BOOKING: 'Phòng này đã được đặt trong khoảng thời gian bạn chọn.',
+frontend/src\constants\messages.ts:6:INVALID_INPUT: 'Dữ liệu đầu vào không hợp lệ. Vui lòng kiểm tra lại.',
+frontend/src\constants\messages.ts:7:TIMEOUT: 'Yêu cầu vượt quá thời gian xử lý. Vui lòng thử lại sau.',
+frontend/src\constants\messages.ts:11:BOOKING_CREATED: 'Tạo đơn đặt phòng thành công. Đang chờ phê duyệt.',
+frontend/src\constants\messages.ts:12:BOOKING_APPROVED: 'Đã phê duyệt đơn đặt phòng.',
+frontend/src\constants\messages.ts:13:DEVICE_UPDATED: 'Đã cập nhật trạng thái thiết bị thành công.',
+frontend/src\pages\auth\ForgotPassword.tsx:15:toast.error('Vui lòng nhập email');
+frontend/src\pages\auth\ForgotPassword.tsx:25:toast.error(error.response?.data?.message || 'Có lỗi xảy ra, vui lòng thử lại');
+frontend/src\pages\auth\ForgotPassword.tsx:39:Khôi phục mật khẩu
+frontend/src\pages\auth\ForgotPassword.tsx:42:Nhập email sinh viên/giảng viên của bạn để nhận liên kết đặt lại mật khẩu.
+frontend/src\pages\auth\ForgotPassword.tsx:52:Địa chỉ Email
+frontend/src\pages\auth\ForgotPassword.tsx:71:{isLoading ? 'Đang xử lý...' : 'Gửi yêu cầu'}
+frontend/src\pages\auth\ForgotPassword.tsx:80:Quay lại đăng nhập
+frontend/src\pages\auth\Login.tsx:68:// Có thể là Array message (Validation) hoặc string (Blacklist/Unauthorized)
+frontend/src\pages\auth\Login.tsx:352:Quên mật khẩu?
+frontend/src\pages\booking\Approvals.tsx:102:toast.success(`Đã duyệt ${selectedIds.length} đơn`);
+frontend/src\pages\booking\Approvals.tsx:106:toast.error('Có lỗi xảy ra khi duyệt các đơn đã chọn');
+frontend/src\pages\booking\Approvals.tsx:118:toast.success(`Đã từ chối ${selectedIds.length} đơn`);
+frontend/src\pages\booking\Approvals.tsx:122:toast.error('Có lỗi xảy ra khi từ chối các đơn đã chọn');
+frontend/src\pages\booking\Approvals.tsx:182:const toastId = toast.loading('Đang xuất file Excel...');
+frontend/src\pages\booking\Approvals.tsx:203:toast.success('Đã xuất báo cáo Excel', { id: toastId });
+frontend/src\pages\booking\Approvals.tsx:205:toast.error('Lỗi xuất báo cáo Excel');
+frontend/src\pages\booking\Approvals.tsx:222:<Check className="w-4 h-4" /> Duyệt {selectedIds.length} đơn
+frontend/src\pages\booking\Approvals.tsx:228:<X className="w-4 h-4" /> Từ chối {selectedIds.length} đơn
+frontend/src\pages\booking\Approvals.tsx:251:Tất cả yêu cầu
+frontend/src\pages\booking\Approvals.tsx:261:Duyệt lịch (Phòng Lab)
+frontend/src\pages\booking\Approvals.tsx:271:Duyệt thiết bị & Hóa chất
+frontend/src\pages\booking\Approvals.tsx:277:label={t('total_requests', 'Tổng đơn')}
+frontend/src\pages\booking\Approvals.tsx:284:label={t('status_filter_pending', 'Chờ duyệt')}
+frontend/src\pages\booking\Approvals.tsx:291:label={t('status_filter_approved', 'Đã duyệt')}
+frontend/src\pages\booking\Approvals.tsx:298:label={t('status_filter_rejected', 'Từ chối')}
+frontend/src\pages\booking\Approvals.tsx:332:<option value="ALL">Tất cả trạng thái</option>
+frontend/src\pages\booking\Approvals.tsx:341:<Download className="w-4 h-4" /> Xuất Excel
+frontend/src\pages\booking\Approvals.tsx:415:<span className="w-fit px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800">Mượn Dụng Cụ</span>
+frontend/src\pages\booking\Approvals.tsx:417:<span className="w-fit px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700">Đặt Không Gian</span>
+frontend/src\pages\booking\Approvals.tsx:508:Lý do từ chối (Gửi cho người đăng ký) <span className="text-red-500">*</span>
+frontend/src\pages\booking\Approvals.tsx:513:placeholder="VD: Thiết bị này đang bảo trì..."
+frontend/src\pages\booking\Approvals.tsx:533:toast.error('Vui lòng nhập lý do từ chối');
+frontend/src\pages\booking\BorrowToolsView.tsx:113:toast.error('Lỗi tải dữ liệu tài sản');
+frontend/src\pages\booking\BorrowToolsView.tsx:157:toast.success('Đăng ký nhận thông báo thành công!');
+frontend/src\pages\booking\BorrowToolsView.tsx:159:toast.error(error.response?.data?.message || 'Lỗi khi đăng ký nhận thông báo');
+frontend/src\pages\booking\BorrowToolsView.tsx:216:toast.success('Đã gửi yêu cầu mượn thành công!');
+frontend/src\pages\booking\BorrowToolsView.tsx:222:const msg = error.response?.data?.message || 'Có lỗi khi tạo yêu cầu. Một số đơn có thể đã được tạo.';
+frontend/src\pages\booking\BorrowToolsView.tsx:276:<span className="hidden sm:inline">Giỏ mượn</span>
+frontend/src\pages\booking\BorrowToolsView.tsx:292:{ id: 'combo', label: 'Combo Thực hành', icon: Filter }
+frontend/src\pages\booking\BorrowToolsView.tsx:355:else if (isCombo) roomName = 'Dùng cho mọi Lab';
+frontend/src\pages\booking\BorrowToolsView.tsx:356:else roomName = 'Kho Hóa Chất Chung';
+frontend/src\pages\booking\BorrowToolsView.tsx:392:<AlertCircle className="w-3 h-3" /> Bảo trì
+frontend/src\pages\booking\BorrowToolsView.tsx:416:<Award className="w-4 h-4" /> Yêu cầu: {eq.required_badge.name}
+frontend/src\pages\booking\BorrowToolsView.tsx:423:<CheckCircle className="w-4 h-4 text-amber-500" /> Trọn bộ {combo.items?.length || 0} món
+frontend/src\pages\booking\BorrowToolsView.tsx:442:<Bell className="w-4 h-4" /> Nhận thông báo khi trống
+frontend/src\pages\booking\BorrowToolsView.tsx:453:{isInCart ? 'Xóa khỏi giỏ' : 'Thêm vào giỏ'}
+frontend/src\pages\booking\BorrowToolsView.tsx:478:Giỏ mượn đồ ({cart.length})
+frontend/src\pages\booking\BorrowToolsView.tsx:492:<p>Giỏ mượn đang trống</p>
+frontend/src\pages\booking\BorrowToolsView.tsx:503:{cartItem.item.type === 'equipment' ? `S/N: ${(cartItem.item as Equipment).serial_number}` : cartItem.item.type === 'combo' ? 'Combo KIT' : 'Hóa chất'}
+frontend/src\pages\booking\BorrowToolsView.tsx:508:<span className="text-[12px] text-slate-500 font-medium">Số lượng:</span>
+frontend/src\pages\booking\BorrowToolsView.tsx:532:Tiến hành Đặt mượn <ChevronRight className="w-5 h-5" />
+frontend/src\pages\booking\BorrowToolsView.tsx:547:Thông tin Đặt lịch
+frontend/src\pages\booking\BorrowToolsView.tsx:553:Bạn đang mượn {cart.length} tài nguyên. Thông tin điền dưới đây sẽ áp dụng chung cho tất cả các món đồ trong giỏ hàng.
+frontend/src\pages\booking\BorrowToolsView.tsx:574:Học phần / Đề tài (Bắt buộc cho hóa chất) <span className="text-red-500">*</span>
+frontend/src\pages\booking\BorrowToolsView.tsx:583:<option value="" disabled>-- Chọn học phần --</option>
+frontend/src\pages\booking\BorrowToolsView.tsx:658:Lặp lại định kỳ (Hàng tuần)
+frontend/src\pages\booking\BorrowToolsView.tsx:665:Lặp lại cho đến ngày <span className="text-red-500">*</span>
+frontend/src\pages\booking\BorrowToolsView.tsx:688:'Hoàn tất Đặt mượn'
+frontend/src\pages\booking\CalendarView.tsx:120:// Check user overlap (Ngăn chặn đặt 2 phòng cùng lúc)
+frontend/src\pages\booking\CalendarView.tsx:351:toast.error('Không thể dời lịch vào thời điểm đã qua');
+frontend/src\pages\booking\CalendarView.tsx:367:toast.success(`Đã dời lịch sang ${format(newStart, 'HH:mm dd/MM/yyyy')}`);
+frontend/src\pages\booking\CalendarView.tsx:370:const msg = error.response?.data?.message || 'Không thể dời lịch';
+frontend/src\pages\booking\CalendarView.tsx:387:toast.error('Vui lòng chọn ít nhất 1 Thiết bị hoặc 1 Hóa chất để mượn!');
+frontend/src\pages\booking\CalendarView.tsx:422:(msg.includes('xung đột') ||
+frontend/src\pages\booking\CalendarView.tsx:423:msg.includes('được đặt') ||
+frontend/src\pages\booking\CalendarView.tsx:424:msg.includes('trùng') ||
+frontend/src\pages\booking\CalendarView.tsx:440:console.error('Lỗi lấy khung giờ gợi ý:', sErr);
+frontend/src\pages\booking\CalendarView.tsx:488:Thiết bị {selectedEquipments.length > 0 && <span className="bg-indigo-600 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">{selectedEquipments.length}</span>}
+frontend/src\pages\booking\CalendarView.tsx:515:Hóa chất {selectedChemicals.length > 0 && <span className="bg-emerald-600 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">{selectedChemicals.length}</span>}
+frontend/src\pages\booking\CalendarView.tsx:542:Học phần {selectedCourses.length > 0 && <span className="bg-amber-600 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">{selectedCourses.length}</span>}
+frontend/src\pages\booking\CalendarView.tsx:566:<div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-[#FFF8E1] dark:bg-yellow-900/30 border border-[#FFE082] rounded-sm"></div><span className="text-[#757575] dark:text-slate-400">Chờ duyệt</span></div>
+frontend/src\pages\booking\CalendarView.tsx:567:<div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-[#D6E4F7] dark:bg-blue-900/30 border border-[#1E5FA5] rounded-sm"></div><span className="text-[#757575] dark:text-slate-400">Đã duyệt</span></div>
+frontend/src\pages\booking\CalendarView.tsx:568:<div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 rounded-sm"></div><span className="text-[#757575] dark:text-slate-400">Khóa</span></div>
+frontend/src\pages\booking\CalendarView.tsx:575:<Plus className="w-4 h-4" /> {isResourceMode ? 'Mượn dụng cụ học tập' : 'Đặt lịch'}
+frontend/src\pages\booking\CalendarView.tsx:621:Hôm nay
+frontend/src\pages\booking\CalendarView.tsx:751:? `Đã kết thúc: ${slot.title}\nPhòng: ${slot.roomName}`
+frontend/src\pages\booking\CalendarView.tsx:752:: `${slot.title}\nPhòng: ${slot.roomName}\nThời gian: ${slot.durationMinutes} phút\nTrạng thái: ${slot.type === 'approved' ? 'Đã duyệt' : slot.type === 'pending' ? 'Chờ duyệt' : slot.type}`;
+frontend/src\pages\booking\CalendarView.tsx:797:⚠️ QUÁ HẠN TRẢ
+frontend/src\pages\booking\CalendarView.tsx:842:'Đang thực hành'
+frontend/src\pages\booking\CalendarView.tsx:844:'Đã kết thúc'
+frontend/src\pages\booking\CalendarView.tsx:867:<p className="text-[#94A3B8] font-medium">Hôm nay phòng Lab đang trống</p>
+frontend/src\pages\booking\CalendarView.tsx:868:<p className="text-[12px] text-[#94A3B8]">Hãy là người đầu tiên đặt phòng nhé!</p>
+frontend/src\pages\booking\CalendarView.tsx:880:{isResourceMode ? 'Mượn Dụng Cụ Học Tập' : 'Đặt lịch'}
+frontend/src\pages\booking\CalendarView.tsx:893:Mục đích sử dụng <span className="text-red-500">*</span>
+frontend/src\pages\booking\CalendarView.tsx:908:{activeTab === 'SPACE' ? 'Chọn phòng Lab' : 'Nơi sử dụng (Phòng Lab)'} <span className="text-red-500">*</span>
+frontend/src\pages\booking\CalendarView.tsx:933:Thiết bị đi kèm (Tùy chọn)
+frontend/src\pages\booking\CalendarView.tsx:941:<option value="">-- Không chọn thiết bị --</option>
+frontend/src\pages\booking\CalendarView.tsx:956:Học phần (Dành cho Giảng viên)
+frontend/src\pages\booking\CalendarView.tsx:964:<option value="">-- Không gắn vào học phần --</option>
+frontend/src\pages\booking\CalendarView.tsx:978:Hóa chất tiêu hao (Tùy chọn)
+frontend/src\pages\booking\CalendarView.tsx:986:+ Thêm
+frontend/src\pages\booking\CalendarView.tsx:1007:{c.name} (Còn {c.quantity_in_stock} {c.unit})
+frontend/src\pages\booking\CalendarView.tsx:1023:title="Số lượng"
+frontend/src\pages\booking\CalendarView.tsx:1046:Ngày <span className="text-red-500">*</span>
+frontend/src\pages\booking\CalendarView.tsx:1060:Giờ bắt đầu <span className="text-red-500">*</span>
+frontend/src\pages\booking\CalendarView.tsx:1075:Thời lượng (Giờ) <span className="text-red-500">*</span>
+frontend/src\pages\booking\CalendarView.tsx:1101:? 'Tham gia Danh sách chờ (nếu dụng cụ hoặc phòng bị trùng)'
+frontend/src\pages\booking\CalendarView.tsx:1110:<AlertCircle className="w-4 h-4" /> Khung giờ bạn chọn đã bị trùng lặp với người khác. Vui lòng chọn giờ khác hoặc tick chọn "Tham gia Danh sách chờ".
+frontend/src\pages\booking\CalendarView.tsx:1120:🚫 <strong>Trùng lịch cá nhân:</strong> Bạn đã có lịch sử dụng {rooms.find(r => r.id === overlappingUserBookings[0].room_id)?.name || 'phòng khác'} vào khung giờ {format(new Date(overlappingUserBookings[0].start_time), 'HH:mm')} - {format(new Date(overlappingUserBookings[0].end_time), 'HH:mm')}. Bạn không thể đặt 2 phòng trong cùng một thời điểm!
+frontend/src\pages\booking\CalendarView.tsx:1130:Không gian bị trùng lịch. Gợi ý 5 khung giờ trống (Sliding Window):
+frontend/src\pages\booking\CalendarView.tsx:1134:Không có khung giờ nào trống trong 3 ngày tới.
+frontend/src\pages\booking\CalendarView.tsx:1161:<span className="text-[10px] text-blue-500 font-medium">Chọn</span>
+frontend/src\pages\booking\CalendarView.tsx:1176:Hủy
+frontend/src\pages\booking\MyBookings.tsx:56:toast.success('Cảm ơn bạn đã đánh giá!');
+frontend/src\pages\booking\MyBookings.tsx:61:toast.error('Lỗi khi gửi đánh giá');
+frontend/src\pages\booking\MyBookings.tsx:90:IN_USE: 'Đang sử dụng',
+frontend/src\pages\booking\MyBookings.tsx:91:COMPLETED: 'Hoàn thành',
+frontend/src\pages\booking\MyBookings.tsx:153:SUMMARY:LabBook - ${booking.room?.name || 'Phòng Lab'}
+frontend/src\pages\booking\MyBookings.tsx:154:DESCRIPTION:Mục đích: ${booking.purpose}\\nTrạng thái: ${booking.status}
+frontend/src\pages\booking\MyBookings.tsx:166:toast.success('Đã xuất file lịch (.ics)');
+frontend/src\pages\booking\MyBookings.tsx:187:Quản lý và theo dõi trạng thái các đơn đặt lịch của bạn
+frontend/src\pages\booking\MyBookings.tsx:208:{ id: 'ALL', label: 'Tất cả' },
+frontend/src\pages\booking\MyBookings.tsx:209:{ id: 'UPCOMING', label: 'Sắp diễn ra' },
+frontend/src\pages\booking\MyBookings.tsx:210:{ id: 'PENDING', label: 'Chờ duyệt' },
+frontend/src\pages\booking\MyBookings.tsx:211:{ id: 'HISTORY', label: 'Lịch sử' }
+frontend/src\pages\booking\MyBookings.tsx:254:<span className="text-[12px] font-bold text-slate-400 uppercase tracking-wider block">Mã Đơn</span>
+frontend/src\pages\booking\MyBookings.tsx:266:<span className="text-[13px] font-semibold">Phòng/Khu vực</span>
+frontend/src\pages\booking\MyBookings.tsx:269:{bk.room?.name || 'Không xác định'}
+frontend/src\pages\booking\MyBookings.tsx:274:<Package className="w-3 h-3" /> Mượn Dụng Cụ
+frontend/src\pages\booking\MyBookings.tsx:278:Đặt Không Gian
+frontend/src\pages\booking\MyBookings.tsx:287:<span className="text-[13px] font-bold text-slate-700 dark:text-slate-300">Thời gian</span>
+frontend/src\pages\booking\MyBookings.tsx:303:title="Thêm vào lịch cá nhân"
+frontend/src\pages\booking\MyBookings.tsx:312:title="Hủy đơn"
+frontend/src\pages\booking\MyBookings.tsx:342:<Star className="w-4 h-4" /> Đánh giá
+frontend/src\pages\booking\MyBookings.tsx:347:Chi tiết <ChevronRight className="w-4 h-4 ml-0.5" />
+frontend/src\pages\booking\MyBookings.tsx:364:Bạn chưa có đơn đặt lịch nào trong mục này. Hãy tạo mới một đơn đặt lịch để sử dụng tài nguyên của phòng Lab.
+frontend/src\pages\booking\MyBookings.tsx:370:Đặt lịch ngay
+frontend/src\pages\booking\MyBookings.tsx:394:{scanBooking.status === 'APPROVED' ? 'Giả lập Check-in' : 'Giả lập Check-out'}
+frontend/src\pages\booking\MyBookings.tsx:407:Vui lòng hướng camera điện thoại về phía mã QR dán trên cửa phòng <strong className="text-blue-900 dark:text-blue-100">{scanBooking.room?.name}</strong>
+frontend/src\pages\booking\MyBookings.tsx:408:{scanBooking.equipment && ` hoặc trên thiết bị ${scanBooking.equipment.name}`}.
+frontend/src\pages\booking\MyBookings.tsx:427:Đang quét...
+frontend/src\pages\booking\MyBookings.tsx:450:toast.success(res.data?.message || 'Thao tác thành công!');
+frontend/src\pages\booking\MyBookings.tsx:455:const msg = err.response?.data?.message || 'Quét thất bại';
+frontend/src\pages\booking\MyBookings.tsx:463:🚪 Quét QR Phòng ({scanBooking.room?.name})
+frontend/src\pages\booking\MyBookings.tsx:475:toast.success(res.data?.message || 'Thao tác thành công!');
+frontend/src\pages\booking\MyBookings.tsx:480:const msg = err.response?.data?.message || 'Quét thất bại';
+frontend/src\pages\booking\MyBookings.tsx:488:🛠️ Quét QR Thiết bị ({scanBooking.equipment?.name || 'Kèm theo'})
+frontend/src\pages\booking\MyBookings.tsx:509:Đơn #{selectedBooking.id}
+frontend/src\pages\booking\MyBookings.tsx:522:{/* Thông tin chung */}
+frontend/src\pages\booking\MyBookings.tsx:526:<h3 className="text-[14px] font-extrabold uppercase tracking-widest">Thông tin chung</h3>
+frontend/src\pages\booking\MyBookings.tsx:534:<div className="text-[12px] text-slate-500 font-medium mb-0.5">Phòng Lab</div>
+frontend/src\pages\booking\MyBookings.tsx:540:<div className="text-[12px] text-slate-500 font-medium mb-1.5">Mục đích sử dụng</div>
+frontend/src\pages\booking\MyBookings.tsx:548:{/* Thời gian */}
+frontend/src\pages\booking\MyBookings.tsx:552:<h3 className="text-[14px] font-extrabold uppercase tracking-widest">Thời gian mượn</h3>
+frontend/src\pages\booking\MyBookings.tsx:564:{/* Tài nguyên */}
+frontend/src\pages\booking\MyBookings.tsx:569:<h3 className="text-[14px] font-extrabold uppercase tracking-widest">Tài nguyên đính kèm</h3>
+frontend/src\pages\booking\MyBookings.tsx:604:<CalendarPlus className="w-5 h-5" /> Thêm vào Lịch cá nhân
+frontend/src\pages\booking\MyBookings.tsx:618:Đánh giá trải nghiệm
+frontend/src\pages\booking\MyBookings.tsx:628:<p className="text-sm text-slate-500 text-center">Bạn đánh giá thế nào về phòng máy/thiết bị bạn vừa sử dụng?</p>
+frontend/src\pages\booking\MyBookings.tsx:637:placeholder="Nhận xét của bạn (không bắt buộc)..."
+frontend/src\pages\booking\MyBookings.tsx:647:Gửi Đánh Giá
+frontend/src\pages\checkin\QRScannerView.tsx:59:toast.error('Không tìm thấy thông tin thiết bị này trong hệ thống.');
+frontend/src\pages\checkin\QRScannerView.tsx:66:toast.success('Quét QR thành công!');
+frontend/src\pages\checkin\QRScannerView.tsx:68:toast.error('Lỗi khi quét QR: ' + (err.response?.data?.message || 'Dữ liệu mã QR không hợp lệ'));
+frontend/src\pages\checkin\QRScannerView.tsx:69:setScanResult({ error: 'Không thể xử lý mã QR này' });
+frontend/src\pages\checkin\QRScannerView.tsx:84:<h1 className="text-2xl font-bold text-neutral-900 dark:text-slate-100">Quét Mã QR</h1>
+frontend/src\pages\checkin\QRScannerView.tsx:85:<p className="text-sm text-neutral-500 dark:text-slate-400">Check-in / Check-out thiết bị phòng Lab</p>
+frontend/src\pages\checkin\QRScannerView.tsx:94:Đưa mã QR của thiết bị vào khung ngắm để quét.
+frontend/src\pages\checkin\QRScannerView.tsx:111:{scanResult.error ? 'Lỗi quét mã' : 'Xử lý thành công'}
+frontend/src\pages\checkin\QRScannerView.tsx:121:<span className="text-sm text-slate-500 dark:text-slate-400">Trạng thái</span>
+frontend/src\pages\checkin\QRScannerView.tsx:123:{scanResult.status === 'IN_USE' ? 'ĐÃ CHECK-IN' : 'ĐÃ CHECK-OUT'}
+frontend/src\pages\checkin\QRScannerView.tsx:130:<span className="text-slate-500 dark:text-slate-400">ID Phòng:</span>
+frontend/src\pages\checkin\QRScannerView.tsx:136:<span className="text-slate-500 dark:text-slate-400">ID Thiết bị:</span>
+frontend/src\pages\checkin\QRScannerView.tsx:141:<span className="text-slate-500 dark:text-slate-400">Thời gian:</span>
+frontend/src\pages\checkin\QRScannerView.tsx:158:Tiếp tục quét
+frontend/src\pages\chemicals\ChemicalManagement.tsx:192:Quản lý Hóa chất
+frontend/src\pages\chemicals\ChemicalManagement.tsx:195:Quản lý danh mục hóa chất, số lượng tồn kho và theo dõi hạn sử dụng.
+frontend/src\pages\chemicals\ChemicalManagement.tsx:202:<Plus className="w-4 h-4" /> Thêm Hóa chất
+frontend/src\pages\chemicals\ChemicalManagement.tsx:208:label="Tổng loại hóa chất"
+frontend/src\pages\chemicals\ChemicalManagement.tsx:215:label="Tổng tồn kho"
+frontend/src\pages\chemicals\ChemicalManagement.tsx:222:label="Sắp hết (≤ 5)"
+frontend/src\pages\chemicals\ChemicalManagement.tsx:229:label="Sắp hết hạn"
+frontend/src\pages\chemicals\ChemicalManagement.tsx:274:Bảo quản
+frontend/src\pages\chemicals\ChemicalManagement.tsx:482:Cảnh báo tồn kho (&le;)
+frontend/src\pages\chemicals\ChemicalManagement.tsx:495:Điều kiện bảo quản
+frontend/src\pages\chemicals\ChemicalManagement.tsx:502:placeholder="Vd: Tủ lạnh 4°C, Tránh ánh sáng..."
+frontend/src\pages\chemicals\LimitManagement.tsx:68:toast.error('Lỗi tải dữ liệu định mức');
+frontend/src\pages\chemicals\LimitManagement.tsx:76:toast.error('Vui lòng điền đầy đủ thông tin');
+frontend/src\pages\chemicals\LimitManagement.tsx:82:toast.success('Thêm định mức thành công');
+frontend/src\pages\chemicals\LimitManagement.tsx:87:const msg = error.response?.data?.message || 'Lỗi khi thêm định mức';
+frontend/src\pages\chemicals\LimitManagement.tsx:94:toast.error('Số lượng tối đa phải lớn hơn 0');
+frontend/src\pages\chemicals\LimitManagement.tsx:104:toast.success('Cập nhật định mức thành công');
+frontend/src\pages\chemicals\LimitManagement.tsx:109:toast.error('Lỗi khi cập nhật định mức');
+frontend/src\pages\chemicals\LimitManagement.tsx:116:toast.success('Xóa định mức thành công');
+frontend/src\pages\chemicals\LimitManagement.tsx:120:toast.error('Lỗi khi xóa định mức');
+frontend/src\pages\chemicals\LimitManagement.tsx:169:Quản lý Định mức Hóa chất
+frontend/src\pages\chemicals\LimitManagement.tsx:172:Thiết lập giới hạn sử dụng hóa chất theo từng học phần để đảm bảo an toàn.
+frontend/src\pages\chemicals\LimitManagement.tsx:183:Thêm định mức
+frontend/src\pages\chemicals\LimitManagement.tsx:192:placeholder="Tìm kiếm theo học phần, mã hóa chất..."
+frontend/src\pages\chemicals\LimitManagement.tsx:207:<p className="text-slate-500 dark:text-slate-400">Chưa có định mức nào được thiết lập</p>
+frontend/src\pages\chemicals\LimitManagement.tsx:212:Thêm định mức đầu tiên
+frontend/src\pages\chemicals\LimitManagement.tsx:222:Học phần
+frontend/src\pages\chemicals\LimitManagement.tsx:225:Hóa chất
+frontend/src\pages\chemicals\LimitManagement.tsx:228:Định mức
+frontend/src\pages\chemicals\LimitManagement.tsx:231:Mô tả
+frontend/src\pages\chemicals\LimitManagement.tsx:234:Thao tác
+frontend/src\pages\chemicals\LimitManagement.tsx:280:title="Chỉnh sửa"
+frontend/src\pages\chemicals\LimitManagement.tsx:287:title="Xóa"
+frontend/src\pages\chemicals\LimitManagement.tsx:307:{editingLimit ? 'Chỉnh sửa định mức' : 'Thêm định mức mới'}
+frontend/src\pages\chemicals\LimitManagement.tsx:326:Học phần <span className="text-red-500">*</span>
+frontend/src\pages\chemicals\LimitManagement.tsx:339:<option value={0}>-- Chọn học phần --</option>
+frontend/src\pages\chemicals\LimitManagement.tsx:350:Hóa chất <span className="text-red-500">*</span>
+frontend/src\pages\chemicals\LimitManagement.tsx:364:<option value={0}>-- Chọn hóa chất --</option>
+frontend/src\pages\chemicals\LimitManagement.tsx:377:Số lượng tối đa <span className="text-red-500">*</span>
+frontend/src\pages\chemicals\LimitManagement.tsx:387:placeholder="ví dụ: 100"
+frontend/src\pages\chemicals\LimitManagement.tsx:396:placeholder="đơn vị"
+frontend/src\pages\chemicals\LimitManagement.tsx:403:Mô tả
+frontend/src\pages\chemicals\LimitManagement.tsx:410:placeholder="Ghi chú thêm về định mức này..."
+frontend/src\pages\chemicals\LimitManagement.tsx:424:Hủy
+frontend/src\pages\chemicals\LimitManagement.tsx:430:{editingLimit ? 'Cập nhật' : 'Thêm mới'}
+frontend/src\pages\chemicals\LimitManagement.tsx:442:title="Xóa định mức"
+frontend/src\pages\chemicals\LimitManagement.tsx:443:message="Bạn có chắc chắn muốn xóa định mức này? Hành động này không thể hoàn tác."
+frontend/src\pages\chemicals\LimitManagement.tsx:444:confirmText="Xóa"
+frontend/src\pages\chemicals\ResourceManagement.tsx:17:const [activeTab, setActiveTab] = useState('Thiết bị');
+frontend/src\pages\chemicals\ResourceManagement.tsx:19:{ id: 'Phòng Lab', label: t('lab_room') },
+frontend/src\pages\chemicals\ResourceManagement.tsx:20:{ id: 'Thiết bị', label: t('equipment') },
+frontend/src\pages\chemicals\ResourceManagement.tsx:21:{ id: 'Hóa chất', label: t('chemicals') },
+frontend/src\pages\chemicals\ResourceManagement.tsx:22:{ id: 'Combo thiết bị', label: 'Combo thiết bị' },
+frontend/src\pages\chemicals\ResourceManagement.tsx:23:{ id: 'Lịch bảo trì', label: 'Lịch bảo trì' },
+frontend/src\pages\chemicals\ResourceManagement.tsx:55:if (activeTab === 'Phòng Lab') {
+frontend/src\pages\chemicals\ResourceManagement.tsx:64:const toastId = toast.loading('Đang tải ảnh lên...');
+frontend/src\pages\chemicals\ResourceManagement.tsx:72:toast.success('Tải ảnh lên thành công', { id: toastId });
+frontend/src\pages\chemicals\ResourceManagement.tsx:74:toast.error('Lỗi tải ảnh lên');
+frontend/src\pages\chemicals\ResourceManagement.tsx:161:{activeTab === 'Thiết bị' && (
+frontend/src\pages\chemicals\ResourceManagement.tsx:167:{activeTab === 'Phòng Lab' && (
+frontend/src\pages\chemicals\ResourceManagement.tsx:174:Quản lý Phòng Lab
+frontend/src\pages\chemicals\ResourceManagement.tsx:177:Quản lý danh sách các phòng thực hành và sức chứa.
+frontend/src\pages\chemicals\ResourceManagement.tsx:184:<Plus className="w-4 h-4" /> Thêm Phòng
+frontend/src\pages\chemicals\ResourceManagement.tsx:190:label={t('total_rooms', 'Tổng số phòng')}
+frontend/src\pages\chemicals\ResourceManagement.tsx:197:label={t('available_rooms', 'Đang khả dụng')}
+frontend/src\pages\chemicals\ResourceManagement.tsx:204:label={t('with_ac', 'Có điều hòa')}
+frontend/src\pages\chemicals\ResourceManagement.tsx:335:{activeTab === 'Hóa chất' && (
+frontend/src\pages\chemicals\ResourceManagement.tsx:341:{activeTab === 'Combo thiết bị' && (
+frontend/src\pages\chemicals\ResourceManagement.tsx:347:{activeTab === 'Lịch bảo trì' && (
+frontend/src\pages\chemicals\ResourceManagement.tsx:414:Ảnh (Tùy chọn)
+frontend/src\pages\chemicals\ResourceManagement.tsx:418:<Upload className="w-4 h-4" /> Chọn ảnh
+frontend/src\pages\chemicals\ResourceManagement.tsx:520:Ảnh (Tùy chọn)
+frontend/src\pages\chemicals\ResourceManagement.tsx:524:<Upload className="w-4 h-4" /> Chọn ảnh
+frontend/src\pages\community\Community.tsx:36:toast.error('Lỗi khi tải bài viết');
+frontend/src\pages\community\Community.tsx:46:toast.success('Đăng bài thành công');
+frontend/src\pages\community\Community.tsx:52:toast.error('Lỗi khi đăng bài');
+frontend/src\pages\community\Community.tsx:62:Cộng đồng Lab
+frontend/src\pages\community\Community.tsx:64:<p className="text-sm text-slate-500 mt-1">Chia sẻ kinh nghiệm, hỏi đáp và tìm bạn cùng nhóm thực hành.</p>
+frontend/src\pages\community\Community.tsx:70:<Plus className="w-4 h-4" /> Đăng bài
+frontend/src\pages\community\Community.tsx:76:<h2 className="text-lg font-bold mb-4 dark:text-white">Tạo bài viết mới</h2>
+frontend/src\pages\community\Community.tsx:79:placeholder="Tiêu đề..."
+frontend/src\pages\community\Community.tsx:86:placeholder="Nội dung bài viết..."
+frontend/src\pages\community\Community.tsx:94:<button type="button" onClick={() => setShowForm(false)} className="px-4 py-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl">Hủy</button>
+frontend/src\pages\community\Community.tsx:95:<button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700">Đăng</button>
+frontend/src\pages\community\Community.tsx:101:<div className="text-center p-8 text-slate-500">Đang tải...</div>
+frontend/src\pages\community\Community.tsx:105:<p className="text-slate-500">Chưa có bài viết nào. Hãy là người đầu tiên!</p>
+frontend/src\pages\community\Community.tsx:119:<div className="text-sm text-slate-500 mb-2">Đăng bởi {post.author?.name} • {new Date(post.created_at).toLocaleString('vi-VN')}</div>
+frontend/src\pages\courses\Courses.tsx:26:const [formData, setFormData] = useState({ id: 0, code: '', name: '', instructor_id: '', semester: 'Kỳ 1', academic_year: '2025-2026' });
+frontend/src\pages\courses\Courses.tsx:36:semester: course.semester || 'Kỳ 1',
+frontend/src\pages\courses\Courses.tsx:41:setFormData({ id: 0, code: '', name: '', instructor_id: '', semester: 'Kỳ 1', academic_year: '2025-2026' });
+frontend/src\pages\courses\Courses.tsx:93:toast.success('Yêu cầu xóa đã được gửi đến Admin');
+frontend/src\pages\courses\Courses.tsx:98:const msg = err.response?.data?.message || 'Có lỗi xảy ra khi gửi yêu cầu';
+frontend/src\pages\courses\Courses.tsx:102:toast.error('Vui lòng nhập lý do xóa');
+frontend/src\pages\courses\Courses.tsx:145:label={t('total_courses', 'Tổng học phần')}
+frontend/src\pages\courses\Courses.tsx:152:label={t('total_instructors_involved', 'Giảng viên tham gia')}
+frontend/src\pages\courses\Courses.tsx:186:Học kỳ
+frontend/src\pages\courses\Courses.tsx:261:title="Yêu cầu xóa"
+frontend/src\pages\courses\Courses.tsx:294:Mã học phần <span className="text-red-500">*</span>
+frontend/src\pages\courses\Courses.tsx:307:Tên môn học <span className="text-red-500">*</span>
+frontend/src\pages\courses\Courses.tsx:321:Học kỳ
+frontend/src\pages\courses\Courses.tsx:328:<option value="Kỳ 1">Kỳ 1</option>
+frontend/src\pages\courses\Courses.tsx:329:<option value="Kỳ 2">Kỳ 2</option>
+frontend/src\pages\courses\Courses.tsx:330:<option value="Kỳ Hè">Kỳ Hè</option>
+frontend/src\pages\courses\Courses.tsx:335:Năm học
+frontend/src\pages\courses\Courses.tsx:348:Giảng viên phụ trách <span className="text-red-500">*</span>
+frontend/src\pages\courses\Courses.tsx:376:{isEditing ? 'Cập nhật' : 'Tạo mới'}
+frontend/src\pages\courses\Courses.tsx:399:Yêu cầu xóa học phần
+frontend/src\pages\courses\Courses.tsx:413:Bạn không có quyền trực tiếp xóa học phần này. Vui lòng nhập lý do xóa để gửi yêu cầu đến Quản trị viên.
+frontend/src\pages\courses\Courses.tsx:417:Lý do xóa <span className="text-red-500">*</span>
+frontend/src\pages\courses\Courses.tsx:425:placeholder="Ví dụ: Học phần này bị hủy do không đủ số lượng sinh viên..."
+frontend/src\pages\courses\Courses.tsx:444:Gửi yêu cầu
+frontend/src\pages\dashboard\DashboardAdmin.tsx:23:// Màu sắc cho biểu đồ Đơn đặt phòng
+frontend/src\pages\dashboard\DashboardAdmin.tsx:32:// Màu sắc cho biểu đồ Thiết bị
+frontend/src\pages\dashboard\DashboardAdmin.tsx:165:feed.push({ id: `feed-bk-p-${b.id}`, type: 'BOOKING_CREATED', message: t('booking_created_feed', { user: b.user?.name || t('someone', 'Ai đó'), room: b.room?.name || b.room_id }), time: new Date(b.created_at || now), color: 'text-blue-500', bgColor: 'bg-blue-100 dark:bg-blue-900/30' });
+frontend/src\pages\dashboard\DashboardAdmin.tsx:473:<h2 className="text-xl font-bold text-neutral-800 dark:text-slate-100 tracking-tight">{t('pending_approval', 'Chờ phê duyệt')}</h2>
+frontend/src\pages\dashboard\DashboardAdmin.tsx:494:<h3 className="font-bold text-[15px] text-neutral-800 dark:text-slate-200">{req.room?.name || `${t('room_prefix', 'Phòng')} ${req.room_id}`}</h3>
+frontend/src\pages\dashboard\DashboardInstructor.tsx:23:const userName = currentUser?.name || 'Giảng viên';
+frontend/src\pages\dashboard\DashboardInstructor.tsx:50:// Lọc số lượng khóa học do giảng viên này phụ trách
+frontend/src\pages\dashboard\DashboardInstructor.tsx:75:toast.error('Không thể tải dữ liệu Dashboard');
+frontend/src\pages\dashboard\DashboardInstructor.tsx:88:toast.success('Đã duyệt đơn thành công');
+frontend/src\pages\dashboard\DashboardInstructor.tsx:91:toast.error('Có lỗi xảy ra khi duyệt đơn');
+frontend/src\pages\dashboard\DashboardInstructor.tsx:98:toast.success('Đã từ chối đơn');
+frontend/src\pages\dashboard\DashboardInstructor.tsx:101:toast.error('Có lỗi xảy ra khi từ chối đơn');
+frontend/src\pages\dashboard\DashboardInstructor.tsx:179:{/* Lịch dạy / Ca thực hành hôm nay (MỚI) */}
+frontend/src\pages\dashboard\DashboardInstructor.tsx:226:{/* Quick Actions & Báo cáo */}
+frontend/src\pages\dashboard\DashboardInstructor.tsx:251:{/* Cảnh báo sự cố */}
+frontend/src\pages\dashboard\DashboardInstructor.tsx:269:{/* Đơn chờ duyệt trực tiếp */}
+frontend/src\pages\dashboard\DashboardInstructor.tsx:299:<h3 className="text-[14px] font-bold text-slate-800 dark:text-slate-200">{item.user?.name || 'Sinh viên'}</h3>
+frontend/src\pages\dashboard\DashboardStudent.tsx:44:// Lấy thông tin user thật từ localStorage
+frontend/src\pages\dashboard\DashboardStudent.tsx:70:// Đếm thống kê
+frontend/src\pages\dashboard\DashboardStudent.tsx:77:// Lịch sắp tới: PENDING + APPROVED, sắp xếp theo start_time
+frontend/src\pages\dashboard\DashboardStudent.tsx:84:// Tính toán trạng thái Khả dụng thời gian thực (Dynamic Status)
+frontend/src\pages\dashboard\DashboardStudent.tsx:88:// Nếu trạng thái tĩnh của phòng không phải AVAILABLE (vd MAINTENANCE, BROKEN) thì giữ nguyên
+frontend/src\pages\dashboard\DashboardStudent.tsx:91:// Lấy tất cả lịch đã duyệt của phòng này trong tương lai gần (hôm nay)
+frontend/src\pages\dashboard\DashboardStudent.tsx:94:// Kiểm tra xem phòng có đang bị đặt không
+frontend/src\pages\dashboard\DashboardStudent.tsx:105:// Tính toán thời gian trống (availableUntil)
+frontend/src\pages\dashboard\DashboardStudent.tsx:106:// Tìm lịch đặt tiếp theo trong ngày hôm nay
+frontend/src\pages\dashboard\DashboardStudent.tsx:124:// Sắp xếp: AVAILABLE lên đầu, sau đó IN_USE, cuối cùng là MAINTENANCE/BROKEN
+frontend/src\pages\dashboard\DashboardStudent.tsx:133:// Lấy 6 phòng đứng đầu danh sách
+frontend/src\pages\dashboard\DashboardStudent.tsx:146:// Nạp thông báo cũ từ Database
+frontend/src\pages\dashboard\DashboardStudent.tsx:152:console.error('Lỗi tải thông báo:', err);
+frontend/src\pages\dashboard\DashboardStudent.tsx:157:// Khởi tạo Socket.io
+frontend/src\pages\dashboard\DashboardStudent.tsx:164:fetchData(); // Lắng nghe sự kiện để tải lại data ngầm
+frontend/src\pages\dashboard\DashboardStudent.tsx:192:toast.success(t('marked_all_read') || 'Đã đánh dấu tất cả là đã đọc');
+frontend/src\pages\dashboard\DashboardStudent.tsx:198:// Format ngày cho Lịch đặt sắp tới
+frontend/src\pages\dashboard\DashboardStudent.tsx:227:DESCRIPTION:Lịch thực hành được đặt qua hệ thống LabBook.
+frontend/src\pages\dashboard\DashboardStudent.tsx:301:{/* Lịch đặt sắp tới */}
+frontend/src\pages\dashboard\DashboardStudent.tsx:355:{/* Phòng Lab khả dụng */}
+frontend/src\pages\dashboard\Users.tsx:56:// Khóa -> Mở Modal nhập lý do
+frontend/src\pages\dashboard\Users.tsx:60:// Mở khóa -> {t("remove_blacklist")}
+frontend/src\pages\dashboard\Users.tsx:144:if (!window.confirm('Bạn có chắc chắn muốn TẮT xác thực 2 lớp (MFA) cho người dùng này không?')) return;
+frontend/src\pages\dashboard\Users.tsx:147:toast.success('Đã tắt MFA thành công cho người dùng này.');
+frontend/src\pages\dashboard\Users.tsx:151:const msg = err.response?.data?.message || 'Lỗi khi tắt MFA';
+frontend/src\pages\dashboard\Users.tsx:161:const toastId = toast.loading('Đang nhập dữ liệu từ Excel...');
+frontend/src\pages\dashboard\Users.tsx:163:toast.success(`Đã nhập thành công ${res.data?.count || 0} người dùng!`, { id: toastId });
+frontend/src\pages\dashboard\Users.tsx:167:const msg = err.response?.data?.message || 'Nhập file Excel thất bại';
+frontend/src\pages\dashboard\Users.tsx:222:<Upload className="w-4 h-4 text-[#1E5FA5] dark:text-blue-400" /> Nhập Excel
+frontend/src\pages\dashboard\Users.tsx:241:label={t('total_users', 'Tổng tài khoản')}
+frontend/src\pages\dashboard\Users.tsx:248:label={t('role_admin', 'Admin & Kỹ thuật')}
+frontend/src\pages\dashboard\Users.tsx:255:label={t('role_instructor', 'Giảng viên')}
+frontend/src\pages\dashboard\Users.tsx:262:label={t('role_student', 'Sinh viên')}
+frontend/src\pages\dashboard\Users.tsx:269:label={t('blacklist_list', 'Bị chặn')}
+frontend/src\pages\dashboard\Users.tsx:297:<option value="ALL">Tất cả trạng thái</option>
+frontend/src\pages\dashboard\Users.tsx:298:<option value="BLACKLIST">Đình chỉ (Inactive)</option>
+frontend/src\pages\dashboard\Users.tsx:305:<option value="ALL">Tất cả Đơn vị / Khoa</option>
+frontend/src\pages\dashboard\Users.tsx:337:Khoa / Lớp
+frontend/src\pages\dashboard\Users.tsx:387:Lớp: {u.student_class}
+frontend/src\pages\dashboard\Users.tsx:397:<span className="text-[12px] text-slate-400 italic">Chưa cập nhật</span>
+frontend/src\pages\dashboard\Users.tsx:411:Đình chỉ (Inactive)
+frontend/src\pages\dashboard\Users.tsx:418:Hoạt động (Active)
+frontend/src\pages\dashboard\Users.tsx:431:toast.error('Sinh viên phải tự bật MFA trong mục Hồ sơ cá nhân.');
+frontend/src\pages\dashboard\Users.tsx:437:title={u.is_mfa_enabled ? "Tắt xác thực 2 lớp" : "Chưa bật xác thực 2 lớp"}
+frontend/src\pages\dashboard\Users.tsx:444:{u.is_mfa_enabled ? 'Đã bật' : 'Đã tắt'}
+frontend/src\pages\dashboard\Users.tsx:453:title="Xem lịch sử hoạt động"
+frontend/src\pages\dashboard\Users.tsx:504:Họ và tên
+frontend/src\pages\dashboard\Users.tsx:540:Khoa / Viện
+frontend/src\pages\dashboard\Users.tsx:552:Lớp sinh hoạt
+frontend/src\pages\dashboard\Users.tsx:604:Họ và tên
+frontend/src\pages\dashboard\Users.tsx:628:Khoa / Viện
+frontend/src\pages\dashboard\Users.tsx:640:Lớp sinh hoạt
+frontend/src\pages\equipment\CombosManagement.tsx:25:toast.error('Lỗi tải danh sách Combo');
+frontend/src\pages\equipment\CombosManagement.tsx:41:Quản lý Combo / Bộ thiết bị
+frontend/src\pages\equipment\CombosManagement.tsx:44:Quản lý các bộ dụng cụ cấp phát sẵn cho sinh viên mượn thực hành.
+frontend/src\pages\equipment\CombosManagement.tsx:48:onClick={() => toast.success('Tính năng thêm combo đang được phát triển')}
+frontend/src\pages\equipment\CombosManagement.tsx:52:Thêm Combo mới
+frontend/src\pages\equipment\CombosManagement.tsx:58:label="Tổng số Combo"
+frontend/src\pages\equipment\CombosManagement.tsx:65:label="Tổng thiết bị"
+frontend/src\pages\equipment\CombosManagement.tsx:79:placeholder="Tìm kiếm theo tên combo..."
+frontend/src\pages\equipment\CombosManagement.tsx:95:<p>Chưa có combo nào được tạo.</p>
+frontend/src\pages\equipment\CombosManagement.tsx:102:Tên Combo
+frontend/src\pages\equipment\CombosManagement.tsx:105:Mô tả
+frontend/src\pages\equipment\CombosManagement.tsx:108:Số lượng thiết bị
+frontend/src\pages\equipment\CombosManagement.tsx:111:Thao tác
+frontend/src\pages\equipment\DeviceManagement.tsx:32:// --- B. Khai báo TypeScript chặt chẽ (Thay thế any) ---
+frontend/src\pages\equipment\DeviceManagement.tsx:118:// apiClient.ts sẽ tự hiển thị toast
+frontend/src\pages\equipment\DeviceManagement.tsx:130:toast.error('Vui lòng tạo ít nhất 1 Phòng Lab trước khi lưu Thiết bị.');
+frontend/src\pages\equipment\DeviceManagement.tsx:164:toast.error('Vui lòng tạo ít nhất 1 Phòng Lab trước khi lưu Thiết bị.');
+frontend/src\pages\equipment\DeviceManagement.tsx:204:// --- A. Tối ưu Hiệu năng Tìm kiếm bằng useMemo ---
+frontend/src\pages\equipment\DeviceManagement.tsx:234:Quản lý danh sách thiết bị, phân bổ phòng và tình trạng hoạt động.
+frontend/src\pages\equipment\DeviceManagement.tsx:340:Giá trị
+frontend/src\pages\equipment\DeviceManagement.tsx:417:title="Xem mã QR"
+frontend/src\pages\equipment\DeviceManagement.tsx:488:{/* --- C. Tách các Component Modal (Clean Code) --- */}
+frontend/src\pages\equipment\DeviceManagement.tsx:529:Mã QR Định danh Thiết bị
+frontend/src\pages\equipment\DeviceManagement.tsx:559:Mã QR này được dùng để dán lên thiết bị thực tế. Sinh viên có thể dùng chức năng
+frontend/src\pages\equipment\DeviceManagement.tsx:560:quét QR trên điện thoại để Check-in/out nhanh khi mượn thiết bị này.
+frontend/src\pages\equipment\DeviceManagement.tsx:568:Đóng
+frontend/src\pages\equipment\DeviceManagement.tsx:576:Tải ảnh QR
+frontend/src\pages\equipment\MaintenanceManagement.tsx:26:toast.error('Lỗi tải danh sách lịch bảo trì');
+frontend/src\pages\equipment\MaintenanceManagement.tsx:42:Lịch bảo trì & Sửa chữa
+frontend/src\pages\equipment\MaintenanceManagement.tsx:45:Thiết lập lịch khóa phòng/thiết bị để bảo dưỡng định kỳ.
+frontend/src\pages\equipment\MaintenanceManagement.tsx:49:onClick={() => toast.success('Tính năng thêm lịch bảo trì đang được phát triển')}
+frontend/src\pages\equipment\MaintenanceManagement.tsx:53:Tạo lịch bảo trì
+frontend/src\pages\equipment\MaintenanceManagement.tsx:59:label="Tổng lịch bảo trì"
+frontend/src\pages\equipment\MaintenanceManagement.tsx:66:label="Đang tiến hành"
+frontend/src\pages\equipment\MaintenanceManagement.tsx:73:label="Đã hoàn thành"
+frontend/src\pages\equipment\MaintenanceManagement.tsx:80:label="Sắp tới"
+frontend/src\pages\equipment\MaintenanceManagement.tsx:94:placeholder="Tìm kiếm theo lý do..."
+frontend/src\pages\equipment\MaintenanceManagement.tsx:110:<p>Chưa có lịch bảo trì nào được lên kế hoạch.</p>
+frontend/src\pages\equipment\MaintenanceManagement.tsx:116:<th className="px-6 py-4 text-[13px] font-semibold text-[#757575] dark:text-slate-400">Tài sản bị khóa</th>
+frontend/src\pages\equipment\MaintenanceManagement.tsx:117:<th className="px-6 py-4 text-[13px] font-semibold text-[#757575] dark:text-slate-400">Lý do bảo trì</th>
+frontend/src\pages\equipment\MaintenanceManagement.tsx:118:<th className="px-6 py-4 text-[13px] font-semibold text-[#757575] dark:text-slate-400">Thời gian bắt đầu</th>
+frontend/src\pages\equipment\MaintenanceManagement.tsx:119:<th className="px-6 py-4 text-[13px] font-semibold text-[#757575] dark:text-slate-400">Thời gian kết thúc</th>
+frontend/src\pages\equipment\MaintenanceManagement.tsx:120:<th className="px-6 py-4 text-[13px] font-semibold text-[#757575] dark:text-slate-400 text-right">Thao tác</th>
+frontend/src\pages\equipment\MaintenanceManagement.tsx:127:{schedule.room_id ? `Phòng Lab #${schedule.room_id}` : ''}
+frontend/src\pages\equipment\MaintenanceManagement.tsx:129:{schedule.equipment_id ? `Thiết bị #${schedule.equipment_id}` : ''}
+frontend/src\pages\profile\Profile.tsx:36:toast.error('Vui lòng chọn một file hình ảnh');
+frontend/src\pages\profile\Profile.tsx:41:toast.error('Kích thước ảnh tối đa là 5MB');
+frontend/src\pages\profile\Profile.tsx:58:toast.success('Tải ảnh đại diện thành công');
+frontend/src\pages\profile\Profile.tsx:60:toast.error(error.response?.data?.message || 'Lỗi khi tải ảnh lên');
+frontend/src\pages\profile\Profile.tsx:71:toast.success('Cập nhật thông tin liên lạc thành công');
+frontend/src\pages\profile\Profile.tsx:73:toast.error('Cập nhật thất bại. Vui lòng thử lại.');
+frontend/src\pages\profile\Profile.tsx:178:title="Đổi ảnh đại diện"
+frontend/src\pages\profile\Profile.tsx:197:{user?.role === 'ADMIN' ? 'Quản trị viên' : user?.role === 'INSTRUCTOR' ? 'Giảng viên' : 'Sinh viên'}
+frontend/src\pages\profile\Profile.tsx:401:Bảo mật 2 lớp (MFA)
+frontend/src\pages\profile\Profile.tsx:404:Bảo vệ tài khoản của bạn khỏi các cuộc tấn công bằng cách yêu cầu mã xác
+frontend/src\pages\profile\Profile.tsx:405:thực 6 số từ điện thoại mỗi khi đăng nhập.
+frontend/src\pages\profile\Profile.tsx:411:<ShieldCheck className="w-5 h-5" /> Đã bật bảo mật 2 lớp
+frontend/src\pages\profile\Profile.tsx:414:Tài khoản của bạn hiện đang được bảo vệ an toàn.
+frontend/src\pages\profile\Profile.tsx:421:{setupLoading ? 'Đang xử lý...' : 'Tắt bảo mật 2 lớp'}
+frontend/src\pages\profile\Profile.tsx:430:{setupLoading ? 'Đang xử lý...' : 'Thiết lập bảo mật 2 lớp'}
+frontend/src\pages\profile\Profile.tsx:435:1. Quét mã QR bằng ứng dụng Authenticator
+frontend/src\pages\profile\Profile.tsx:442:2. Nhập mã xác nhận 6 số
+frontend/src\pages\profile\Profile.tsx:458:Xác nhận
+frontend/src\pages\profile\Profile.tsx:503:<span className={`px-3 py-1 rounded-full text-xs font-bold border ${log.status.includes('Thành công') ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'}`}>
+frontend/src\pages\reports\Reports.tsx:70:const [activeTab, setActiveTab] = useState('incidents'); // 'Thống kê' hoặc 'Sự cố'
+frontend/src\pages\reports\Reports.tsx:73:// States cho Sự cố
+frontend/src\pages\reports\Reports.tsx:87:// States cho Vận hành
+frontend/src\pages\reports\Reports.tsx:91:// States cho Quản lý
+frontend/src\pages\reports\Reports.tsx:95:// States cho Chiến lược
+frontend/src\pages\reports\Reports.tsx:133:toast.error('Không thể tải báo cáo vận hành');
+frontend/src\pages\reports\Reports.tsx:146:toast.error('Không thể tải báo cáo quản lý');
+frontend/src\pages\reports\Reports.tsx:159:toast.error('Không thể tải báo cáo chiến lược');
+frontend/src\pages\reports\Reports.tsx:202:const toastId = toast.loading('Đang lên lịch bảo trì...');
+frontend/src\pages\reports\Reports.tsx:206:toast.success('Đã lên lịch bảo trì tự động thành công', { id: toastId });
+frontend/src\pages\reports\Reports.tsx:208:fetchData(); // Cập nhật lại danh sách báo cáo
+frontend/src\pages\reports\Reports.tsx:210:toast.error('Lên lịch bảo trì thất bại');
+frontend/src\pages\reports\Reports.tsx:236:const toastId = toast.loading('Đang xuất file Excel...');
+frontend/src\pages\reports\Reports.tsx:253:toast.success('Đã xuất báo cáo Excel', { id: toastId });
+frontend/src\pages\reports\Reports.tsx:255:toast.error('Lỗi xuất báo cáo Excel');
+frontend/src\pages\reports\Reports.tsx:263:// Lọc báo cáo trong tháng được chọn
+frontend/src\pages\reports\Reports.tsx:269:// Gom nhóm theo ngày
+frontend/src\pages\reports\Reports.tsx:314:<Download className="w-4 h-4" /> Xuất Excel
+frontend/src\pages\reports\Reports.tsx:523:{/* Biểu đồ hoạt động phòng Lab */}
+frontend/src\pages\reports\Reports.tsx:558:{/* Tỷ lệ khai thác phòng lab dạng danh sách */}
+frontend/src\pages\reports\Reports.tsx:586:{/* Bảng thiết bị cần bảo trì */}
+frontend/src\pages\reports\Reports.tsx:622:Hành động
+frontend/src\pages\reports\Reports.tsx:634:Không có thiết bị nào cần bảo trì/hỏng hóc.
+frontend/src\pages\reports\Reports.tsx:677:Lên lịch bảo trì
+frontend/src\pages\reports\Reports.tsx:688:{/* Bảng theo dõi tiêu hao vật tư/hóa chất (Burn Rate) */}
+frontend/src\pages\reports\Reports.tsx:692:Báo cáo Tốc độ tiêu hao Vật tư/Hóa chất (Burn Rate)
+frontend/src\pages\reports\Reports.tsx:695:Top 5 vật tư có tốc độ tiêu hao nhanh nhất dựa trên lịch sử sử dụng.
+frontend/src\pages\reports\Reports.tsx:706:Tên Hóa chất/Vật tư
+frontend/src\pages\reports\Reports.tsx:709:Tổng số lượng đã dùng
+frontend/src\pages\reports\Reports.tsx:712:Tồn kho hiện tại
+frontend/src\pages\reports\Reports.tsx:723:Chưa có dữ liệu tiêu thụ hóa chất.
+frontend/src\pages\reports\Reports.tsx:766:{/* Biểu đồ phân bố giờ thực hành học phần */}
+frontend/src\pages\reports\Reports.tsx:768:{/* Giờ giảng dạy theo Giảng viên */}
+frontend/src\pages\reports\Reports.tsx:793:{/* Tỷ lệ giờ học phần */}
+frontend/src\pages\reports\Reports.tsx:827:<Tooltip formatter={(val) => [`${val} h`, 'Tổng số giờ']} />
+frontend/src\pages\reports\Reports.tsx:862:{/* Bảng Giảng viên */}
+frontend/src\pages\reports\Reports.tsx:915:{/* Bảng Học phần */}
+frontend/src\pages\reports\Reports.tsx:982:{/* Biểu đồ ROI và NC KH */}
+frontend/src\pages\reports\Reports.tsx:984:{/* ROI theo Phòng Lab */}
+frontend/src\pages\reports\Reports.tsx:1010:{/* Xu thế công bố khoa học */}
+frontend/src\pages\reports\Reports.tsx:1045:{/* Bảng ROI chi tiết */}
+frontend/src\pages\reports\Reports.tsx:1083:{room.totalInvestment.toLocaleString()} VNĐ
+frontend/src\pages\reports\Reports.tsx:1089:{room.totalValue.toLocaleString()} VNĐ
+frontend/src\pages\reports\Reports.tsx:1101:{/* Bảng Danh sách Công bố Khoa học */}
+frontend/src\pages\reports\Reports.tsx:1210:title="Làm mới"
+frontend/src\pages\reports\Reports.tsx:1229:<p className="text-sm text-slate-500">Chưa có sự cố nào được ghi nhận.</p>
+frontend/src\pages\reports\Reports.tsx:1244:<div className="text-[12px] font-bold text-slate-400 uppercase tracking-wider line-clamp-1">{r.user?.name || 'Khách'}</div>
+frontend/src\pages\reports\Reports.tsx:1280:Bắt đầu sửa
+frontend/src\pages\reports\Reports.tsx:1288:Hoàn tất
+frontend/src\pages\reports\Reports.tsx:1322:Báo cáo hỏng hóc
+frontend/src\pages\reports\Reports.tsx:1324:<p className="text-[13px] text-slate-500 mt-1">Điền thông tin chi tiết để kỹ thuật viên xử lý.</p>
+frontend/src\pages\reports\Reports.tsx:1339:📷 Tải ảnh lên
+frontend/src\pages\reports\Reports.tsx:1342:<span className="text-[16px]">🔍</span> Quét mã QR
+frontend/src\pages\reports\Reports.tsx:1345:<p className="text-[11px] text-center text-blue-500 mt-2 font-medium">Bổ sung hình ảnh hoặc quét QR để điền nhanh thiết bị</p>
+frontend/src\pages\reports\Reports.tsx:1372:<option value="">Không có</option>
+frontend/src\pages\reports\Reports.tsx:1389:<option value="">Không có</option>
+frontend/src\pages\reports\Reports.tsx:1401:Mức độ khẩn cấp
+frontend/src\pages\reports\Reports.tsx:1406:<div className="py-2 text-center text-[12px] font-bold rounded-xl border border-slate-200 text-slate-500 peer-checked:bg-slate-100 peer-checked:text-slate-900 peer-checked:border-slate-300 transition-all">Bình thường</div>
+frontend/src\pages\reports\Reports.tsx:1410:<div className="py-2 text-center text-[12px] font-bold rounded-xl border border-amber-200 text-amber-600 peer-checked:bg-amber-100 peer-checked:border-amber-400 transition-all">Sửa gấp</div>
+frontend/src\pages\reports\Reports.tsx:1414:<div className="py-2 text-center text-[12px] font-bold rounded-xl border border-rose-200 text-rose-600 peer-checked:bg-rose-100 peer-checked:border-rose-400 transition-all">Nguy hiểm</div>
+frontend/src\pages\reports\Reports.tsx:1439:Gửi báo cáo sự cố
+frontend/src\pages\reports\StrategicManagement.tsx:65:toast.error('Lỗi khi tải dữ liệu chiến lược');
+frontend/src\pages\reports\StrategicManagement.tsx:98:toast.success('Thêm khoản đầu tư thành công');
+frontend/src\pages\reports\StrategicManagement.tsx:105:toast.success('Thêm công bố khoa học thành công');
+frontend/src\pages\reports\StrategicManagement.tsx:110:toast.error('Thêm dữ liệu thất bại');
+frontend/src\pages\reports\StrategicManagement.tsx:119:toast.success('Đã xóa khoản đầu tư');
+frontend/src\pages\reports\StrategicManagement.tsx:122:toast.success('Đã xóa công bố khoa học');
+frontend/src\pages\reports\StrategicManagement.tsx:126:toast.error('Xóa thất bại');
+frontend/src\pages\reports\StrategicManagement.tsx:134:const toastId = toast.loading('Đang xuất file Excel...');
+frontend/src\pages\reports\StrategicManagement.tsx:151:toast.success('Đã xuất báo cáo Excel', { id: toastId });
+frontend/src\pages\reports\StrategicManagement.tsx:153:toast.error('Lỗi xuất báo cáo Excel');
+frontend/src\pages\reports\StrategicManagement.tsx:192:const c = pub.category || 'Khác';
+frontend/src\pages\reports\StrategicManagement.tsx:237:{/* Chỉ hiện nút Thêm Đầu tư cho Admin. Nút {t('add_publication')} hiện cho cả Admin & Instructor */}
+frontend/src\pages\reports\StrategicManagement.tsx:243:<Plus className="w-4 h-4" /> {activeTab === 'investment' ? 'Thêm Đầu tư' : t('add_publication')}
+frontend/src\pages\reports\StrategicManagement.tsx:249:{/* Thẻ KPI */}
+frontend/src\pages\reports\StrategicManagement.tsx:257:return `${(total / 1000000000).toFixed(2).replace(/\.00$/, '').replace('.', ',')} Tỷ ₫`;
+frontend/src\pages\reports\StrategicManagement.tsx:297:placeholder={activeTab === 'investment' ? 'Tìm theo mô tả, nguồn vốn...' : t('search_publication_placeholder')}
+frontend/src\pages\reports\StrategicManagement.tsx:308:<LoadingSpinner text="Đang tải dữ liệu..." />
+frontend/src\pages\reports\StrategicManagement.tsx:314:<th className="p-3 text-[13px] text-gray-500">Hạng mục & Nguồn vốn</th>
+frontend/src\pages\reports\StrategicManagement.tsx:315:<th className="p-3 text-[13px] text-gray-500 text-right">Số tiền (VNĐ)</th>
+frontend/src\pages\reports\StrategicManagement.tsx:316:<th className="p-3 text-[13px] text-gray-500 text-center">Năm</th>
+frontend/src\pages\reports\StrategicManagement.tsx:325:<div className="font-semibold text-sm text-slate-800 dark:text-slate-200">{inv.description || 'Đầu tư chung'}</div>
+frontend/src\pages\reports\StrategicManagement.tsx:326:{inv.source && <div className="text-xs text-slate-500 mt-1">Nguồn: {inv.source}</div>}
+frontend/src\pages\reports\StrategicManagement.tsx:341:title="Xóa đầu tư"
+frontend/src\pages\reports\StrategicManagement.tsx:393:title="Xóa công bố"
+frontend/src\pages\reports\StrategicManagement.tsx:408:<h3 className="text-[16px] font-bold text-[#212121] dark:text-slate-100 mb-6 text-center">Vốn Đầu Tư Qua Các Năm</h3>
+frontend/src\pages\reports\StrategicManagement.tsx:424:<h3 className="text-[16px] font-bold text-[#212121] dark:text-slate-100 mb-6 text-center">Phân Loại Công Bố Khoa Học</h3>
+frontend/src\pages\reports\StrategicManagement.tsx:450:<h3 className="text-[16px] font-bold text-[#212121] dark:text-slate-100 mb-4">Bảng Phân Tích Hiệu Suất (ROI) Theo Phòng Lab</h3>
+frontend/src\pages\reports\StrategicManagement.tsx:456:<th className="p-4 text-right">Tổng Vốn Đầu Tư</th>
+frontend/src\pages\reports\StrategicManagement.tsx:457:<th className="p-4 text-center">Tổng Công Bố</th>
+frontend/src\pages\reports\StrategicManagement.tsx:458:<th className="p-4 text-center">Bài Báo Q1/Q2</th>
+frontend/src\pages\reports\StrategicManagement.tsx:459:<th className="p-4 text-right">Hiệu Suất Tương Đối</th>
+frontend/src\pages\reports\StrategicManagement.tsx:473:{row.totalInv > 0 ? `${((row.totalPubs / (row.totalInv / 1000000)) * 100).toFixed(2)} bài / 100tr` : '0 bài / 100tr'}
+frontend/src\pages\reports\StrategicManagement.tsx:480:<td colSpan={5} className="p-8 text-center text-[#757575] dark:text-slate-400">Không có dữ liệu đánh giá ROI</td>
+frontend/src\pages\reports\StrategicManagement.tsx:495:{formType === 'investment' ? `Thêm ${t('tab_investment')}` : `Thêm ${t('tab_publications')}`}
+frontend/src\pages\reports\StrategicManagement.tsx:508:<option value="">-- Chọn phòng --</option>
+frontend/src\pages\reports\StrategicManagement.tsx:518:<label className="block text-sm font-medium mb-1">Số tiền đầu tư (VNĐ)</label>
+frontend/src\pages\reports\StrategicManagement.tsx:530:<label className="block text-sm font-medium mb-1">Năm đầu tư</label>
+frontend/src\pages\reports\StrategicManagement.tsx:543:<label className="block text-sm font-medium mb-1">Nguồn vốn</label>
+frontend/src\pages\reports\StrategicManagement.tsx:546:placeholder="VD: Ngân sách trường, Doanh nghiệp tài trợ..."
+frontend/src\pages\reports\StrategicManagement.tsx:555:<label className="block text-sm font-medium mb-1">Hạng mục</label>
+frontend/src\pages\reports\StrategicManagement.tsx:557:placeholder="VD: Nâng cấp máy chủ AI, Mua máy quang phổ..."
+frontend/src\pages\reports\StrategicManagement.tsx:576:<option value="">-- Chọn phòng --</option>
+frontend/src\pages\reports\StrategicManagement.tsx:585:<label className="block text-sm font-medium mb-1">Tiêu đề Công bố</label>
+frontend/src\pages\reports\StrategicManagement.tsx:606:<label className="block text-sm font-medium mb-1">Tạp chí</label>
+frontend/src\pages\reports\StrategicManagement.tsx:616:<label className="block text-sm font-medium mb-1">Năm</label>
+frontend/src\pages\reports\StrategicManagement.tsx:636:<option value="">-- Không phân loại --</option>
+frontend/src\pages\reports\StrategicManagement.tsx:637:<option value="Q1">Chuẩn Q1</option>
+frontend/src\pages\reports\StrategicManagement.tsx:638:<option value="Q2">Chuẩn Q2</option>
+frontend/src\pages\reports\StrategicManagement.tsx:639:<option value="Q3/Q4">Chuẩn Q3/Q4</option>
+frontend/src\pages\reports\StrategicManagement.tsx:641:<option value="Trong nước">Tạp chí Trong nước</option>
+frontend/src\pages\reports\StrategicManagement.tsx:663:Hủy
+frontend/src\pages\reports\StrategicManagement.tsx:666:Lưu
+frontend/src\pages\reports\StrategicManagement.tsx:676:title="Xác nhận xóa"
+frontend/src\pages\reports\StrategicManagement.tsx:677:message="Bạn có chắc chắn muốn xóa mục này không?"
+frontend/src\pages\reports\StrategicManagement.tsx:678:confirmText="Xóa"
+frontend/src\pages\settings\Settings.tsx:88:{/* THẺ 1: CÀI ĐẶT HỆ THỐNG (CHỈ ADMIN) */}
+frontend/src\pages\settings\Settings.tsx:95:Cài đặt hệ thống
+frontend/src\pages\settings\Settings.tsx:227:Khung thời gian đặt trước (Lead Time)
+frontend/src\pages\settings\Settings.tsx:232:Cho phép đặt trước tối đa (Ngày)
+frontend/src\pages\settings\Settings.tsx:242:Ngăn sinh viên đặt phòng quá xa trong tương lai
+frontend/src\pages\settings\Settings.tsx:247:Phải đặt trước tối thiểu (Giờ)
+frontend/src\pages\settings\Settings.tsx:257:Thời gian chuẩn bị trước khi sử dụng phòng
+frontend/src\pages\settings\Settings.tsx:277:Tự động duyệt đơn của Giảng viên (Auto-Approve)
+frontend/src\pages\settings\Settings.tsx:280:Nếu bật, tất cả các đơn đặt phòng của Giảng viên sẽ tự động được duyệt (APPROVED) ngay lập tức mà không cần chờ Admin.
+frontend/src\pages\settings\Settings.tsx:293:{getValue('AUTO_APPROVE_INSTRUCTOR') === 'true' ? 'Đang bật' : 'Đã tắt'}
+frontend/src\pages\settings\Settings.tsx:307:Cài đặt & Hồ sơ
+frontend/src\pages\settings\Settings.tsx:309:<p className="text-[#757575] dark:text-slate-400 mt-1">Quản lý tham số hệ thống và thông tin cá nhân của bạn</p>
+frontend/src\pages\settings\Settings.tsx:318:Bắt buộc Quét QR Check-in
+frontend/src\pages\settings\Settings.tsx:321:{getDesc('REQUIRE_QR_CHECKIN') || 'Nếu bật, sinh viên phải quét mã QR tại phòng để điểm danh. Nếu tắt, khi tới giờ hệ thống sẽ tự động Check-in.'}
+frontend/src\pages\settings\Settings.tsx:334:{getValue('REQUIRE_QR_CHECKIN') === 'true' ? 'Đang bật (Bắt buộc)' : 'Đã tắt (Tự động)'}
+frontend/src\pages\settings\Settings.tsx:377:Quản lý Phiên đăng nhập (Session)
+frontend/src\pages\settings\Settings.tsx:381:Tự động đăng xuất (Session Timeout)
+frontend/src\pages\settings\Settings.tsx:391:<span className="text-[14px] text-[#757575] dark:text-slate-400">phút</span>
+frontend/src\pages\settings\Settings.tsx:394:Tự động đăng xuất tài khoản nếu không có bất kỳ thao tác nào trong khoảng thời gian này. Cấu hình này cực kỳ quan trọng để bảo vệ dữ liệu khi sử dụng máy tính công cộng tại phòng thực hành.
+frontend/src\pages\settings\Settings.tsx:409:Múi giờ (Timezone)
+frontend/src\pages\settings\Settings.tsx:417:<option value="UTC">UTC (Giờ phối hợp quốc tế)</option>
+frontend/src\pages\settings\Settings.tsx:422:Múi giờ mặc định hiển thị trên lịch và các báo cáo
+frontend/src\pages\settings\Settings.tsx:427:Định dạng ngày tháng
+frontend/src\pages\settings\Settings.tsx:434:<option value="DD/MM/YYYY">DD/MM/YYYY (Việt Nam)</option>
+frontend/src\pages\settings\Settings.tsx:435:<option value="MM/DD/YYYY">MM/DD/YYYY (Mỹ)</option>
+frontend/src\pages\settings\Settings.tsx:436:<option value="YYYY-MM-DD">YYYY-MM-DD (Quốc tế)</option>
+frontend/src\pages\settings\Settings.tsx:439:Định dạng hiển thị thời gian trên toàn hệ thống
+frontend/src\pages\settings\Settings.tsx:481:{/* THẺ 2: HỒ SƠ CÁ NHÂN (TẤT CẢ MỌI NGƯỜI) */}
+frontend/src\services\apiClient.ts:13:withCredentials: true, // Gửi kèm HttpOnly Cookie tự động
+frontend/src\services\apiClient.ts:16:// Thêm Access Token vào mọi Request
+frontend/src\services\apiClient.ts:40:// Xử lý lỗi toàn cục
+frontend/src\services\apiClient.ts:46:// Lỗi mạng (Network error / Server Down)
+frontend/src\services\apiClient.ts:48:toast.error('Mất kết nối máy chủ. Vui lòng kiểm tra mạng!');
+frontend/src\services\apiClient.ts:54:// Bắt lỗi 401 (Access Token hết hạn) và gọi API cấp lại Token
+frontend/src\services\apiClient.ts:82:// Gọi thẳng axios gốc nhưng nhớ bật withCredentials để trình duyệt tự gửi Cookie
+frontend/src\services\apiClient.ts:95:// Cập nhật Token mới
+frontend/src\services\apiClient.ts:102:return apiClient(originalRequest); // Gửi lại Request ban đầu bị fail
+frontend/src\services\apiClient.ts:106:// UX Improvement: Chỉ văng màn hình login nếu có mạng (Lỗi từ server thực sự trả về 401/403)
+frontend/src\services\apiClient.ts:107:// Nếu không có mạng thì không bắt user đăng nhập lại
+frontend/src\services\apiClient.ts:111:toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+frontend/src\services\apiClient.ts:113:toast.error('Lỗi kết nối khi làm mới phiên làm việc. Vui lòng thử lại khi có mạng.');
+frontend/src\services\apiClient.ts:122:// Xử lý các lỗi khác (400, 404, 500 sẽ do từng component tự bắt và hiển thị)
+frontend/src\services\apiClient.ts:124:toast.error('Bạn không có quyền thực hiện hành động này.');
+frontend/src\services\apiClient.ts:129:'Tài nguyên đã bị thay đổi bởi một người dùng khác. Vui lòng tải lại dữ liệu.';
+frontend/src\services\socket.ts:19:toast.error('Lỗi kết nối thời gian thực: ' + err.message);
+frontend/src\store\authStore.ts:23:// Khôi phục từ localStorage lúc khởi tạo
+frontend/src\utils\timeAgo.ts:7:if (minutes < 1) return 'Vừa xong';
+frontend/src\utils\timeAgo.ts:8:if (minutes < 60) return `${minutes} phút trước`;
+frontend/src\utils\timeAgo.ts:9:if (hours < 24) return `${hours} giờ trước`;
+frontend/src\utils\timeAgo.ts:10:if (days < 30) return `${days} ngày trước`;

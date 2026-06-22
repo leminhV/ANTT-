@@ -524,7 +524,7 @@
   "quick_actions": "クイックアクション",
   "book_room": "部屋を予約",
   "report_issue": "問題を報告する",
-  "borrow_tools": "ツールを借りる",
+  "borrow_tools": "学習ツールの貸出",
   "no_practice_today": "今日は実習セッションがありません",
   "free_time_hint": "学生の予約リクエストの承認に時間を費やすことができます。",
   "no_pending_bookings": "素晴らしい！保留中の予約リクエストはありません。",
@@ -613,7 +613,7 @@
   "change_avatar": "アバターを変更",
   "not_updated": "未更新",
   "status_normal": "正常に動作中",
-  "strategic_management": "戦略管理 (投資・研究)",
+  "strategic_management": "戦略管理",
   "tab_investment": "ラボ投資",
   "tab_publications": "研究発表",
   "tab_roi_charts": "パフォーマンス (ROI)・チャート",
@@ -632,5 +632,13 @@
   "pub_journal_year": "雑誌・年",
   "pub_category": "カテゴリー",
   "pub_lab_room": "ラボ室",
-  "pub_action": "アクション"
+  "pub_action": "アクション",
+  "lab_community": "ラボコミュニティ",
+  "strategic": "戦略",
+  "scan_qr": "QRチェックインスキャン",
+  "scan_qr_checkin": "QRチェックインコードスキャン",
+  "combos_management": "機器コンボ管理",
+  "maintenance_management": "メンテナンス予定管理",
+  "personal_profile": "個人プロフィール",
+  "system_settings": "システム設定"
 }
