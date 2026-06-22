@@ -572,7 +572,7 @@ const STATUS_COLORS: Record<string, string> = {
             onClick={() => setIsModalOpen(true)}
             className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-2 px-5 rounded-full font-bold transition-all duration-300 flex items-center gap-2 shadow-sm hover:shadow-blue-500/30 text-[13px] active:scale-95 whitespace-nowrap"
           >
-            <Plus className="w-4 h-4" /> {isResourceMode ? 'Mượn dụng cụ học tập' : '{t('book_schedule')}'}
+            <Plus className="w-4 h-4" /> {isResourceMode ? 'Mượn dụng cụ học tập' : t('book_schedule')}
           </button>
         </div>
       </div>
@@ -877,7 +877,7 @@ const STATUS_COLORS: Record<string, string> = {
           <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl dark:shadow-slate-900/50 w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 border border-white/20 dark:border-slate-700/50">
             <div className="p-4 border-b border-[#E0E0E0]/50 dark:border-slate-800/50 flex justify-between items-center bg-[#FAFAFA]/50 dark:bg-slate-800/30">
               <h3 className="font-bold text-[#212121] dark:text-slate-100 text-[16px]">
-                {isResourceMode ? 'Mượn Dụng Cụ Học Tập' : '{t('book_schedule')}'}
+                {isResourceMode ? 'Mượn Dụng Cụ Học Tập' : t('book_schedule')}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}

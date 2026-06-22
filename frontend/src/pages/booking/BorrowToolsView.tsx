@@ -289,7 +289,7 @@ export default function BorrowToolsView() {
           { id: 'all', label: t('all_assets'), icon: null },
           { id: 'equipment', label: t('equipment_machinery'), icon: Wrench },
           { id: 'chemical', label: t('consumable_chemicals'), icon: FlaskConical },
-          { id: 'combo', label: '{t('practice_combo')}', icon: Filter }
+          { id: 'combo', label: t('practice_combo'), icon: Filter }
         ].map(tab => (
           <button
             key={tab.id}
@@ -450,7 +450,7 @@ export default function BorrowToolsView() {
                           : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-600 dark:hover:text-white border border-indigo-200 dark:border-indigo-800/50'
                       } active:scale-95`}
                     >
-                      {isInCart ? 'Xóa khỏi giỏ' : '{t('add_to_cart')}'}
+                      {isInCart ? 'Xóa khỏi giỏ' : t('add_to_cart')}
                     </button>
                   )}
                 </div>

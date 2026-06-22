@@ -427,7 +427,7 @@ export function Profile() {
                     disabled={setupLoading}
                     className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-4 py-2 rounded-xl font-bold transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-0.5"
                   >
-                    {setupLoading ? 'Đang xử lý...' : '{t('setup_2fa')}'}
+                    {setupLoading ? 'Đang xử lý...' : t('setup_2fa')}
                   </button>
                 ) : (
                   <div className="mt-4 p-4 border border-blue-200 bg-white dark:bg-slate-800 dark:border-slate-700 rounded-xl max-w-md shadow-sm dark:shadow-slate-900/50">

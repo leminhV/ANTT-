@@ -43,7 +43,7 @@ export function Community() {
     e.preventDefault();
     try {
       await apiClient.post('/api/community/posts', { title, content });
-      toast.success('{t('post')} thành công');
+      toast.success(`${t('post')} thành công`);
       setTitle('');
       setContent('');
       setShowForm(false);
