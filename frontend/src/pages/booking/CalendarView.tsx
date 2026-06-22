@@ -572,7 +572,7 @@ const STATUS_COLORS: Record<string, string> = {
             onClick={() => setIsModalOpen(true)}
             className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white py-2 px-5 rounded-full font-bold transition-all duration-300 flex items-center gap-2 shadow-sm hover:shadow-blue-500/30 text-[13px] active:scale-95 whitespace-nowrap"
           >
-            <Plus className="w-4 h-4" /> {isResourceMode ? 'Mượn dụng cụ học tập' : 'Đặt lịch'}
+            <Plus className="w-4 h-4" /> {isResourceMode ? 'Mượn dụng cụ học tập' : '{t('book_schedule')}'}
           </button>
         </div>
       </div>
@@ -618,7 +618,7 @@ const STATUS_COLORS: Record<string, string> = {
               onClick={() => setCurrentDate(new Date())}
               className="px-3 py-1.5 text-[13px] font-bold text-[#757575] dark:text-slate-300 bg-white dark:bg-slate-800 border border-[#E0E0E0] dark:border-slate-700 hover:bg-[#F5F5F5] dark:hover:bg-slate-800 dark:bg-slate-800/50 dark:hover:bg-slate-700 hover:text-[#212121] dark:text-slate-100 dark:hover:text-white rounded transition-colors"
             >
-              Hôm nay
+              {t('today')}
             </button>
             <div className="w-px h-6 bg-[#E0E0E0] dark:bg-slate-700 mx-1"></div>
             <button
@@ -864,7 +864,7 @@ const STATUS_COLORS: Record<string, string> = {
                 <div className="w-32 h-32 mb-4 rounded-full bg-blue-50 dark:bg-slate-800/50 flex items-center justify-center shadow-inner">
                   <Calendar className="w-16 h-16 text-blue-300 dark:text-slate-600" />
                 </div>
-                <p className="text-[#94A3B8] font-medium">Hôm nay phòng Lab đang trống</p>
+                <p className="text-[#94A3B8] font-medium">{t('today')} phòng Lab đang trống</p>
                 <p className="text-[12px] text-[#94A3B8]">Hãy là người đầu tiên đặt phòng nhé!</p>
               </div>
             )}
@@ -877,7 +877,7 @@ const STATUS_COLORS: Record<string, string> = {
           <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl dark:shadow-slate-900/50 w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200 border border-white/20 dark:border-slate-700/50">
             <div className="p-4 border-b border-[#E0E0E0]/50 dark:border-slate-800/50 flex justify-between items-center bg-[#FAFAFA]/50 dark:bg-slate-800/30">
               <h3 className="font-bold text-[#212121] dark:text-slate-100 text-[16px]">
-                {isResourceMode ? 'Mượn Dụng Cụ Học Tập' : 'Đặt lịch'}
+                {isResourceMode ? 'Mượn Dụng Cụ Học Tập' : '{t('book_schedule')}'}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}

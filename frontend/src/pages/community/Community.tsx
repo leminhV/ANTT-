@@ -43,7 +43,7 @@ export function Community() {
     e.preventDefault();
     try {
       await apiClient.post('/api/community/posts', { title, content });
-      toast.success('Đăng bài thành công');
+      toast.success('{t('post')} thành công');
       setTitle('');
       setContent('');
       setShowForm(false);
@@ -61,13 +61,13 @@ export function Community() {
             <Users className="w-8 h-8 text-blue-600" />
             Cộng đồng Lab
           </h1>
-          <p className="text-sm text-slate-500 mt-1">Chia sẻ kinh nghiệm, hỏi đáp và tìm bạn cùng nhóm thực hành.</p>
+          <p className="text-sm text-slate-500 mt-1">{t('share_experience')}</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition-all font-medium"
         >
-          <Plus className="w-4 h-4" /> Đăng bài
+          <Plus className="w-4 h-4" /> {t('post')}
         </button>
       </div>
 
@@ -102,7 +102,7 @@ export function Community() {
       ) : posts.length === 0 ? (
         <div className="text-center p-12 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
           <Users className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <p className="text-slate-500">Chưa có bài viết nào. Hãy là người đầu tiên!</p>
+          <p className="text-slate-500">{t('no_posts_yet')}</p>
         </div>
       ) : (
         <div className="space-y-4">

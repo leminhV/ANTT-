@@ -273,7 +273,7 @@ export default function BorrowToolsView() {
             className="relative px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg shadow-indigo-500/30 flex items-center gap-2 font-bold transition-all hover:-translate-y-0.5"
           >
             <ShoppingCart className="w-5 h-5" />
-            <span className="hidden sm:inline">Giỏ mượn</span>
+            <span className="hidden sm:inline">{t('cart')}</span>
             {cart.length > 0 && (
               <span className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 rounded-full text-[12px] flex items-center justify-center border-2 border-white dark:border-slate-900">
                 {cart.length}
@@ -289,7 +289,7 @@ export default function BorrowToolsView() {
           { id: 'all', label: t('all_assets'), icon: null },
           { id: 'equipment', label: t('equipment_machinery'), icon: Wrench },
           { id: 'chemical', label: t('consumable_chemicals'), icon: FlaskConical },
-          { id: 'combo', label: 'Combo Thực hành', icon: Filter }
+          { id: 'combo', label: '{t('practice_combo')}', icon: Filter }
         ].map(tab => (
           <button
             key={tab.id}
@@ -389,7 +389,7 @@ export default function BorrowToolsView() {
                   </div>
                   {isEq && eq.status === 'MAINTENANCE' && (
                     <div className="absolute top-3 right-3 bg-red-500/10 backdrop-blur-md border border-red-500/20 text-red-600 px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 shadow-sm">
-                      <AlertCircle className="w-3 h-3" /> Bảo trì
+                      <AlertCircle className="w-3 h-3" /> {t('maintenance')}
                     </div>
                   )}
                   {isEq && (eq.status === 'IN_USE' || eq.status === 'BORROWED') && (
@@ -439,7 +439,7 @@ export default function BorrowToolsView() {
                       onClick={() => handleWaitlist(item.id, item.type)}
                       className="mt-5 w-full py-2.5 rounded-xl text-[14px] font-bold transition-all flex items-center justify-center gap-2 bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 active:scale-95"
                     >
-                      <Bell className="w-4 h-4" /> Nhận thông báo khi trống
+                      <Bell className="w-4 h-4" /> {t('notify_when_available')}
                     </button>
                   ) : (
                     <button
@@ -450,7 +450,7 @@ export default function BorrowToolsView() {
                           : 'bg-indigo-50 text-indigo-700 hover:bg-indigo-600 hover:text-white dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-600 dark:hover:text-white border border-indigo-200 dark:border-indigo-800/50'
                       } active:scale-95`}
                     >
-                      {isInCart ? 'Xóa khỏi giỏ' : 'Thêm vào giỏ'}
+                      {isInCart ? 'Xóa khỏi giỏ' : '{t('add_to_cart')}'}
                     </button>
                   )}
                 </div>
@@ -475,7 +475,7 @@ export default function BorrowToolsView() {
                 <div className="flex items-center justify-between p-6 border-b border-neutral-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
                   <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <ShoppingCart className="w-5 h-5 text-indigo-600" />
-                    Giỏ mượn đồ ({cart.length})
+                    {t('cart')} đồ ({cart.length})
                   </h2>
                   <button 
                     onClick={() => setIsCartOpen(false)}
@@ -489,7 +489,7 @@ export default function BorrowToolsView() {
                   {cart.length === 0 ? (
                     <div className="text-center py-12 text-slate-500">
                       <ShoppingCart className="w-12 h-12 mx-auto mb-4 text-slate-300" />
-                      <p>Giỏ mượn đang trống</p>
+                      <p>{t('cart')} đang trống</p>
                     </div>
                   ) : (
                     cart.map((cartItem, idx) => (

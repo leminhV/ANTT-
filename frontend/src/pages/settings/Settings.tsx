@@ -223,12 +223,12 @@ export function Settings() {
 
           <div className="border border-[#E0E0E0]/50 dark:border-slate-800/50 bg-white/50 dark:bg-slate-800/20 backdrop-blur-sm rounded-2xl p-6 shadow-sm">
             <h3 className="font-semibold text-lg mb-4 text-[#212121] dark:text-slate-100">
-              Khung thời gian đặt trước (Lead Time)
+              {t('lead_time')}
             </h3>
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-[13px] font-medium mb-2 text-[#757575] dark:text-slate-400">
-                  Cho phép đặt trước tối đa (Ngày)
+                  {t('max_advance_booking')}
                 </label>
                 <input
                   type="number"
@@ -238,12 +238,12 @@ export function Settings() {
                   onChange={(e) => handleChange('MAX_LEAD_TIME_DAYS', e.target.value)}
                 />
                 <p className="text-xs text-[#757575] dark:text-slate-400 mt-1">
-                  Ngăn sinh viên đặt phòng quá xa trong tương lai
+                  {t('prevent_far_booking')}
                 </p>
               </div>
               <div>
                 <label className="block text-[13px] font-medium mb-2 text-[#757575] dark:text-slate-400">
-                  Phải đặt trước tối thiểu (Giờ)
+                  {t('min_advance_booking')}
                 </label>
                 <input
                   type="number"
@@ -253,7 +253,7 @@ export function Settings() {
                   onChange={(e) => handleChange('MIN_LEAD_TIME_HOURS', e.target.value)}
                 />
                 <p className="text-xs text-[#757575] dark:text-slate-400 mt-1">
-                  Thời gian chuẩn bị trước khi sử dụng phòng
+                  {t('prep_time')}
                 </p>
               </div>
             </div>
