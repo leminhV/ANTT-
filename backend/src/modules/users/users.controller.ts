@@ -11,7 +11,9 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -37,6 +39,17 @@ export class UsersController {
       throw new BadRequestException('Không tìm thấy file Excel');
     }
     return this.usersService.importFromExcel(file.buffer);
+  }
+
+  @Get('export/excel')
+  @Roles(Role.ADMIN)
+  async exportToExcel(@Res() res: Response) {
+    const buffer = await this.usersService.exportToExcel();
+    res.set({
+      'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'Content-Disposition': 'attachment; filename="Danh_sach_nguoi_dung.xlsx"',
+    });
+    res.send(buffer);
   }
 
   @Post()

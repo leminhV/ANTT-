@@ -13,9 +13,11 @@ import {
   GraduationCap,
   UserX,
   Upload,
+  Download,
 } from 'lucide-react';
 import { UserActivityModal } from '../../components/users/UserActivityModal';
 import { userService } from '../../services';
+import apiClient from '../../services/apiClient';
 import { useUsers } from '../../hooks/useUsers';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { ConfirmModal } from '../../components/common/ConfirmModal';
@@ -171,6 +173,26 @@ export function Users() {
     }
   };
 
+  const handleExportExcel = async () => {
+    try {
+      const toastId = toast.loading('Đang xuất dữ liệu ra Excel...');
+      const response = await apiClient.get('/users/export/excel', {
+        responseType: 'blob',
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'Danh_sach_nguoi_dung.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast.success('Xuất file Excel thành công', { id: toastId });
+    } catch (error: unknown) {
+      toast.error('Xuất file Excel thất bại');
+    }
+  };
+
   const getRoleLabel = (role: string) => {
     switch (role) {
       case 'ADMIN':
@@ -218,6 +240,12 @@ export function Users() {
             {t('manage_users')}
           </h1>
           <div className="flex gap-3">
+            <button
+              onClick={handleExportExcel}
+              className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-[#E0E0E0] dark:border-slate-700 hover:bg-neutral-50 dark:hover:bg-slate-700 text-[#212121] dark:text-slate-200 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 cursor-pointer text-[14px] shadow-sm"
+            >
+              <Download className="w-4 h-4 text-green-600 dark:text-green-400" /> Xuất Excel
+            </button>
             <label className="flex items-center gap-2 bg-white dark:bg-slate-800 border border-[#E0E0E0] dark:border-slate-700 hover:bg-neutral-50 dark:hover:bg-slate-700 text-[#212121] dark:text-slate-200 px-4 py-2.5 rounded-xl font-medium transition-all duration-300 cursor-pointer text-[14px] shadow-sm">
               <Upload className="w-4 h-4 text-[#1E5FA5] dark:text-blue-400" /> Nhập Excel
               <input

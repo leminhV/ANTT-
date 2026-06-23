@@ -216,6 +216,38 @@ export class UsersService {
     return { count: result.count };
   }
 
+  async exportToExcel() {
+    const users = await this.prisma.user.findMany({
+      where: { is_deleted: false },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        department: true,
+        student_class: true,
+        phone: true,
+        is_active: true,
+        created_at: true,
+      },
+      orderBy: { created_at: 'desc' },
+    });
+
+    const data = users.map((u) => ({
+      'ID Hệ thống': u.id,
+      'Họ tên': u.name,
+      'Email': u.email,
+      'Vai trò': u.role === 'ADMIN' ? 'Quản trị viên' : u.role === 'INSTRUCTOR' ? 'Giảng viên' : 'Sinh viên',
+      'Khoa/Phòng ban': u.department || 'Chưa cập nhật',
+      'Lớp': u.student_class || 'Chưa cập nhật',
+      'Số điện thoại': u.phone || 'Chưa cập nhật',
+      'Trạng thái': u.is_active ? 'Đang hoạt động' : 'Đã khóa',
+      'Ngày tạo': new Date(u.created_at).toLocaleDateString('vi-VN'),
+    }));
+
+    return this.excelService.exportToExcel(data, 'Users');
+  }
+
   async getLoginHistory(userId: number) {
     return (this.prisma as any).loginHistory.findMany({
       where: { user_id: userId },
