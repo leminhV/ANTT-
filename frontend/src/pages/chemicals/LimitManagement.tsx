@@ -32,7 +32,6 @@ interface Chemical {
 
 export function LimitManagement() {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState<'chemicals' | 'tools'>('chemicals');
   const [limits, setLimits] = useState<ChemicalLimit[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [chemicals, setChemicals] = useState<Chemical[]>([]);
