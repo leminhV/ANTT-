@@ -154,7 +154,7 @@ export default function BorrowToolsView() {
         item_id: itemId,
         item_type: itemType.toUpperCase(),
       });
-      toast.success('Đăng ký nhận thông báo thành công!');
+      toast.success(t('subscribe_noti_success'));
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Lỗi khi đăng ký nhận thông báo');
     }
@@ -213,7 +213,7 @@ export default function BorrowToolsView() {
 
       await Promise.all(promises);
 
-      toast.success('Đã gửi yêu cầu mượn thành công!');
+      toast.success(t('send_borrow_request_success'));
       setIsCartOpen(false);
       setIsCheckoutStep(false);
       setCart([]);

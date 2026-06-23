@@ -214,7 +214,7 @@ export function Reports() {
       await import('../../services/apiClient').then((m) =>
         m.default.post(`/api/reports/schedule-maintenance/${equipmentId}`)
       );
-      toast.success('Đã lên lịch bảo trì tự động thành công', { id: toastId });
+      toast.success(t('auto_maintenance_success'), { id: toastId });
       
       fetchData(); // Cập nhật lại danh sách báo cáo
     } catch (error) {

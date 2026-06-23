@@ -55,7 +55,7 @@ export function Profile() {
       const newAvatarUrl = res.data.url;
       await userService.updateProfile({ avatar_url: newAvatarUrl });
       updateUser({ avatar_url: newAvatarUrl });
-      toast.success('Tải ảnh đại diện thành công');
+      toast.success(t('upload_avatar_success'));
     } catch (error: any) {
       toast.error(error.response?.data?.message || 'Lỗi khi tải ảnh lên');
     } finally {
@@ -68,9 +68,9 @@ export function Profile() {
       setIsSaving(true);
       await userService.updateProfile({ phone, department });
       updateUser({ phone, department });
-      toast.success('Cập nhật thông tin liên lạc thành công');
+      toast.success(t('update_contact_success'));
     } catch (error) {
-      toast.error('Cập nhật thất bại. Vui lòng thử lại.');
+      toast.error(t('update_contact_failed'));
     } finally {
       setIsSaving(false);
     }
@@ -500,7 +500,7 @@ export function Profile() {
                         {log.location ? `${log.location} (${log.ip_address})` : log.ip_address}
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold border ${log.status.includes('Thành công') ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'}`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold border ${log.status.includes('Thành công') || log.status.includes('Success') ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-200 dark:border-red-800'}`}>
                           {log.status}
                         </span>
                       </td>

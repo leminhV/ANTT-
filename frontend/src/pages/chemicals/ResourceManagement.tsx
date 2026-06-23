@@ -69,7 +69,7 @@ export function ResourceManagement() {
       } else {
         setNewRoom((prev) => ({ ...prev, image_url: imageUrl }));
       }
-      toast.success('Tải ảnh lên thành công', { id: toastId });
+      toast.success(t('upload_image_success'), { id: toastId });
     } catch (error) {
       toast.error('Lỗi tải ảnh lên');
     }

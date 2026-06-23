@@ -84,7 +84,7 @@ export function DashboardInstructor() {
   const handleApprove = async (id: number) => {
     try {
       await bookingService.update(id.toString(), { status: 'APPROVED' });
-      toast.success('Đã duyệt đơn thành công');
+      toast.success(t('approve_request_success'));
       fetchData(); // Reload data
     } catch (error) {
       toast.error('Có lỗi xảy ra khi duyệt đơn');

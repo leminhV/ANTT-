@@ -95,14 +95,14 @@ export function StrategicManagement() {
           source: invForm.source,
           description: invForm.description
         });
-        toast.success('Thêm khoản đầu tư thành công');
+        toast.success(t('add_investment_success'));
       } else {
         await publicationService.create({
           ...pubForm,
           year: parseInt(pubForm.year),
           room_id: parseInt(pubForm.room_id),
         });
-        toast.success('Thêm công bố khoa học thành công');
+        toast.success(t('add_publication_success'));
       }
       setIsModalOpen(false);
       fetchData();

@@ -447,7 +447,7 @@ END:VCALENDAR`;
                     try {
                       const qrData = `ROOM_${scanBooking.room_id}`;
                       const res = await checkInService.scanQR(qrData);
-                      toast.success(res.data?.message || 'Thao tác thành công!');
+                      toast.success(res.data?.message || t('action_success'));
                       setScanBooking(null);
                       fetchData();
                     } catch (error: unknown) {
@@ -472,7 +472,7 @@ END:VCALENDAR`;
                       try {
                         const qrData = `EQ_${scanBooking.equipment_id}`;
                         const res = await checkInService.scanQR(qrData);
-                        toast.success(res.data?.message || 'Thao tác thành công!');
+                        toast.success(res.data?.message || t('action_success'));
                         setScanBooking(null);
                         fetchData();
                       } catch (error: unknown) {

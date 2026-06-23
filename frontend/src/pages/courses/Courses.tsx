@@ -373,7 +373,7 @@ export function Courses() {
                   type="submit"
                   className="px-4 py-2 text-[14px] font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 rounded-lg transition-all duration-300 shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 hover:-translate-y-0.5"
                 >
-                  {isEditing ? 'Cập nhật' : 'Tạo mới'}
+                  {isEditing ? t('update_btn') : t('create_new')}
                 </button>
               </div>
             </form>

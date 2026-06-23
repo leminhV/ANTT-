@@ -79,7 +79,7 @@ export function LimitManagement() {
 
     try {
       await chemicalLimitService.create(formData);
-      toast.success('Thêm định mức thành công');
+      toast.success(t('add_limit_success'));
       setShowAddModal(false);
       resetForm();
       fetchData();
@@ -101,19 +101,19 @@ export function LimitManagement() {
         unit: formData.unit,
         description: formData.description,
       });
-      toast.success('Cập nhật định mức thành công');
+      toast.success(t('update_limit_success'));
       setEditingLimit(null);
       resetForm();
       fetchData();
     } catch (error) {
-      toast.error('Lỗi khi cập nhật định mức');
+      toast.error(t('update_limit_error'));
     }
   };
 
   const handleDelete = async (id: number) => {
     try {
       await chemicalLimitService.delete(id);
-      toast.success('Xóa định mức thành công');
+      toast.success(t('delete_limit_success'));
       setDeleteConfirm(null);
       fetchData();
     } catch (error) {
@@ -419,7 +419,7 @@ export function LimitManagement() {
                 onClick={editingLimit ? handleUpdate : handleAdd}
                 className="px-4 py-2 text-[14px] font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
               >
-                {editingLimit ? 'Cập nhật' : 'Thêm mới'}
+                {editingLimit ? t('update_btn') : t('add_new')}
               </button>
             </div>
           </div>

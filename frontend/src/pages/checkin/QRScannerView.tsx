@@ -5,8 +5,10 @@ import { toast } from 'react-hot-toast';
 import { QrCode, RefreshCw } from 'lucide-react';
 import { DeviceDetailModal } from '../../components/equipment/DeviceDetailModal';
 import { useAuthStore } from '../../store/authStore';
+import { useTranslation } from 'react-i18next';
 
 export function QRScannerView() {
+  const { t } = useTranslation();
   const user = useAuthStore(state => state.user);
   const [scanResult, setScanResult] = useState<any>(null);
   const [selectedDevice, setSelectedDevice] = useState<any>(null);
@@ -58,7 +60,7 @@ export function QRScannerView() {
       // 2. Call scanQR to log check-in/out event
       const res = await checkInService.scanQR(data);
       setScanResult(res.data);
-      toast.success('Quét QR thành công!');
+      toast.success(t('scan_qr_success'));
     } catch (err: any) {
       toast.error('Lỗi khi quét QR: ' + (err.response?.data?.message || 'Dữ liệu mã QR không hợp lệ'));
       setScanResult({ error: 'Không thể xử lý mã QR này' });
@@ -103,7 +105,7 @@ export function QRScannerView() {
             
             <div className="text-center space-y-2">
               <h2 className="text-xl font-bold text-neutral-900 dark:text-slate-100">
-                {scanResult.error ? 'Lỗi quét mã' : 'Xử lý thành công'}
+                {scanResult.error ? t('scan_qr_error') : t('process_success')}
               </h2>
               {scanResult.error ? (
                 <p className="text-sm text-red-500 dark:text-red-400 mt-2">

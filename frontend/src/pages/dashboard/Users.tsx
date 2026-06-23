@@ -144,7 +144,7 @@ export function Users() {
     if (!window.confirm('Bạn có chắc chắn muốn TẮT xác thực 2 lớp (MFA) cho người dùng này không?')) return;
     try {
       await userService.resetMfa(userId);
-      toast.success('Đã tắt MFA thành công cho người dùng này.');
+      toast.success(t('disable_mfa_success'));
       refetch();
     } catch (error: unknown) {
       const err = error as any;
@@ -160,7 +160,7 @@ export function Users() {
     try {
       const toastId = toast.loading('Đang nhập dữ liệu từ Excel...');
       const res = await userService.importExcel(file);
-      toast.success(`Đã nhập thành công ${res.data?.count || 0} người dùng!`, { id: toastId });
+      toast.success(`${t('import_users_success')} ${res.data?.count || 0} ${t('users')}`, { id: toastId });
       refetch();
     } catch (error: unknown) {
       const err = error as any;
@@ -394,7 +394,7 @@ export function Users() {
                           )}
                         </div>
                       ) : (
-                        <span className="text-[12px] text-slate-400 italic">Chưa cập nhật</span>
+                        <span className="text-[12px] text-slate-400 italic">{t('not_updated_italic')}</span>
                       )}
                     </td>
                     <td className="px-6 py-4">
