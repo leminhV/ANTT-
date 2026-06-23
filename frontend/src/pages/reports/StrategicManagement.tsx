@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Trash2, Edit2, TrendingUp, BookOpen, AlertTriangle, DollarSign, Target, Award, FileText, Search, Download } from 'lucide-react';
+import { Plus, Trash2, DollarSign, Target, Award, FileText, Search, Download } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { investmentService, publicationService, roomService } from '../../services';
 import { toast } from 'react-hot-toast';
@@ -115,7 +115,7 @@ export function StrategicManagement() {
     if (!deleteConfirm.id) return;
     try {
       if (deleteConfirm.type === 'investment') {
-        await investmentService.delete(deleteConfirm.id);
+        await investmentService.delete(deleteConfirm.id.toString());
         toast.success('Đã xóa khoản đầu tư');
       } else {
         await publicationService.delete(deleteConfirm.id);

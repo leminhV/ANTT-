@@ -14,6 +14,7 @@ interface DeviceDetailModalProps {
     status: string;
     room?: { name: string };
     created_at?: string;
+    last_maintenance?: string;
   } | null;
   currentUser: { id: number; name: string; email: string; role: string; avatar?: string } | null;
 }

@@ -1,4 +1,10 @@
-import { IsNumber, IsPositive, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsNumber,
+  IsPositive,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class CreateChemicalLimitDto {

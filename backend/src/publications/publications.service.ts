@@ -83,16 +83,22 @@ export class PublicationsService {
       roomName: room.name,
       location: room.location,
       totalPublications: room.publications.length,
-      byCategory: room.publications.reduce((acc, pub) => {
-        const cat = pub.category || 'OTHER';
-        acc[cat] = (acc[cat] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>),
-      byYear: room.publications.reduce((acc, pub) => {
-        const year = pub.year.toString();
-        acc[year] = (acc[year] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>),
+      byCategory: room.publications.reduce(
+        (acc, pub) => {
+          const cat = pub.category || 'OTHER';
+          acc[cat] = (acc[cat] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
+      byYear: room.publications.reduce(
+        (acc, pub) => {
+          const year = pub.year.toString();
+          acc[year] = (acc[year] || 0) + 1;
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
     }));
   }
 }

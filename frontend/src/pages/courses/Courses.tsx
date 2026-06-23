@@ -291,7 +291,7 @@ export function Courses() {
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-[13px] font-medium text-[#757575] dark:text-slate-400 mb-1">
-                  Mã học phần <span className="text-red-500">*</span>
+                  {t('course_code', 'Mã học phần')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   required
@@ -396,7 +396,7 @@ export function Courses() {
           <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-2xl dark:shadow-slate-900/50 w-full max-w-md overflow-hidden border border-white/20 dark:border-slate-700/50 animate-in zoom-in-95 duration-200">
             <div className="p-4 border-b border-[#E0E0E0]/50 dark:border-slate-800/50 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/30">
               <h3 className="font-bold text-[#212121] dark:text-slate-100 text-[16px]">
-                Yêu cầu xóa học phần
+                {t('request_delete_course', 'Yêu cầu xóa học phần')}
               </h3>
               <button
                 onClick={() => {
@@ -410,7 +410,7 @@ export function Courses() {
             </div>
             <div className="p-6 space-y-4">
               <p className="text-[14px] text-[#757575] dark:text-slate-400">
-                Bạn không có quyền trực tiếp xóa học phần này. Vui lòng nhập lý do xóa để gửi yêu cầu đến Quản trị viên.
+                {t('cannot_delete_course_directly', 'Bạn không có quyền trực tiếp xóa học phần này. Vui lòng nhập lý do xóa để gửi yêu cầu đến Quản trị viên.')}
               </p>
               <div>
                 <label className="block text-[13px] font-medium text-[#757575] dark:text-slate-400 mb-1">
@@ -422,7 +422,7 @@ export function Courses() {
                   onChange={(e) => setDeleteReason(e.target.value)}
                   rows={4}
                   className="w-full px-3 py-2 bg-white/80 dark:bg-slate-900/80 border border-[#E0E0E0] dark:border-slate-800 rounded-lg text-[14px] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all resize-none"
-                  placeholder="Ví dụ: Học phần này bị hủy do không đủ số lượng sinh viên..."
+                  placeholder={t('delete_course_reason_placeholder', 'Ví dụ: Học phần này bị hủy do không đủ số lượng sinh viên...')}
                 />
               </div>
               <div className="pt-4 flex justify-end gap-3 border-t border-[#E0E0E0]/50 dark:border-slate-800/50 mt-6">

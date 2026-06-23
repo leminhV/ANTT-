@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router';
 import { toast } from 'react-hot-toast';
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
-import { bookingService, courseService, roomService, checkInService } from '../../services';
+import { bookingService, courseService, roomService } from '../../services';
 import { IBooking, IRoom, ICourse } from '../../types/models';
 import { format, isToday } from 'date-fns';
 
@@ -227,7 +227,7 @@ export function DashboardInstructor() {
                 <CalendarIcon className="w-5 h-5" />
                 <span className="text-[12px] font-medium">{t('book_room')}</span>
               </button>
-              <button onClick={() => navigate('/reports')} className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors">
+              <button onClick={() => navigate('/reports', { state: { action: 'create_report' } })} className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/40 transition-colors">
                 <AlertTriangle className="w-5 h-5" />
                 <span className="text-[12px] font-medium">{t('report_issue')}</span>
               </button>

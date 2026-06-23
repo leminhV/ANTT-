@@ -118,13 +118,13 @@ export class UsersService {
   async updateTrustScore(id: number, scoreDiff: number) {
     const user = await this.findById(id);
     if (!user) throw new BadRequestException('Người dùng không tồn tại');
-    
+
     const newScore = Math.max(0, user.trust_score + scoreDiff);
-    
+
     return this.prisma.user.update({
       where: { id },
       data: { trust_score: newScore },
-      select: { id: true, name: true, trust_score: true }
+      select: { id: true, name: true, trust_score: true },
     });
   }
 
@@ -196,7 +196,8 @@ export class UsersService {
       email: row.email || row.Email,
       password: defaultPassword,
       role: (row.role || row.Role || 'STUDENT') as Role,
-      department: row.department || row.Department || row['Khoa/Viện'] || row['Khoa'],
+      department:
+        row.department || row.Department || row['Khoa/Viện'] || row['Khoa'],
       student_class: row.student_class || row['Lớp'] || row.Class,
     }));
 
@@ -225,22 +226,22 @@ export class UsersService {
 
   async getUserActivity(userId: number) {
     const loginHistory = await this.getLoginHistory(userId);
-    
+
     const bookings = await this.prisma.booking.findMany({
       where: { user_id: userId },
       orderBy: { created_at: 'desc' },
       take: 20,
       include: {
         room: { select: { name: true } },
-      }
+      },
     });
 
     const noShowCount = await this.prisma.booking.count({
-      where: { user_id: userId, status: 'CANCELED' }
+      where: { user_id: userId, status: 'CANCELED' },
     });
 
     const totalBookings = await this.prisma.booking.count({
-      where: { user_id: userId }
+      where: { user_id: userId },
     });
 
     return {
@@ -248,8 +249,8 @@ export class UsersService {
       bookings,
       stats: {
         noShowCount,
-        totalBookings
-      }
+        totalBookings,
+      },
     };
   }
 }

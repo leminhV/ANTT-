@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Param, UseGuards, Req, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  UseGuards,
+  Req,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CommunityService } from './community.service';
 import { CreatePostDto, CreateCommentDto } from './dto/community.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
@@ -32,6 +41,10 @@ export class CommunityController {
     @Body() createCommentDto: CreateCommentDto,
   ) {
     const userId = (req.user as any).id;
-    return this.communityService.createComment(userId, postId, createCommentDto);
+    return this.communityService.createComment(
+      userId,
+      postId,
+      createCommentDto,
+    );
   }
 }

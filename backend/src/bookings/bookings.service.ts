@@ -29,8 +29,15 @@ export class BookingsService {
   ) {}
 
   async create(createBookingDto: CreateBookingDto, userId: number) {
-    const { start_time, end_time, room_id, equipment_id, course_id, purpose, chemical_usages } =
-      createBookingDto;
+    const {
+      start_time,
+      end_time,
+      room_id,
+      equipment_id,
+      course_id,
+      purpose,
+      chemical_usages,
+    } = createBookingDto;
 
     const startTime = new Date(start_time);
     const endTime = new Date(end_time);
@@ -41,7 +48,9 @@ export class BookingsService {
       throw new NotFoundException('Người dùng không tồn tại');
     }
     if (user.trust_score < 50) {
-      throw new BadRequestException('Điểm uy tín của bạn dưới 50, bạn tạm thời bị cấm mượn thiết bị/phòng Lab. Vui lòng liên hệ Admin.');
+      throw new BadRequestException(
+        'Điểm uy tín của bạn dưới 50, bạn tạm thời bị cấm mượn thiết bị/phòng Lab. Vui lòng liên hệ Admin.',
+      );
     }
 
     // 2. Validate times
@@ -160,13 +169,16 @@ export class BookingsService {
 
       const intendedStatus = createBookingDto.status || 'PENDING';
 
-      const isResourceBooking = !!(equipment_id != null || (chemical_usages && chemical_usages.length > 0));
+      const isResourceBooking = !!(
+        equipment_id != null ||
+        (chemical_usages && chemical_usages.length > 0)
+      );
 
       // 3. Xử lý lặp lại đặt phòng (Recurring Booking)
       const bookingsToCreate: any[] = [];
-      let currentStartTime = new Date(startTime);
-      let currentEndTime = new Date(endTime);
-      
+      const currentStartTime = new Date(startTime);
+      const currentEndTime = new Date(endTime);
+
       let recurrenceEnd = new Date(startTime);
       if (createBookingDto.recurrenceEndDate) {
         recurrenceEnd = new Date(createBookingDto.recurrenceEndDate);
@@ -190,14 +202,15 @@ export class BookingsService {
         if ((roomConflict || eqConflict) && intendedStatus !== 'WAITLISTED') {
           throw new ConflictException(
             I18nContext.current()?.t('messages.errors.ROOM_UNAVAILABLE') ||
-              `Trùng lịch tại ngày ${currentStartTime.toLocaleDateString()}`
+              `Trùng lịch tại ngày ${currentStartTime.toLocaleDateString()}`,
           );
         }
 
         // 🛡️ BẢO MẬT: CHẶN USER TỰ DUYỆT ĐƠN
         // Auto-Approval Rule: Giảng viên (INSTRUCTOR) hoặc ADMIN luôn được tự động duyệt
         let finalStatus: any = 'PENDING';
-        const isAutoApprove = user.role === 'INSTRUCTOR' || user.role === 'ADMIN';
+        const isAutoApprove =
+          user.role === 'INSTRUCTOR' || user.role === 'ADMIN';
 
         if (intendedStatus === 'WAITLISTED') {
           finalStatus = 'WAITLISTED';
@@ -232,26 +245,36 @@ export class BookingsService {
         // Xử lý hóa chất cho TỪNG booking
         if (chemical_usages && chemical_usages.length > 0) {
           for (const cu of chemical_usages) {
-            const chemicals = await tx.$queryRaw<any[]>`SELECT * FROM chemicals WHERE id = ${cu.chemical_id} FOR UPDATE`;
+            const chemicals = await tx.$queryRaw<
+              any[]
+            >`SELECT * FROM chemicals WHERE id = ${cu.chemical_id} FOR UPDATE`;
             if (!chemicals || chemicals.length === 0) {
-              throw new BadRequestException(`Hóa chất ID ${cu.chemical_id} không tồn tại`);
+              throw new BadRequestException(
+                `Hóa chất ID ${cu.chemical_id} không tồn tại`,
+              );
             }
             const chemical = chemicals[0];
 
             if (chemical.quantity_stock < cu.quantity) {
-              throw new BadRequestException(`Hóa chất ${chemical.name} không đủ số lượng trong kho (còn ${chemical.quantity_stock})`);
+              throw new BadRequestException(
+                `Hóa chất ${chemical.name} không đủ số lượng trong kho (còn ${chemical.quantity_stock})`,
+              );
             }
 
             if (course_id) {
-              const limits = await tx.$queryRaw<any[]>`SELECT max_quantity FROM chemical_limits WHERE course_id = ${course_id} AND chemical_id = ${cu.chemical_id}`;
+              const limits = await tx.$queryRaw<
+                any[]
+              >`SELECT max_quantity FROM chemical_limits WHERE course_id = ${course_id} AND chemical_id = ${cu.chemical_id}`;
               if (limits && limits.length > 0) {
                 const pastUsages = await tx.chemicalUsage.aggregate({
                   _sum: { quantity_used: true },
-                  where: { course_id, chemical_id: cu.chemical_id }
+                  where: { course_id, chemical_id: cu.chemical_id },
                 });
                 const used = pastUsages._sum.quantity_used || 0;
                 if (used + cu.quantity > limits[0].max_quantity) {
-                  throw new BadRequestException(`Vượt quá định mức hóa chất cho phép của học phần (đã dùng ${used}, tối đa ${limits[0].max_quantity})`);
+                  throw new BadRequestException(
+                    `Vượt quá định mức hóa chất cho phép của học phần (đã dùng ${used}, tối đa ${limits[0].max_quantity})`,
+                  );
                 }
               }
             }
@@ -446,8 +469,15 @@ export class BookingsService {
   async update(id: number, updateBookingDto: UpdateBookingDto) {
     const existingBooking = await this.findOne(id); // Check exists & get current state
 
-    const { start_time, end_time, row_version, purpose, status, chemical_usages, ...rest } =
-      updateBookingDto;
+    const {
+      start_time,
+      end_time,
+      row_version,
+      purpose,
+      status,
+      chemical_usages,
+      ...rest
+    } = updateBookingDto;
 
     const encryptedPurpose = purpose
       ? EncryptionUtil.encrypt(purpose)
@@ -487,7 +517,9 @@ export class BookingsService {
           await this.settingsService.get('BOOKING_BUFFER_MINUTES', '15'),
           10,
         );
-        const existingChemicals = await tx.chemicalUsage.count({ where: { booking_id: id } });
+        const existingChemicals = await tx.chemicalUsage.count({
+          where: { booking_id: id },
+        });
         const isResourceBooking = finalEqId != null || existingChemicals > 0;
 
         await this.checkOverlap(
@@ -680,10 +712,12 @@ export class BookingsService {
         room_id,
         start_time: { lt: endWithBuffer },
         end_time: { gt: startWithBuffer },
-      }
+      },
     });
     if (maintenanceRoom) {
-      throw new ConflictException(`Phòng Lab đang trong thời gian bảo trì từ ${maintenanceRoom.start_time.toLocaleString('vi-VN')} đến ${maintenanceRoom.end_time.toLocaleString('vi-VN')}. Lý do: ${maintenanceRoom.description}`);
+      throw new ConflictException(
+        `Phòng Lab đang trong thời gian bảo trì từ ${maintenanceRoom.start_time.toLocaleString('vi-VN')} đến ${maintenanceRoom.end_time.toLocaleString('vi-VN')}. Lý do: ${maintenanceRoom.description}`,
+      );
     }
 
     // Kiểm tra đụng độ lịch phòng
@@ -729,10 +763,12 @@ export class BookingsService {
           equipment_id,
           start_time: { lt: endWithBuffer },
           end_time: { gt: startWithBuffer },
-        }
+        },
       });
       if (maintenanceEq) {
-        throw new ConflictException(`Thiết bị đang trong thời gian bảo trì từ ${maintenanceEq.start_time.toLocaleString('vi-VN')} đến ${maintenanceEq.end_time.toLocaleString('vi-VN')}. Lý do: ${maintenanceEq.description}`);
+        throw new ConflictException(
+          `Thiết bị đang trong thời gian bảo trì từ ${maintenanceEq.start_time.toLocaleString('vi-VN')} đến ${maintenanceEq.end_time.toLocaleString('vi-VN')}. Lý do: ${maintenanceEq.description}`,
+        );
       }
     }
 
@@ -969,7 +1005,9 @@ export class BookingsService {
 
     for (const waitlisted of waitlistedBookings) {
       try {
-        const isResourceBooking = waitlisted.equipment_id != null || (waitlisted.chemical_usages && waitlisted.chemical_usages.length > 0);
+        const isResourceBooking =
+          waitlisted.equipment_id != null ||
+          (waitlisted.chemical_usages && waitlisted.chemical_usages.length > 0);
 
         await this.prisma.$transaction(async (tx) => {
           await this.checkOverlap(
@@ -981,7 +1019,7 @@ export class BookingsService {
             bufferMinutes,
             'PENDING',
             isResourceBooking,
-            waitlisted.id
+            waitlisted.id,
           );
 
           await tx.booking.update({

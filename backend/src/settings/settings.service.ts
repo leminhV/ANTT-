@@ -82,7 +82,8 @@ export class SettingsService implements OnModuleInit {
         key: 'REQUIRE_QR_CHECKIN',
         value: 'true',
         category: 'AUTOMATION',
-        description: 'Bắt buộc quét mã QR để Check-in. Nếu tắt, hệ thống sẽ tự động Check-in khi tới giờ.',
+        description:
+          'Bắt buộc quét mã QR để Check-in. Nếu tắt, hệ thống sẽ tự động Check-in khi tới giờ.',
       },
       {
         key: 'MAINTENANCE_MODE',

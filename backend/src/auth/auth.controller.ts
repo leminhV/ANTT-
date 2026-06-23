@@ -64,7 +64,11 @@ export class AuthController {
     const ipAddress = req.ip || req.connection.remoteAddress || 'Unknown IP';
     const device = req.headers['user-agent'] || 'Unknown Device';
 
-    const loginResult = await this.authService.login(loginDto, ipAddress, device);
+    const loginResult = await this.authService.login(
+      loginDto,
+      ipAddress,
+      device,
+    );
     if ('requires_mfa' in loginResult) {
       return loginResult;
     }

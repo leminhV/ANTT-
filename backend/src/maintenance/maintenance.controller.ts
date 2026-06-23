@@ -25,7 +25,8 @@ export class MaintenanceController {
   @Post()
   @Roles(Role.ADMIN, Role.TECHNICIAN)
   create(
-    @Body() data: {
+    @Body()
+    data: {
       room_id?: number;
       equipment_id?: number;
       start_time: string;
@@ -56,7 +57,8 @@ export class MaintenanceController {
   @Roles(Role.ADMIN, Role.TECHNICIAN)
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: {
+    @Body()
+    data: {
       room_id?: number;
       equipment_id?: number;
       start_time?: string;

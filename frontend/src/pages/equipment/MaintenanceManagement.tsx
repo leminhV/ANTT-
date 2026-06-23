@@ -3,13 +3,10 @@ import { Plus, Search, Edit2, Trash2, Calendar, Wrench, Clock, CheckCircle2 } fr
 import { StatMini } from '../../components/ui/StatMini';
 import { maintenanceService } from '../../services';
 import { toast } from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { format } from 'date-fns';
 
-export function MaintenanceManagement() {
-  const { t } = useTranslation();
-  const [schedules, setSchedules] = useState<any[]>([]);
+export function MaintenanceManagement() {  const [schedules, setSchedules] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 

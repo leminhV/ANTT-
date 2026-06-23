@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BookingsService } from '../bookings/bookings.service';
 
@@ -6,10 +10,15 @@ import { BookingsService } from '../bookings/bookings.service';
 export class CombosService {
   constructor(
     private prisma: PrismaService,
-    private bookingsService: BookingsService
+    private bookingsService: BookingsService,
   ) {}
 
-  async createCombo(data: { name: string; description?: string; image_url?: string; items: { equipment_name: string; quantity: number }[] }) {
+  async createCombo(data: {
+    name: string;
+    description?: string;
+    image_url?: string;
+    items: { equipment_name: string; quantity: number }[];
+  }) {
     return this.prisma.equipmentCombo.create({
       data: {
         name: data.name,
@@ -42,8 +51,13 @@ export class CombosService {
     return this.prisma.equipmentCombo.delete({ where: { id } });
   }
 
-  async update(id: number, data: { name?: string; description?: string; image_url?: string }) {
-    const combo = await this.prisma.equipmentCombo.findUnique({ where: { id } });
+  async update(
+    id: number,
+    data: { name?: string; description?: string; image_url?: string },
+  ) {
+    const combo = await this.prisma.equipmentCombo.findUnique({
+      where: { id },
+    });
     if (!combo) throw new NotFoundException('Combo không tồn tại');
 
     return this.prisma.equipmentCombo.update({
@@ -57,7 +71,17 @@ export class CombosService {
     });
   }
 
-  async bookCombo(comboId: number, data: { room_id: number; start_time: string; end_time: string; purpose: string; course_id?: number }, user: any) {
+  async bookCombo(
+    comboId: number,
+    data: {
+      room_id: number;
+      start_time: string;
+      end_time: string;
+      purpose: string;
+      course_id?: number;
+    },
+    user: any,
+  ) {
     const combo = await this.findOne(comboId);
     const startTime = new Date(data.start_time);
     const endTime = new Date(data.end_time);
@@ -83,23 +107,28 @@ export class CombosService {
       `;
 
       if (availableEqs.length < item.quantity) {
-        throw new BadRequestException(`Không đủ số lượng thiết bị "${item.equipment_name}" trong kho cho khoảng thời gian này`);
+        throw new BadRequestException(
+          `Không đủ số lượng thiết bị "${item.equipment_name}" trong kho cho khoảng thời gian này`,
+        );
       }
 
-      availableEqs.forEach(eq => equipmentsToBook.push(eq.id));
+      availableEqs.forEach((eq) => equipmentsToBook.push(eq.id));
     }
 
     const bookings = [];
     // Tạo từng đơn thông qua BookingsService để kế thừa toàn bộ logic (Auto Approve, Trust Score...)
     for (const eqId of equipmentsToBook) {
-      const newBooking = await this.bookingsService.create({
-        room_id: data.room_id,
-        equipment_id: eqId,
-        start_time: data.start_time,
-        end_time: data.end_time,
-        purpose: data.purpose + ` (Combo: ${combo.name})`,
-        course_id: data.course_id,
-      }, user);
+      const newBooking = await this.bookingsService.create(
+        {
+          room_id: data.room_id,
+          equipment_id: eqId,
+          start_time: data.start_time,
+          end_time: data.end_time,
+          purpose: data.purpose + ` (Combo: ${combo.name})`,
+          course_id: data.course_id,
+        },
+        user,
+      );
       bookings.push(newBooking);
     }
 

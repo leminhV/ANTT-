@@ -554,7 +554,7 @@ export function DashboardAdmin() {
                 <div className="text-center py-8 text-neutral-400 border-2 border-dashed border-neutral-200 dark:border-slate-800 rounded-2xl">{t('no_recent_activity')}</div>
               ) : (
                 <div className="relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 dark:before:via-slate-700 before:to-transparent">
-                  {activityFeed.map((item, idx) => (
+                  {activityFeed.map((item) => (
                     <div key={item.id} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active mb-5 last:mb-0">
                       <div className={`flex items-center justify-center w-10 h-10 rounded-full border-4 border-white dark:border-slate-900 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 ${item.bgColor} ${item.color}`}>
                         {item.type === 'BOOKING_CREATED' && <FileText className="w-4 h-4" />}

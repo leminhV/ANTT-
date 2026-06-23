@@ -3,15 +3,12 @@ import { Html5QrcodeScanner } from 'html5-qrcode';
 import { checkInService, equipmentService } from '../../services';
 import { toast } from 'react-hot-toast';
 import { QrCode, RefreshCw } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { DeviceDetailModal } from '../../components/equipment/DeviceDetailModal';
 import { useAuthStore } from '../../store/authStore';
 
 export function QRScannerView() {
-  const { t } = useTranslation();
   const user = useAuthStore(state => state.user);
   const [scanResult, setScanResult] = useState<any>(null);
-  const [isScanning, setIsScanning] = useState(false);
   const [selectedDevice, setSelectedDevice] = useState<any>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
@@ -25,14 +22,12 @@ export function QRScannerView() {
     scanner.render(
       (result) => {
         scanner.clear();
-        setIsScanning(false);
         handleScan(result);
       },
-      (error) => {
+      (_error) => {
         // Ignored, happens constantly when scanning
       }
     );
-    setIsScanning(true);
 
     return () => {
       scanner.clear();

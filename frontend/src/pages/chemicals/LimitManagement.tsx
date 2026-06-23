@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Plus, Search, Edit2, Trash2, AlertTriangle, CheckCircle2, X } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, AlertTriangle, X } from 'lucide-react';
 import { chemicalLimitService, courseService, chemicalService } from '../../services';
 import { ConfirmModal } from '../../components/common/ConfirmModal';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { toast } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface ChemicalLimit {
   id: number;
@@ -32,6 +32,7 @@ interface Chemical {
 
 export function LimitManagement() {
   const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState<'chemicals' | 'tools'>('chemicals');
   const [limits, setLimits] = useState<ChemicalLimit[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [chemicals, setChemicals] = useState<Chemical[]>([]);
@@ -152,13 +153,6 @@ export function LimitManagement() {
     );
   });
 
-  const getPercentageColor = (used: number, max: number) => {
-    const percentage = (used / max) * 100;
-    if (percentage >= 90) return 'bg-red-500';
-    if (percentage >= 70) return 'bg-amber-500';
-    return 'bg-emerald-500';
-  };
-
   return (
     <div className="flex flex-col h-full bg-[#F8FAFC] dark:bg-slate-950">
       {/* Header */}
@@ -169,7 +163,7 @@ export function LimitManagement() {
             Quản lý Định mức Hóa chất
           </h2>
           <p className="text-[13px] text-[#64748B] dark:text-slate-400 mt-1">
-            Thiết lập giới hạn sử dụng hóa chất theo từng học phần để đảm bảo an toàn.
+            {t('set_limit_for_course', 'Thiết lập giới hạn sử dụng hóa chất theo từng học phần để đảm bảo an toàn.')}
           </p>
         </div>
         <button
@@ -189,7 +183,7 @@ export function LimitManagement() {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input
           type="text"
-          placeholder="Tìm kiếm theo học phần, mã hóa chất..."
+          placeholder={t('search_course_chemical', 'Tìm kiếm theo học phần, mã hóa chất...')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full pl-10 pr-4 py-2.5 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-[14px] focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -219,7 +213,7 @@ export function LimitManagement() {
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
                   <th className="px-4 py-3 text-left text-[12px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                    Học phần
+                    {t('course', 'Học phần')}
                   </th>
                   <th className="px-4 py-3 text-left text-[12px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
                     Hóa chất
@@ -323,12 +317,11 @@ export function LimitManagement() {
                 <>
                   <div>
                     <label className="block text-[13px] font-medium text-slate-700 dark:text-slate-300 mb-1">
-                      Học phần <span className="text-red-500">*</span>
+                      {t('course', 'Học phần')} <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={formData.course_id}
                       onChange={(e) => {
-                        const course = courses.find((c) => c.id === Number(e.target.value));
                         setFormData({
                           ...formData,
                           course_id: Number(e.target.value),
@@ -336,7 +329,7 @@ export function LimitManagement() {
                       }}
                       className="w-full px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-[14px] focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-                      <option value={0}>-- Chọn học phần --</option>
+                      <option value={0}>-- {t('select_course', 'Chọn học phần')} --</option>
                       {courses.map((course) => (
                         <option key={course.id} value={course.id}>
                           {course.name} ({course.code})
@@ -437,12 +430,12 @@ export function LimitManagement() {
       {/* Delete Confirmation */}
       <ConfirmModal
         isOpen={deleteConfirm !== null}
-        onClose={() => setDeleteConfirm(null)}
+        onCancel={() => setDeleteConfirm(null)}
         onConfirm={() => deleteConfirm && handleDelete(deleteConfirm)}
         title="Xóa định mức"
         message="Bạn có chắc chắn muốn xóa định mức này? Hành động này không thể hoàn tác."
         confirmText="Xóa"
-        type="danger"
+        isDestructive={true}
       />
     </div>
   );

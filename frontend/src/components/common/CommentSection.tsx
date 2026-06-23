@@ -55,7 +55,13 @@ export function CommentSection({ entityType, entityId, currentUser }: CommentPro
 
     setIsLoading(true);
     try {
-      const payload: Record<string, unknown> = { content: newComment };
+      const payload: {
+        content: string;
+        reportId?: number;
+        bookingId?: number;
+        equipmentId?: number;
+        parentId?: number;
+      } = { content: newComment };
       if (entityType === 'report') payload.reportId = entityId;
       if (entityType === 'booking') payload.bookingId = entityId;
       if (entityType === 'equipment') payload.equipmentId = entityId;
@@ -131,7 +137,7 @@ export function CommentSection({ entityType, entityId, currentUser }: CommentPro
           <div className="flex items-center gap-4 mt-2">
             {!isReply && (
               <button
-                onClick={() => setReplyTo({ id: comment.id, name: comment.user?.name })}
+                onClick={() => setReplyTo({ id: comment.id, name: comment.user?.name || t('user_role') })}
                 className="text-[11px] font-bold text-[#757575] dark:text-slate-400 hover:text-[#1E5FA5] dark:text-blue-400 transition-colors flex items-center gap-1"
               >
                 <CornerDownRight className="w-3 h-3" /> Phản hồi

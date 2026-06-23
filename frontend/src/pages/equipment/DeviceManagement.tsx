@@ -44,6 +44,10 @@ export interface Device {
   room?: { name: string };
   created_at?: string;
   last_maintenance?: string;
+  image_url?: string;
+  purchase_date?: string;
+  value?: number;
+  maintenance_interval_months?: number;
 }
 
 export function DeviceManagement() {

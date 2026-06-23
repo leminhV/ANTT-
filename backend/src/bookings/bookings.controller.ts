@@ -136,7 +136,12 @@ export class BookingsController {
     @Body() body: { start_time: string; end_time: string },
     @CurrentUser() user: UserPayload,
   ) {
-    return this.bookingsService.reschedule(id, body.start_time, body.end_time, user);
+    return this.bookingsService.reschedule(
+      id,
+      body.start_time,
+      body.end_time,
+      user,
+    );
   }
 
   @Delete(':id')

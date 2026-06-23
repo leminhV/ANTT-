@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Users, Plus, MessageSquare, ThumbsUp, Trash2, Eye } from 'lucide-react';
+import { Users, Plus, MessageSquare, ThumbsUp, Eye } from 'lucide-react';
 import apiClient from '../../services/apiClient';
 import toast from 'react-hot-toast';
 

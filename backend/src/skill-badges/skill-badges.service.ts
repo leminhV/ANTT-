@@ -20,7 +20,7 @@ export class SkillBadgesService {
     return this.prisma.userSkillBadge.findMany({
       where: { user_id: userId },
       include: { badge: true },
-      orderBy: { issued_at: 'desc' }
+      orderBy: { issued_at: 'desc' },
     });
   }
 
@@ -30,8 +30,8 @@ export class SkillBadgesService {
         user_id_badge_id: {
           user_id: dto.user_id,
           badge_id: dto.badge_id,
-        }
-      }
+        },
+      },
     });
 
     if (existing) {
@@ -43,7 +43,7 @@ export class SkillBadgesService {
         user_id: dto.user_id,
         badge_id: dto.badge_id,
       },
-      include: { badge: true }
+      include: { badge: true },
     });
   }
 }

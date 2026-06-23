@@ -951,7 +951,7 @@ export function CalendarView() {
               {activeTab === 'SPACE' && isInstructorOrAdmin && courses.length > 0 && (
                 <div className="animate-in slide-in-from-top-2 duration-300">
                   <label className="block text-[13px] font-medium text-[#757575] dark:text-slate-400 mb-1">
-                    Học phần (Dành cho Giảng viên)
+                    {t('course_instructor_only', 'Học phần (Dành cho Giảng viên)')}
                   </label>
                   <select
                     value={formData.course_id}
@@ -959,7 +959,7 @@ export function CalendarView() {
                     className="w-full px-3 py-2 border border-[#E0E0E0] dark:border-slate-800 rounded-md text-[14px] focus:outline-none focus:border-[#1E5FA5] dark:focus:border-blue-500 focus:ring-1 focus:ring-[#1E5FA5] dark:focus:ring-blue-500/50"
                     disabled={isSubmitting}
                   >
-                    <option value="">-- Không gắn vào học phần --</option>
+                    <option value="">-- {t('no_course_attached', 'Không gắn vào học phần')} --</option>
                     {courses.map((c) => (
                       <option key={c.id} value={c.id}>
                         {c.name}

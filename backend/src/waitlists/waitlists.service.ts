@@ -8,7 +8,9 @@ export class WaitlistsService {
 
   async create(userId: number, dto: CreateWaitlistDto) {
     if (!dto.equipment_id && !dto.room_id) {
-      throw new BadRequestException('Vui lòng chọn thiết bị hoặc phòng để đăng ký nhận thông báo');
+      throw new BadRequestException(
+        'Vui lòng chọn thiết bị hoặc phòng để đăng ký nhận thông báo',
+      );
     }
 
     // Check existing
@@ -17,12 +19,14 @@ export class WaitlistsService {
         user_id: userId,
         equipment_id: dto.equipment_id,
         room_id: dto.room_id,
-        is_notified: false
-      }
+        is_notified: false,
+      },
     });
 
     if (existing) {
-      throw new BadRequestException('Bạn đã đăng ký nhận thông báo cho tài nguyên này rồi.');
+      throw new BadRequestException(
+        'Bạn đã đăng ký nhận thông báo cho tài nguyên này rồi.',
+      );
     }
 
     return this.prisma.waitlist.create({

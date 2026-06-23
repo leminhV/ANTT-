@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -21,7 +25,9 @@ export class MaintenanceService {
     const end = new Date(data.end_time);
 
     if (start >= end) {
-      throw new BadRequestException('Thời gian bắt đầu phải trước thời gian kết thúc');
+      throw new BadRequestException(
+        'Thời gian bắt đầu phải trước thời gian kết thúc',
+      );
     }
 
     return this.prisma.maintenanceSchedule.create({
@@ -71,21 +77,28 @@ export class MaintenanceService {
     });
   }
 
-  async update(id: number, data: {
-    room_id?: number;
-    equipment_id?: number;
-    start_time?: string | Date;
-    end_time?: string | Date;
-    description?: string;
-  }) {
-    const schedule = await this.prisma.maintenanceSchedule.findUnique({ where: { id } });
+  async update(
+    id: number,
+    data: {
+      room_id?: number;
+      equipment_id?: number;
+      start_time?: string | Date;
+      end_time?: string | Date;
+      description?: string;
+    },
+  ) {
+    const schedule = await this.prisma.maintenanceSchedule.findUnique({
+      where: { id },
+    });
     if (!schedule) throw new NotFoundException('Lịch bảo trì không tồn tại');
 
     if (data.start_time && data.end_time) {
       const start = new Date(data.start_time);
       const end = new Date(data.end_time);
       if (start >= end) {
-        throw new BadRequestException('Thời gian bắt đầu phải trước thời gian kết thúc');
+        throw new BadRequestException(
+          'Thời gian bắt đầu phải trước thời gian kết thúc',
+        );
       }
     }
 
@@ -94,7 +107,9 @@ export class MaintenanceService {
       data: {
         room_id: data.room_id ?? schedule.room_id,
         equipment_id: data.equipment_id ?? schedule.equipment_id,
-        start_time: data.start_time ? new Date(data.start_time) : schedule.start_time,
+        start_time: data.start_time
+          ? new Date(data.start_time)
+          : schedule.start_time,
         end_time: data.end_time ? new Date(data.end_time) : schedule.end_time,
         description: data.description ?? schedule.description,
       },

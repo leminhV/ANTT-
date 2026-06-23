@@ -63,11 +63,16 @@ export class CronjobsService {
   @Cron('0 */15 * * * *')
   async autoDetectNoShows() {
     this.logger.debug('Running Job: autoDetectNoShows...');
-    
+
     try {
-      const requireQrCheckin = await this.settingsService.get('REQUIRE_QR_CHECKIN', 'true');
+      const requireQrCheckin = await this.settingsService.get(
+        'REQUIRE_QR_CHECKIN',
+        'true',
+      );
       if (requireQrCheckin === 'false') {
-        this.logger.debug('[No-show] QR Check-in is disabled, skipping punishment.');
+        this.logger.debug(
+          '[No-show] QR Check-in is disabled, skipping punishment.',
+        );
         return;
       }
 
@@ -141,7 +146,10 @@ export class CronjobsService {
   @Cron(CronExpression.EVERY_MINUTE)
   async autoCheckInBookings() {
     try {
-      const requireQrCheckin = await this.settingsService.get('REQUIRE_QR_CHECKIN', 'true');
+      const requireQrCheckin = await this.settingsService.get(
+        'REQUIRE_QR_CHECKIN',
+        'true',
+      );
       if (requireQrCheckin === 'true') return;
 
       const now = new Date();
@@ -179,7 +187,9 @@ export class CronjobsService {
         }
       }
       this.notificationsService.broadcastCalendarUpdate();
-      this.logger.log(`[Auto Check-in] Đã tự động Check-in cho ${readyBookings.length} đơn do tính năng Quét QR bị tắt.`);
+      this.logger.log(
+        `[Auto Check-in] Đã tự động Check-in cho ${readyBookings.length} đơn do tính năng Quét QR bị tắt.`,
+      );
     } catch (error) {
       this.logger.error('[Auto Check-in] Failed:', error);
     }

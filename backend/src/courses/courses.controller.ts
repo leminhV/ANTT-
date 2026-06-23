@@ -26,7 +26,14 @@ export class CoursesController {
   @UseGuards(ThrottlerGuard) // Bổ sung Rate Limit riêng tránh spam tạo khóa học
   @Roles(Role.ADMIN, Role.INSTRUCTOR) // Chỉ Admin hoặc Giảng viên mới được tạo
   create(
-    @Body() createData: { code: string; name: string; instructor_id: number; semester?: string; academic_year?: string },
+    @Body()
+    createData: {
+      code: string;
+      name: string;
+      instructor_id: number;
+      semester?: string;
+      academic_year?: string;
+    },
   ) {
     return this.coursesService.create(createData);
   }
@@ -48,7 +55,13 @@ export class CoursesController {
   update(
     @Param('id') id: string,
     @Body()
-    updateData: { code?: string; name?: string; instructor_id?: number; semester?: string; academic_year?: string },
+    updateData: {
+      code?: string;
+      name?: string;
+      instructor_id?: number;
+      semester?: string;
+      academic_year?: string;
+    },
     @Req() req: any,
   ) {
     return this.coursesService.update(+id, updateData, req.user);

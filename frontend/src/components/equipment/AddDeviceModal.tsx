@@ -1,19 +1,13 @@
 import { useTranslation } from 'react-i18next';
-import { X, Upload } from 'lucide-react';
-import { IRoom } from '../../../types/models';
-
+import { Upload } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 interface AddDeviceModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (e: React.FormEvent) => void;
-  newDevice: { name: string; serial_number: string; room_id: number; status: string };
-  setNewDevice: (device: {
-    name: string;
-    serial_number: string;
-    room_id: number;
-    status: string;
-  }) => void;
-  rooms: IRoom[];
+  newDevice: any;
+  setNewDevice: any;
+  rooms: any[];
 }
 
 export function AddDeviceModal({

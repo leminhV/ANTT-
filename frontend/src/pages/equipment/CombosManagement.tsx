@@ -3,12 +3,9 @@ import { Plus, Search, Edit2, Trash2, Package, Layers } from 'lucide-react';
 import { StatMini } from '../../components/ui/StatMini';
 import { comboService } from '../../services';
 import { toast } from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 
-export function CombosManagement() {
-  const { t } = useTranslation();
-  const [combos, setCombos] = useState<any[]>([]);
+export function CombosManagement() {  const [combos, setCombos] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 

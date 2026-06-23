@@ -8,7 +8,9 @@ export class RatingsService {
 
   async create(userId: number, dto: CreateRatingDto) {
     if (!dto.equipment_id && !dto.room_id) {
-      throw new BadRequestException('Phải đánh giá ít nhất 1 thiết bị hoặc phòng');
+      throw new BadRequestException(
+        'Phải đánh giá ít nhất 1 thiết bị hoặc phòng',
+      );
     }
 
     return this.prisma.rating.create({
@@ -20,8 +22,8 @@ export class RatingsService {
         room_id: dto.room_id,
       },
       include: {
-        user: { select: { id: true, name: true, avatar_url: true } }
-      }
+        user: { select: { id: true, name: true, avatar_url: true } },
+      },
     });
   }
 

@@ -104,7 +104,9 @@ export class UsersController {
     @Body('scoreDiff') scoreDiff: number,
   ) {
     if (scoreDiff === undefined || isNaN(scoreDiff)) {
-      throw new BadRequestException('Vui lòng cung cấp điểm cần thay đổi (scoreDiff)');
+      throw new BadRequestException(
+        'Vui lòng cung cấp điểm cần thay đổi (scoreDiff)',
+      );
     }
     return this.usersService.updateTrustScore(id, Number(scoreDiff));
   }

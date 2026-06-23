@@ -19,15 +19,20 @@ export class ExcelService {
     return buffer;
   }
 
-  exportMultipleSheetsToExcel(sheets: { data: any[]; sheetName: string }[]): Buffer {
+  exportMultipleSheetsToExcel(
+    sheets: { data: any[]; sheetName: string }[],
+  ): Buffer {
     if (!sheets || sheets.length === 0) {
       throw new BadRequestException('Không có dữ liệu để xuất Excel');
     }
     const workbook = xlsx.utils.book_new();
-    
+
     sheets.forEach(({ data, sheetName }) => {
       // Create empty sheet if no data to prevent crash
-      const worksheet = data.length > 0 ? xlsx.utils.json_to_sheet(data) : xlsx.utils.json_to_sheet([{}]);
+      const worksheet =
+        data.length > 0
+          ? xlsx.utils.json_to_sheet(data)
+          : xlsx.utils.json_to_sheet([{}]);
       xlsx.utils.book_append_sheet(workbook, worksheet, sheetName);
     });
 

@@ -22,7 +22,7 @@ export class CommunityService {
       include: {
         author: { select: { id: true, name: true, avatar_url: true } },
         equipment: { select: { id: true, name: true } },
-        _count: { select: { comments: true } }
+        _count: { select: { comments: true } },
       },
       orderBy: { created_at: 'desc' },
     });
@@ -41,10 +41,10 @@ export class CommunityService {
         equipment: { select: { id: true, name: true } },
         comments: {
           include: {
-            author: { select: { id: true, name: true, avatar_url: true } }
+            author: { select: { id: true, name: true, avatar_url: true } },
           },
-          orderBy: { created_at: 'asc' }
-        }
+          orderBy: { created_at: 'asc' },
+        },
       },
     });
   }

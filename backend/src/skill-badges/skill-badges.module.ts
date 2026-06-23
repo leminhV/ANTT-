@@ -4,6 +4,6 @@ import { SkillBadgesService } from './skill-badges.service';
 
 @Module({
   controllers: [SkillBadgesController],
-  providers: [SkillBadgesService]
+  providers: [SkillBadgesService],
 })
 export class SkillBadgesModule {}

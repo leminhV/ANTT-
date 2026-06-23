@@ -571,7 +571,7 @@ export default function BorrowToolsView() {
                   {cart.some(c => c.item.type === 'chemical') && (
                     <div>
                       <label className="block text-[13px] font-medium text-[#757575] dark:text-slate-400 mb-1">
-                        Học phần / Đề tài (Bắt buộc cho hóa chất) <span className="text-red-500">*</span>
+                        {t('course_project_required', 'Học phần / Đề tài (Bắt buộc cho hóa chất)')} <span className="text-red-500">*</span>
                       </label>
                       <select
                         required
@@ -580,7 +580,7 @@ export default function BorrowToolsView() {
                         className="w-full px-3 py-2.5 border border-[#E0E0E0] dark:border-slate-800 rounded-xl text-[14px] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white dark:bg-slate-900"
                         disabled={isSubmitting}
                       >
-                        <option value="" disabled>-- Chọn học phần --</option>
+                        <option value="" disabled>-- {t('select_course', 'Chọn học phần')} --</option>
                         {courses.map(c => (
                           <option key={c.id} value={c.id}>{c.code} - {c.name}</option>
                         ))}

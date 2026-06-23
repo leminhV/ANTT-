@@ -1,26 +1,13 @@
 import { useTranslation } from 'react-i18next';
-import { X, Upload } from 'lucide-react';
-import { IRoom } from '../../../types/models';
+import { Upload } from 'lucide-react';
 
 interface EditDeviceModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (e: React.FormEvent) => void;
-  editingDevice: {
-    id: number;
-    name: string;
-    serial_number: string;
-    room_id: number;
-    status: string;
-  };
-  setEditingDevice: (device: {
-    id: number;
-    name: string;
-    serial_number: string;
-    room_id: number;
-    status: string;
-  }) => void;
-  rooms: IRoom[];
+  editingDevice: any;
+  setEditingDevice: any;
+  rooms: any[];
 }
 
 export function EditDeviceModal({

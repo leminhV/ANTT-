@@ -108,7 +108,7 @@ export class ReportsService {
       ID: inv.id,
       'Phòng Lab': inv.room?.name || 'N/A',
       'Số tiền (VNĐ)': inv.amount,
-      'Năm': inv.year,
+      Năm: inv.year,
       'Nguồn vốn': inv.source || 'N/A',
       'Mô tả': inv.description || '',
       'Ngày tạo': inv.created_at.toLocaleString('vi-VN'),
@@ -120,15 +120,15 @@ export class ReportsService {
       'Tác giả': pub.authors,
       'Tạp chí/Hội nghị': pub.journal,
       'Phân loại': pub.category || 'N/A',
-      'Năm': pub.year,
-      'DOI': pub.doi || '',
+      Năm: pub.year,
+      DOI: pub.doi || '',
       'Phòng Lab': pub.room?.name || 'N/A',
       'Ngày tạo': pub.created_at.toLocaleString('vi-VN'),
     }));
 
     return this.excelService.exportMultipleSheetsToExcel([
       { data: investmentData, sheetName: 'Dau_tu' },
-      { data: publicationData, sheetName: 'Cong_bo' }
+      { data: publicationData, sheetName: 'Cong_bo' },
     ]);
   }
 

@@ -9,14 +9,13 @@ import {
   Bell,
   MessageSquare,
   AlertTriangle,
-  Wrench,
   FileText
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 import { toast } from 'react-hot-toast';
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
-import { bookingService, roomService, notificationService, authService } from '../../services';
+import { bookingService, roomService, notificationService } from '../../services';
 import { format, formatDistanceToNow, isToday, isTomorrow } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { socketService } from '../../services/socket';
@@ -425,7 +424,7 @@ END:VCALENDAR`;
               <span className="text-[14px] font-bold text-neutral-700 dark:text-slate-300 text-center">{t('discussion')}</span>
             </button>
             
-            <button onClick={() => navigate('/reports')} className="flex flex-col items-center justify-center gap-2.5 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group">
+            <button onClick={() => navigate('/reports', { state: { action: 'create_report' } })} className="flex flex-col items-center justify-center gap-2.5 bg-white/60 dark:bg-slate-900/40 backdrop-blur-xl border border-white/40 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 rounded-3xl p-5 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all group">
               <div className="bg-red-50 dark:bg-red-900/30 p-3 rounded-2xl group-hover:scale-110 transition-transform">
                 <AlertTriangle className="w-6 h-6 text-red-500" />
               </div>

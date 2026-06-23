@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards, Req, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  UseGuards,
+  Req,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { WaitlistsService } from './waitlists.service';
 import { CreateWaitlistDto } from './dto/waitlist.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';

@@ -45,7 +45,12 @@ export class AuthService {
     return this.generateAuthResponse(user);
   }
 
-  async recordLoginHistory(userId: number, ipAddress: string, device: string, status: string) {
+  async recordLoginHistory(
+    userId: number,
+    ipAddress: string,
+    device: string,
+    status: string,
+  ) {
     try {
       // NOTE: Because Prisma client is not fully regenerated yet, we use any or raw query if it complains.
       // But let's try the normal way. If it fails, we will know.
@@ -62,7 +67,11 @@ export class AuthService {
     }
   }
 
-  async login(loginDto: LoginDto, ipAddress: string = 'Unknown', device: string = 'Unknown') {
+  async login(
+    loginDto: LoginDto,
+    ipAddress: string = 'Unknown',
+    device: string = 'Unknown',
+  ) {
     const { email, password } = loginDto;
 
     const user = await this.usersService.findByEmail(email);
@@ -133,12 +142,22 @@ export class AuthService {
     if (!passwordMatch) {
       const updatedUser = await this.usersService.incrementFailedLogin(user.id);
       if (updatedUser && updatedUser.failed_login_attempts >= 5) {
-        await this.recordLoginHistory(user.id, ipAddress, device, 'Thất bại - Sai MK nhiều lần');
+        await this.recordLoginHistory(
+          user.id,
+          ipAddress,
+          device,
+          'Thất bại - Sai MK nhiều lần',
+        );
         throw new ForbiddenException(
           'Tài khoản đã bị khóa do đăng nhập sai quá nhiều lần. Vui lòng thử lại sau 15 phút.',
         );
       }
-      await this.recordLoginHistory(user.id, ipAddress, device, 'Thất bại - Sai mật khẩu');
+      await this.recordLoginHistory(
+        user.id,
+        ipAddress,
+        device,
+        'Thất bại - Sai mật khẩu',
+      );
       throw new UnauthorizedException('Email hoặc mật khẩu không chính xác');
     }
 
@@ -289,18 +308,24 @@ export class AuthService {
     const user = await this.usersService.findByEmail(email);
     if (!user) {
       // 🛡️ SECURITY: Trả về chung một thông báo để tránh lộ lọt email (User Enumeration)
-      return { message: 'Nếu email tồn tại trong hệ thống, mật khẩu đã được đặt lại thành Temp@1234' };
+      return {
+        message:
+          'Nếu email tồn tại trong hệ thống, mật khẩu đã được đặt lại thành Temp@1234',
+      };
     }
 
     const defaultPassword = 'Temp@1234';
     const hashedPassword = await bcrypt.hash(defaultPassword, 10);
-    
+
     // Đặt lại mật khẩu (Giả lập cho Demo do không có SMTP)
     await this.prisma.user.update({
       where: { id: user.id },
-      data: { password: hashedPassword }
+      data: { password: hashedPassword },
     });
 
-    return { message: 'Nếu email tồn tại trong hệ thống, mật khẩu đã được đặt lại thành Temp@1234' };
+    return {
+      message:
+        'Nếu email tồn tại trong hệ thống, mật khẩu đã được đặt lại thành Temp@1234',
+    };
   }
 }

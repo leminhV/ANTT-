@@ -23,6 +23,7 @@ export interface IRoom {
   has_air_conditioner: boolean;
   status: string;
   is_deleted: boolean;
+  image_url?: string;
   _count?: {
     equipment: number;
   };

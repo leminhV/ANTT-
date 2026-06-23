@@ -1,6 +1,13 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateChemicalLimitDto, UpdateChemicalLimitDto } from './dto/create-chemical-limit.dto';
+import {
+  CreateChemicalLimitDto,
+  UpdateChemicalLimitDto,
+} from './dto/create-chemical-limit.dto';
 
 @Injectable()
 export class ChemicalLimitsService {
@@ -18,7 +25,9 @@ export class ChemicalLimitsService {
     });
 
     if (existing) {
-      throw new ConflictException('Định mức cho hóa chất này trong học phần đã tồn tại');
+      throw new ConflictException(
+        'Định mức cho hóa chất này trong học phần đã tồn tại',
+      );
     }
 
     // Verify course and chemical exist
@@ -38,7 +47,9 @@ export class ChemicalLimitsService {
       data: dto,
       include: {
         course: { select: { id: true, name: true, code: true } },
-        chemical: { select: { id: true, name: true, formula: true, unit: true } },
+        chemical: {
+          select: { id: true, name: true, formula: true, unit: true },
+        },
       },
     });
   }
@@ -52,7 +63,9 @@ export class ChemicalLimitsService {
       where,
       include: {
         course: { select: { id: true, name: true, code: true } },
-        chemical: { select: { id: true, name: true, formula: true, unit: true } },
+        chemical: {
+          select: { id: true, name: true, formula: true, unit: true },
+        },
       },
       orderBy: { created_at: 'desc' },
     });
@@ -63,7 +76,9 @@ export class ChemicalLimitsService {
       where: { id },
       include: {
         course: { select: { id: true, name: true, code: true } },
-        chemical: { select: { id: true, name: true, formula: true, unit: true } },
+        chemical: {
+          select: { id: true, name: true, formula: true, unit: true },
+        },
       },
     });
 
@@ -85,7 +100,9 @@ export class ChemicalLimitsService {
       data: dto,
       include: {
         course: { select: { id: true, name: true, code: true } },
-        chemical: { select: { id: true, name: true, formula: true, unit: true } },
+        chemical: {
+          select: { id: true, name: true, formula: true, unit: true },
+        },
       },
     });
   }
@@ -99,7 +116,11 @@ export class ChemicalLimitsService {
     return this.prisma.chemicalLimit.delete({ where: { id } });
   }
 
-  async checkLimit(courseId: number, chemicalId: number, quantity: number): Promise<{
+  async checkLimit(
+    courseId: number,
+    chemicalId: number,
+    quantity: number,
+  ): Promise<{
     allowed: boolean;
     limit?: number;
     used?: number;
@@ -140,7 +161,9 @@ export class ChemicalLimitsService {
     const limits = await this.prisma.chemicalLimit.findMany({
       where: { course_id: courseId },
       include: {
-        chemical: { select: { id: true, name: true, formula: true, unit: true } },
+        chemical: {
+          select: { id: true, name: true, formula: true, unit: true },
+        },
       },
     });
 

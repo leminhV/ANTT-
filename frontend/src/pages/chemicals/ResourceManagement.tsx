@@ -294,6 +294,7 @@ export function ResourceManagement() {
                                     location: r.location,
                                     capacity: r.capacity,
                                     has_air_conditioner: r.has_air_conditioner,
+                                    image_url: r.image_url || '',
                                   });
                                   setIsEditingRoom(true);
                                 }}

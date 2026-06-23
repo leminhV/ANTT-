@@ -11,7 +11,11 @@ import {
   Query,
 } from '@nestjs/common';
 import { ChemicalLimitsService } from './chemical-limits.service';
-import { CreateChemicalLimitDto, UpdateChemicalLimitDto, GetChemicalLimitsDto } from './dto/create-chemical-limit.dto';
+import {
+  CreateChemicalLimitDto,
+  UpdateChemicalLimitDto,
+  GetChemicalLimitsDto,
+} from './dto/create-chemical-limit.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -73,6 +77,10 @@ export class ChemicalLimitsController {
     @Param('chemicalId', ParseIntPipe) chemicalId: number,
     @Query('quantity') quantity: number,
   ) {
-    return this.chemicalLimitsService.checkLimit(courseId, chemicalId, quantity);
+    return this.chemicalLimitsService.checkLimit(
+      courseId,
+      chemicalId,
+      quantity,
+    );
   }
 }
